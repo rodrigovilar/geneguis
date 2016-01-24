@@ -1,4 +1,4 @@
-package br.edu.ufcg.embedded.ise.geneguis.jpadomain.examples;
+package br.edu.ufcg.embedded.ise.geneguis.backend.examples;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

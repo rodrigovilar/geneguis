@@ -7,6 +7,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
+import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
+
 @Entity
 public class Rule {
 

@@ -3,6 +3,8 @@ package br.edu.ufcg.embedded.ise.geneguis.backend;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
+
 public class CreateHelper {
 
 	public static Widget createSimpleWidget(String name, String code, WidgetType type, String... requiredContexts) {

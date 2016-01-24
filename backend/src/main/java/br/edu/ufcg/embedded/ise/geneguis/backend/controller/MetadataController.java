@@ -22,7 +22,7 @@ public class MetadataController {
 		Iterable<EntityType> domains = getContainer().getEntityTypes();
 		
 		for(EntityType domain : domains) {
-			entities.add(Converter.toRest(domain));
+			entities.add(Converter.toRest(domain, false));
 		}
 		
 		return entities;
@@ -31,6 +31,6 @@ public class MetadataController {
 	@RequestMapping("/entities/{name}")
 	@ResponseBody
 	public EntityTypeRest getEntity(@PathVariable String name) {
-		return Converter.toRest(getContainer().getEntityType(name));
+		return Converter.toRest(getContainer().getEntityType(name), true);
 	}
 }

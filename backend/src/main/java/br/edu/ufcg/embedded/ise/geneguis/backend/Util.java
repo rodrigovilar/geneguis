@@ -5,8 +5,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.ApplicationContext;
 
+import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.service.PortService;
 import br.edu.ufcg.embedded.ise.geneguis.backend.service.RuleService;
 import br.edu.ufcg.embedded.ise.geneguis.backend.service.WidgetService;
@@ -17,7 +18,7 @@ public class Util {
 	private static RuleService ruleService;
 	private static PortService contextService;
 
-	public static void initDB(ConfigurableApplicationContext application) {
+	public static void initDB(ApplicationContext application) {
 		widgetService = application.getBean(WidgetService.class);
 		ruleService = application.getBean(RuleService.class);
 		contextService = application.getBean(PortService.class);

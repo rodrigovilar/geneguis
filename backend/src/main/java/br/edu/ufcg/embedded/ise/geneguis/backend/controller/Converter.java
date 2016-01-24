@@ -8,22 +8,56 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import br.edu.ufcg.embedded.ise.geneguis.Cardinality;
 import br.edu.ufcg.embedded.ise.geneguis.EntityType;
-import br.edu.ufcg.embedded.ise.geneguis.backend.Cardinality;
+import br.edu.ufcg.embedded.ise.geneguis.PropertyType;
+import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
+import br.edu.ufcg.embedded.ise.geneguis.RelationshipType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.Port;
-import br.edu.ufcg.embedded.ise.geneguis.backend.PropertyTypeType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.Rule;
 import br.edu.ufcg.embedded.ise.geneguis.backend.Widget;
 
 public class Converter {
 
-	public static EntityTypeRest toRest(EntityType domain) {
+	public static EntityTypeRest toRest(EntityType domain, boolean withDetails) {
 		if (domain == null)
 			return null;
 
+		EntityTypeRest entityTypeRest = toDomain(domain);
+		
+		if (withDetails) {
+			for (PropertyType propertyType : domain.getPropertyTypes()) {
+				PropertyTypeRest rest = toDomain(propertyType);
+				entityTypeRest.getPropertyTypes().add(rest);
+			}
+			for (RelationshipType relationType : domain.getRelationshipTypes()) {
+				RelationshipTypeRest rest = toDomain(relationType);
+				entityTypeRest.getRelationshipTypes().add(rest);
+			}
+		}
+
+		return entityTypeRest;
+	}
+
+	private static RelationshipTypeRest toDomain(RelationshipType relationType) {
+		RelationshipTypeRest rest = new RelationshipTypeRest();
+		rest.setName(relationType.getName());
+		rest.setSourceCardinality(relationType.getSourceCardinality());
+		rest.setTargetCardinality(relationType.getTargetCardinality());
+		rest.setTargetType(relationType.getTargetType().getName());
+		return rest;
+	}
+
+	private static PropertyTypeRest toDomain(PropertyType propertyType) {
+		PropertyTypeRest rest = new PropertyTypeRest();
+		rest.setName(propertyType.getName());
+		rest.setType(propertyType.getType());
+		return rest;
+	}
+
+	private static EntityTypeRest toDomain(EntityType domain) {
 		EntityTypeRest entityTypeRest = new EntityTypeRest();
 		entityTypeRest.setName(domain.getName());
-
 		return entityTypeRest;
 	}
 
@@ -162,7 +196,7 @@ public class Converter {
 
 		EntityTypeRest targetType = new EntityTypeRest();
 		targetType.setName(typeName);
-		relationshipTypeRest.setTargetType(targetType);
+		relationshipTypeRest.setTargetType(targetType.getName());
 
 		return relationshipTypeRest;
 	}

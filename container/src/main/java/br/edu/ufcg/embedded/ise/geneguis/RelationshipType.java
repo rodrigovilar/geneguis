@@ -1,11 +1,9 @@
-package br.edu.ufcg.embedded.ise.geneguis.backend.controller;
+package br.edu.ufcg.embedded.ise.geneguis;
 
-import br.edu.ufcg.embedded.ise.geneguis.Cardinality;
-
-public class RelationshipTypeRest {
+public class RelationshipType {
 
 	private String name;
-	private String targetType;
+	private EntityType targetType;
 	private Cardinality targetCardinality;
 	private Cardinality sourceCardinality;
 	
@@ -17,11 +15,11 @@ public class RelationshipTypeRest {
 		this.name = name;
 	}
 
-	public String getTargetType() {
+	public EntityType getTargetType() {
 		return targetType;
 	}
 
-	public void setTargetType(String targetType) {
+	public void setTargetType(EntityType targetType) {
 		this.targetType = targetType;
 	}
 

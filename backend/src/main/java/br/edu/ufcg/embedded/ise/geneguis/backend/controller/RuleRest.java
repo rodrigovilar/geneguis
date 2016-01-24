@@ -1,6 +1,6 @@
 package br.edu.ufcg.embedded.ise.geneguis.backend.controller;
 
-import br.edu.ufcg.embedded.ise.geneguis.backend.PropertyTypeType;
+import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
 
 public class RuleRest {
 

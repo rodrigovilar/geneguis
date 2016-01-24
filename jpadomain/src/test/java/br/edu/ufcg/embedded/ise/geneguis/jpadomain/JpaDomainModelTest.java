@@ -7,7 +7,7 @@ import org.junit.Test;
 import br.edu.ufcg.embedded.ise.geneguis.Container;
 import br.edu.ufcg.embedded.ise.geneguis.ContainerException;
 import br.edu.ufcg.embedded.ise.geneguis.EntityType;
-import br.edu.ufcg.embedded.ise.geneguis.jpadomain.examples.Customer;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.examples.Item;
 import br.edu.ufcg.embedded.ise.geneguis.jpadomain.examples.Product;
 import br.edu.ufcg.embedded.ise.geneguis.jpadomain.examples.Supplier;
 import br.edu.ufcg.embedded.ise.geneguis.test.Helper;
@@ -32,7 +32,7 @@ public class JpaDomainModelTest {
 	@Test
 	public void withOneEntityType() {
 		JpaDomainModel domainModel = new JpaDomainModel();
-		domainModel.deployEntityType(Customer.class, new RepositoryAdapter<Customer,Long>());
+		domainModel.deployEntityType(Item.class, new RepositoryAdapter<Item,Long>());
 		Container container = new Container(domainModel);
 
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
@@ -43,7 +43,7 @@ public class JpaDomainModelTest {
 	@Test
 	public void withTwoEntityTypes() {
 		JpaDomainModel domainModel = new JpaDomainModel();
-		domainModel.deployEntityType(Customer.class, new RepositoryAdapter<Customer,Long>());
+		domainModel.deployEntityType(Item.class, new RepositoryAdapter<Item,Long>());
 		domainModel.deployEntityType(Product.class, new RepositoryAdapter<Product,Long>());
 		Container container = new Container(domainModel);
 

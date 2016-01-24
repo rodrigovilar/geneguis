@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -29,10 +31,20 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 
+import br.edu.ufcg.embedded.ise.geneguis.Cardinality;
+import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.EntityTypeRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PropertyTypeRest;
 
 public class TestHelper {
+
+	@SuppressWarnings("unchecked")
+	public static <T> void deploy(ApplicationContext applicationContext, Class<T> entityTypeClass,
+			Class<?> repositoryType) {
+		JpaRepository<T, ?> rep = (JpaRepository<T, ?>) applicationContext.getBean(repositoryType);
+		EntryPoint.getDomainModel().deployEntityType(entityTypeClass, rep);
+
+	}
 
 	public static EntityTypeRest createEntityTypeRest(String name) {
 		EntityTypeRest expected = new EntityTypeRest();
@@ -69,19 +81,17 @@ public class TestHelper {
 		return mockMvc.perform(MockMvcRequestBuilders.delete(url).accept(MediaType.APPLICATION_JSON));
 	}
 
-	public static ResultMatcher entityType(final int position, final Object id, final String name) {
+	public static ResultMatcher entityType(final int position, final String name) {
 		return new ResultMatcher() {
 			public void match(MvcResult result) throws Exception {
-				jsonPath("$[" + position + "].id").value(id).match(result);
 				jsonPath("$[" + position + "].name").value(name).match(result);
 			}
 		};
 	}
 
-	public static ResultMatcher entityType(final Object id, final String name) {
+	public static ResultMatcher entityType(final String name) {
 		return new ResultMatcher() {
 			public void match(MvcResult result) throws Exception {
-				jsonPath("$.id").value(id).match(result);
 				jsonPath("$.name").value(name).match(result);
 			}
 		};
@@ -98,14 +108,11 @@ public class TestHelper {
 	}
 
 	public static ResultMatcher relationshipType(final int relationshipTypePosition, final String name,
-			final String targetTypeName, final int targetTypeId, final Cardinality sourceCardinality,
-			final Cardinality targetCardinality) {
+			final String targetTypeName, final Cardinality sourceCardinality, final Cardinality targetCardinality) {
 		return new ResultMatcher() {
 			public void match(MvcResult result) throws Exception {
 				jsonPath("$.relationshipTypes[" + relationshipTypePosition + "].name").value(name).match(result);
-				jsonPath("$.relationshipTypes[" + relationshipTypePosition + "].targetType.name").value(targetTypeName)
-						.match(result);
-				jsonPath("$.relationshipTypes[" + relationshipTypePosition + "].targetType.id").value(targetTypeId)
+				jsonPath("$.relationshipTypes[" + relationshipTypePosition + "].targetType").value(targetTypeName)
 						.match(result);
 				jsonPath("$.relationshipTypes[" + relationshipTypePosition + "].targetCardinality")
 						.value(targetCardinality.name()).match(result);

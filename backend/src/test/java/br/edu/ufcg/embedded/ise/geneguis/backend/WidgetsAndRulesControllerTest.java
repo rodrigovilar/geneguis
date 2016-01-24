@@ -27,6 +27,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.RulesController;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetController;
 import br.edu.ufcg.embedded.ise.geneguis.backend.service.RuleService;

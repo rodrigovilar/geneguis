@@ -1,8 +1,14 @@
 package br.edu.ufcg.embedded.ise.geneguis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class EntityType {
 
 	private String name;
+	private List<PropertyType> propertyTypes = new ArrayList<PropertyType>();
+	private List<RelationshipType> relationshipTypes = new ArrayList<RelationshipType>();
+
 	
 	public EntityType() {}
 
@@ -17,6 +23,23 @@ public class EntityType {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public List<PropertyType> getPropertyTypes() {
+		return propertyTypes;
+	}
+
+	public void setPropertyTypes(List<PropertyType> propertyTypes) {
+		this.propertyTypes = propertyTypes;
+	}
+
+	public List<RelationshipType> getRelationshipTypes() {
+		return relationshipTypes;
+	}
+
+	public void setRelationshipTypes(List<RelationshipType> relationshipTypes) {
+		this.relationshipTypes = relationshipTypes;
+	}
+
 
 	@Override
 	public int hashCode() {

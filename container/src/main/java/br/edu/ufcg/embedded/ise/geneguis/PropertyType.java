@@ -1,12 +1,11 @@
-package br.edu.ufcg.embedded.ise.geneguis.backend.controller;
+package br.edu.ufcg.embedded.ise.geneguis;
 
-import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
-
-public class PropertyTypeRest {
+public class PropertyType {
 
 	private String name;
 	private PropertyTypeType type;
 
+	
 	public PropertyTypeType getType() {
 		return type;
 	}
@@ -40,7 +39,7 @@ public class PropertyTypeRest {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PropertyTypeRest other = (PropertyTypeRest) obj;
+		PropertyType other = (PropertyType) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;
