@@ -16,4 +16,9 @@ public class Container {
 		return model.getEntityTypes();
 	}
 
+	public EntityType getEntityType(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
