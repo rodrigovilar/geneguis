@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>br.edu.ufcg.embedded.ise.geneguis</groupId>
+	<artifactId>widgets</artifactId>
+	<version>0.1</version>
+	<packaging>jar</packaging>
+
+	<name>frontend</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.4</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>Geneguis Frontend</finalName>
+		<plugins>
+			<plugin>
+				<groupId>com.github.iron9light</groupId>
+				<artifactId>coffeescript-maven-plugin</artifactId>
+				<version>1.1.2</version>
+				<configuration>
+					<srcDir>${basedir}/src/main/resources/coffee</srcDir>
+					<outputDir>${basedir}/src/main/resources/js</outputDir>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
