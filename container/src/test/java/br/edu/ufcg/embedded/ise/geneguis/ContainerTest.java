@@ -2,6 +2,7 @@ package br.edu.ufcg.embedded.ise.geneguis;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -52,5 +53,25 @@ public class ContainerTest {
 class DomainWithoutEntityTypes implements DomainModel {
 	public Iterable<EntityType> getEntityTypes() {
 		return new ArrayList<EntityType>();
+	}
+
+	public <T> List<T> getEntities(String resource) {
+		return null;
+	}
+
+	public <T> T saveEntity(String name, T instance) {
+		return null;
+	}
+
+	public <T> T getEntity(String name, Long entityId) {
+		return null;
+	}
+
+	public <T> T saveEntity(Long entityId, String name, T newEntity) {
+		return null;
+	}
+
+	public boolean deleteEntity(String name, Long entityId) {
+		return false;
 	}
 }

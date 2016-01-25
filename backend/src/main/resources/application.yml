@@ -1,0 +1,32 @@
+#spring:
+
+#  datasource:
+#    driverClassName: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/my_point
+#    username: root
+#    password: root
+   
+#  jpa:
+#     show-sql: false
+#     hibernate:
+#       ddl-auto: update
+
+spring:
+
+#  datasource:
+#    driverClassName: org.h2.Driver
+#    url: jdbc:h2:mem:alm;MODE=Oracle;DB_CLOSE_DELAY=-1
+#    username: sa
+#    password: 
+   
+#  jpa:
+#     hibernate:
+#       ddl-auto: update
+
+  jackson:
+    dateFormat: "YYYY-MM-dd"
+    serialization:
+      write_dates_as_timestamps: false
+
+  server:
+    port: 8081
