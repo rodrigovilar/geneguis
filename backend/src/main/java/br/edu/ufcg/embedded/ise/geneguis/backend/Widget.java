@@ -1,11 +1,11 @@
 package br.edu.ufcg.embedded.ise.geneguis.backend;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -16,10 +16,7 @@ import javax.validation.constraints.NotNull;
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "name", "version" }) )
 public class Widget {
 
-	@GeneratedValue
 	@Id
-	private Long id;
-	
 	@NotNull
 	private String name;
 	
@@ -33,15 +30,7 @@ public class Widget {
 	private WidgetType type;
 	
 	@OneToMany(fetch = FetchType.EAGER)
-	private List<Port> requiredPorts;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+	private List<Port> requiredPorts = new ArrayList<Port>();
 
 	public String getName() {
 		return name;
@@ -88,7 +77,6 @@ public class Widget {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((code == null) ? 0 : code.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((requiredPorts == null) ? 0 : requiredPorts.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
@@ -109,11 +97,6 @@ public class Widget {
 			if (other.code != null)
 				return false;
 		} else if (!code.equals(other.code))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
 			return false;
 		if (name == null) {
 			if (other.name != null)

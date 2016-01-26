@@ -29,7 +29,9 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.RulesController;
+import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetCodeRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetController;
+import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.service.RuleService;
 import br.edu.ufcg.embedded.ise.geneguis.backend.service.WidgetService;
 
@@ -65,48 +67,64 @@ public class WidgetsAndRulesControllerTest {
 
 	@DirtiesContext
 	@Test
+	public void testCreateWidgetWithCodeAndRequiredPorts() throws Exception {
+		WidgetRest widget = CreateHelper.createSimpleWidget("Widget1", WidgetType.Property, "port1", "port2");
+		Map<String, Object> widgetInstanceMap = objectToMap(widget);
+		fixWidgetInstanceMap(widgetInstanceMap, 1, widget.getType());
+		
+		post(mockMvc, "/widgets", widget).andExpect(status().isCreated()).andExpect(instance(widgetInstanceMap));
+
+		WidgetCodeRest widgetCode = CreateHelper.createWidgetCode("Widget1", "\"any code\"");
+		Map<String, Object> widgetCodeInstanceMap = objectToMap(widgetCode);
+
+		post(mockMvc, "/widgets/Widget1/code", "any code").andExpect(status().isCreated()).andExpect(
+				instance(widgetCodeInstanceMap));
+	}
+
+	@DirtiesContext
+	@Test
 	public void testCreateWidgets() throws Exception {
-		Widget widget = CreateHelper.createSimpleWidget("fooName", "fooCode", WidgetType.Property);
+		WidgetRest widget = CreateHelper.createSimpleWidget("fooName", WidgetType.Property);
 
 		Map<String, Object> widgetInstanceMap = objectToMap(widget);
-		fixWidgetInstanceMap(widgetInstanceMap, 1, widget.getType().name());
+		fixWidgetInstanceMap(widgetInstanceMap, 1, widget.getType());
 
 		post(mockMvc, "/widgets", widget).andExpect(status().isCreated()).andExpect(instance(widgetInstanceMap));
 
-		Widget widget2 = CreateHelper.createSimpleWidget("fooName", "otherFooCode", WidgetType.Property);
+		WidgetRest widget2 = CreateHelper.createSimpleWidget("fooName", WidgetType.Property);
 
 		Map<String, Object> widgetInstanceMap2 = objectToMap(widget2);
-		fixWidgetInstanceMap(widgetInstanceMap2, 2, widget2.getType().name());
+		fixWidgetInstanceMap(widgetInstanceMap2, 2, widget2.getType());
 
 		post(mockMvc, "/widgets", widget2).andExpect(status().isCreated()).andExpect(instance(widgetInstanceMap2));
 
-		Widget widget3 = CreateHelper.createSimpleWidget("otherFooName", "fooCode2", WidgetType.Property);
+		WidgetRest widget3 = CreateHelper.createSimpleWidget("otherFooName", WidgetType.Property);
 
 		Map<String, Object> widgetInstanceMap3 = objectToMap(widget3);
-		fixWidgetInstanceMap(widgetInstanceMap3, 1, widget3.getType().name());
+		fixWidgetInstanceMap(widgetInstanceMap3, 1, widget3.getType());
 
 		post(mockMvc, "/widgets", widget3).andExpect(status().isCreated()).andExpect(instance(widgetInstanceMap3));
 
-		Widget entityWidget = CreateHelper.createSimpleWidget("entityWidget", "entityWidgetCode", WidgetType.Entity);
+		WidgetRest entityWidget = CreateHelper.createSimpleWidget("entityWidget", WidgetType.Entity);
 
 		Map<String, Object> widgetInstanceMap4 = objectToMap(entityWidget);
-		fixWidgetInstanceMap(widgetInstanceMap4, 1, entityWidget.getType().name());
+		fixWidgetInstanceMap(widgetInstanceMap4, 1, entityWidget.getType());
 
 		post(mockMvc, "/widgets", entityWidget).andExpect(status().isCreated()).andExpect(instance(widgetInstanceMap4));
 
-		Widget entityWidget2 = CreateHelper.createSimpleWidget("entityWidget", "any Code", WidgetType.Entity);
+		WidgetRest entityWidget2 = CreateHelper.createSimpleWidget("entityWidget", WidgetType.Entity);
 
 		Map<String, Object> widgetInstanceMap5 = objectToMap(entityWidget2);
-		fixWidgetInstanceMap(widgetInstanceMap5, 2, entityWidget2.getType().name());
+		fixWidgetInstanceMap(widgetInstanceMap5, 2, entityWidget2.getType());
 
 		post(mockMvc, "/widgets", entityWidget2).andExpect(status().isCreated())
 				.andExpect(instance(widgetInstanceMap5));
 
-		Widget widgetWithPorts = CreateHelper.createSimpleWidget("entityWidget", "any Code", WidgetType.Entity, "form",
+		WidgetRest widgetWithPorts = CreateHelper.createSimpleWidget("entityWidget", WidgetType.Entity, "form",
 				"report");
 
 		Map<String, Object> widgetInstanceMap6 = objectToMap(widgetWithPorts);
-		fixWidgetInstanceMap(widgetInstanceMap6, 3, widgetWithPorts.getType().name());
+		fixWidgetInstanceMap(widgetInstanceMap6, 3, widgetWithPorts.getType());
 
 		post(mockMvc, "/widgets", widgetWithPorts).andExpect(status().isCreated())
 				.andExpect(instance(widgetInstanceMap6));
@@ -118,11 +136,11 @@ public class WidgetsAndRulesControllerTest {
 	public void testGetWidgets() throws Exception {
 		get(mockMvc, "/widgets").andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
 
-		Widget widget = CreateHelper.createSimpleWidget("entityWidget", "entityWidgetCode", WidgetType.Entity);
+		WidgetRest widget = CreateHelper.createSimpleWidget("entityWidget", WidgetType.Entity);
 		post(mockMvc, "/widgets", widget).andExpect(status().isCreated());
 		get(mockMvc, "/widgets").andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
 
-		Widget widget2 = CreateHelper.createSimpleWidget("fooName", "fooCode", WidgetType.Property);
+		WidgetRest widget2 = CreateHelper.createSimpleWidget("fooName", WidgetType.Property);
 		post(mockMvc, "/widgets", widget2).andExpect(status().isCreated());
 		get(mockMvc, "/widgets").andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(2)));
 	}
@@ -131,23 +149,22 @@ public class WidgetsAndRulesControllerTest {
 	@Test
 	public void testCreateRules() throws Exception {
 
-		String contextName = "form";
-		Widget entitySetWidget = CreateHelper.createSimpleWidget("CRUDComponent", "entityWidgetCode",
-				WidgetType.EntitySet, contextName);
+		String portName = "form";
+		WidgetRest entitySetWidget = CreateHelper.createSimpleWidget("CRUDComponent", WidgetType.EntitySet,
+				portName);
 		post(mockMvc, "/widgets", entitySetWidget).andExpect(status().isCreated());
-		String contextName2 = "row";
-		Widget entityWidget = CreateHelper.createSimpleWidget("TableFormWidget", "entityWidgetCode", WidgetType.Entity,
-				contextName2);
+		String portName2 = "row";
+		WidgetRest entityWidget = CreateHelper.createSimpleWidget("TableFormWidget", WidgetType.Entity, portName2);
 		post(mockMvc, "/widgets", entityWidget).andExpect(status().isCreated());
-		Rule defaultEntityRule = CreateHelper.createEntityRule(contextName, "*", entityWidget.getName());
+		Rule defaultEntityRule = CreateHelper.createEntityRule(portName, "*", entityWidget.getName());
 		Map<String, Object> instanceMap = objectToMap(defaultEntityRule);
 		fixRuleInstanceMap(instanceMap);
 
 		post(mockMvc, "/rules", defaultEntityRule).andExpect(status().isCreated()).andExpect(instance(instanceMap));
 
-		Widget propertyWidget = CreateHelper.createSimpleWidget("StringTextField", "fooCode", WidgetType.Property);
+		WidgetRest propertyWidget = CreateHelper.createSimpleWidget("StringTextField", WidgetType.Property);
 		post(mockMvc, "/widgets", propertyWidget).andExpect(status().isCreated());
-		Rule propertyTypeRule = CreateHelper.createPropertyRule(contextName2, PropertyTypeType.string, "*",
+		Rule propertyTypeRule = CreateHelper.createPropertyRule(portName2, PropertyTypeType.string, "*",
 				propertyWidget.getName());
 		instanceMap = objectToMap(propertyTypeRule);
 		fixRuleInstanceMap(instanceMap);
@@ -155,7 +172,7 @@ public class WidgetsAndRulesControllerTest {
 
 		post(mockMvc, "/rules", propertyTypeRule).andExpect(status().isCreated()).andExpect(instance(instanceMap));
 
-		Rule propertyRule = CreateHelper.createPropertyRule(contextName2, PropertyTypeType.string, "*.name",
+		Rule propertyRule = CreateHelper.createPropertyRule(portName2, PropertyTypeType.string, "*.name",
 				propertyWidget.getName());
 		instanceMap = objectToMap(propertyRule);
 		fixRuleInstanceMap(instanceMap);
@@ -163,7 +180,7 @@ public class WidgetsAndRulesControllerTest {
 
 		post(mockMvc, "/rules", propertyRule).andExpect(status().isCreated()).andExpect(instance(instanceMap));
 
-		Rule entityRule = CreateHelper.createEntityRule(contextName, "*Item", entityWidget.getName());
+		Rule entityRule = CreateHelper.createEntityRule(portName, "*Item", entityWidget.getName());
 		instanceMap = objectToMap(entityRule);
 		fixRuleInstanceMap(instanceMap);
 
@@ -177,12 +194,11 @@ public class WidgetsAndRulesControllerTest {
 		get(mockMvc, "/rules").andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
 
 		String contextName = "form";
-		Widget entitySetWidget = CreateHelper.createSimpleWidget("CRUDComponent", "entityWidgetCode",
-				WidgetType.EntitySet, contextName);
+		WidgetRest entitySetWidget = CreateHelper.createSimpleWidget("CRUDComponent", WidgetType.EntitySet,
+				contextName);
 		post(mockMvc, "/widgets", entitySetWidget).andExpect(status().isCreated());
 		String contextName2 = "row";
-		Widget entityWidget = CreateHelper.createSimpleWidget("TableFormWidget", "entityWidgetCode",
-				WidgetType.Entity, contextName2);
+		WidgetRest entityWidget = CreateHelper.createSimpleWidget("TableFormWidget", WidgetType.Entity, contextName2);
 		post(mockMvc, "/widgets", entityWidget).andExpect(status().isCreated());
 		Rule defaultEntityRule = CreateHelper.createEntityRule(contextName, "*", entityWidget.getName());
 
@@ -191,7 +207,7 @@ public class WidgetsAndRulesControllerTest {
 
 		get(mockMvc, "/rules").andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
 
-		Widget propertyWidget = CreateHelper.createSimpleWidget("fooName", "fooCode", WidgetType.Property);
+		WidgetRest propertyWidget = CreateHelper.createSimpleWidget("fooName", WidgetType.Property);
 		post(mockMvc, "/widgets", propertyWidget).andExpect(status().isCreated());
 		Rule propertyTypeRule = CreateHelper.createPropertyRule(contextName2, PropertyTypeType.string, "*",
 				propertyWidget.getName());

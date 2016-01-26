@@ -60,7 +60,7 @@ public class RuleService {
 		} else {
 			widget = widgetService.getWidgetByName(widget.getName());
 		}
-		rule.getWidget().setId(widget.getId());
+		rule.getWidget().setName(widget.getName());
 
 		return ruleRepository.saveAndFlush(rule);
 	}

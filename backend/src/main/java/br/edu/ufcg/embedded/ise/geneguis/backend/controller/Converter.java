@@ -16,6 +16,7 @@ import br.edu.ufcg.embedded.ise.geneguis.RelationshipType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.Port;
 import br.edu.ufcg.embedded.ise.geneguis.backend.Rule;
 import br.edu.ufcg.embedded.ise.geneguis.backend.Widget;
+import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
 
 public class Converter {
 
@@ -67,9 +68,17 @@ public class Converter {
 
 		Widget widget = new Widget();
 		widget.setName(rest.getName());
-		widget.setCode(rest.getCode());
-		widget.setId(rest.getId());
 		widget.setVersion(rest.getVersion());
+
+		if (rest.getType() != null) {
+			widget.setType(WidgetType.valueOf(rest.getType()));
+		}
+		
+		for (PortRest portRest : rest.getRequiredPorts()) {
+			Port port = toDomain(portRest);
+			widget.getRequiredPorts().add(port);
+		}
+		
 		return widget;
 	}
 
@@ -79,9 +88,15 @@ public class Converter {
 
 		WidgetRest rest = new WidgetRest();
 		rest.setName(widget.getName());
-		rest.setCode(widget.getCode());
-		rest.setId(widget.getId());
 		rest.setVersion(widget.getVersion());
+		rest.setType(widget.getType().name());
+		
+		for (Port port : widget.getRequiredPorts()) {
+			PortRest portRest = toRest(port);
+			rest.getRequiredPorts().add(portRest);
+		}
+
+		
 		return rest;
 	}
 
@@ -91,7 +106,7 @@ public class Converter {
 
 		PortRest portRest = new PortRest();
 		portRest.setName(port.getName());
-		portRest.setType(port.getType());
+		portRest.setType(port.getType().name());
 
 		return portRest;
 	}
@@ -102,7 +117,7 @@ public class Converter {
 
 		Port port = new Port();
 		port.setName(rest.getName());
-		port.setType(rest.getType());
+		port.setType(WidgetType.valueOf(rest.getType()));
 		return port;
 	}
 

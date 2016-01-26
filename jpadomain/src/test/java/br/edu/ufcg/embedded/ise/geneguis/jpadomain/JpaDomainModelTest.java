@@ -36,7 +36,7 @@ public class JpaDomainModelTest {
 		Container container = new Container(domainModel);
 
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
-		Helper.assertNextEntityType(entityTypes, "Customer");
+		Helper.assertNextEntityType(entityTypes, "Item");
 		Helper.assertNoMoreEntityTypes(entityTypes);
 	}
 
@@ -48,7 +48,7 @@ public class JpaDomainModelTest {
 		Container container = new Container(domainModel);
 
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
-		Helper.assertNextEntityType(entityTypes, "Customer");
+		Helper.assertNextEntityType(entityTypes, "Item");
 		Helper.assertNextEntityType(entityTypes, "Product");
 		Helper.assertNoMoreEntityTypes(entityTypes);
 	}
