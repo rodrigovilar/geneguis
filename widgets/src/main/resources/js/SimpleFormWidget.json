@@ -1,0 +1,6 @@
+{ name: "SimpleFormWidget", 
+  type: "Entity",
+  requiredPorts: [
+      {name: "field", type: "Property"}
+  ]
+}

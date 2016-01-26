@@ -1,0 +1,7 @@
+{ name: "ListingTable", 
+  type: "EntitySet",
+  requiredPorts: [
+      {name: "property", type: "Property"},
+      {name: "form", type: "Entity"}
+  ]
+}
