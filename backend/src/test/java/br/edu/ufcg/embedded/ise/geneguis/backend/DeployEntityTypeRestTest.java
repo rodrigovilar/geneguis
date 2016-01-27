@@ -75,7 +75,6 @@ public class DeployEntityTypeRestTest {
 
 		EntryPoint.setDomainModel(new JpaDomainModel());
 		EntryPoint.setContainer(new Container(EntryPoint.getDomainModel()));
-		EntryPoint.setApplication(applicationContext);
 	}
 
 	@After

@@ -22,8 +22,8 @@ public class WidgetService {
 		return widgetRepository.findAll();
 	}
 
-	public Widget getWidget(Long id) {
-		return widgetRepository.findOne(id);
+	public Widget getWidget(String name) {
+		return widgetRepository.findOne(name);
 	}
 
 	public Widget getWidgetByName(String name) {

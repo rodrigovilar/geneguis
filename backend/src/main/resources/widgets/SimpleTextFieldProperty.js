@@ -13,8 +13,7 @@
 
     SimpleTextFieldProperty.prototype.render = function(view) {
       var value;
-      this.textField = $("<input>");
-      this.textField.attr("id", this.propertyType.name);
+      this.textField = this.createInputElement();
       if (this.property) {
         value = this.property;
         if (this.propertyType.type === "date") {

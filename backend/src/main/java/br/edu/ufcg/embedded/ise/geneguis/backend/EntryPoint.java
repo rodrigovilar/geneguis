@@ -33,14 +33,25 @@ public class EntryPoint {
 	public static void setDomainModel(JpaDomainModel domainModel) {
 		EntryPoint.domainModel = domainModel;
 	}
+	
+	public static <T> T getBean(Class<T> type) {
+		return application.getBean(type);
+	}
 
 	public static void main(String[] args) {
-		domainModel = new JpaDomainModel();
+		run(null, new JpaDomainModel(), args);
+	}
+
+	public static void run(Class<?> app, JpaDomainModel domainModel, String[] args) {
 		container = new Container(domainModel);
-		application = SpringApplication.run(EntryPoint.class, args);
+		EntryPoint.domainModel = domainModel;
 		
-		if (args.length > 0 && "initDB".equals(args[0])) {
-			Util.initDB(application);
+		if (app == null) {
+			application = SpringApplication.run(EntryPoint.class);
+
+		} else {
+			Object[] apps = new Object[] { EntryPoint.class, app };			
+			application = SpringApplication.run(apps, args);
 		}
 	}
 }
