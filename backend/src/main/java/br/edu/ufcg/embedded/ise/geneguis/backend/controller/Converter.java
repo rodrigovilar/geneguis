@@ -24,7 +24,7 @@ public class Converter {
 		if (domain == null)
 			return null;
 
-		EntityTypeRest entityTypeRest = toDomain(domain);
+		EntityTypeRest entityTypeRest = toRest(domain);
 		
 		if (withDetails) {
 			for (PropertyType propertyType : domain.getPropertyTypes()) {
@@ -56,7 +56,7 @@ public class Converter {
 		return rest;
 	}
 
-	private static EntityTypeRest toDomain(EntityType domain) {
+	private static EntityTypeRest toRest(EntityType domain) {
 		EntityTypeRest entityTypeRest = new EntityTypeRest();
 		entityTypeRest.setName(domain.getName());
 		return entityTypeRest;
