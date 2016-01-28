@@ -28,7 +28,6 @@ public class EntityWidgetTest {
 	}
 
 	@Test
-	@Ignore
 	public void testEntityTitle() {
 		Class<?> entityType = Customer.class;
 		Class<?> repository = CustomerRepository.class;

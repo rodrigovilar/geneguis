@@ -30,6 +30,12 @@ View.emptyPage = ->
 	page
 	
 	
+View.createEl = (tag, prefix, value) ->
+	el = $(tag)
+	el.attr "id", prefix + "_" + value
+	el
+
+		
 window.WidgetManager = {}
 
 WidgetManager.STORAGE_TAG = "WIDGETS"
@@ -273,8 +279,8 @@ $ ->
 			RulesManager.downloadAllRules()
 			WidgetManager.downloadAllWidgets()
 			RenderingEngine.openApp View.emptyPage()
-			
-			
+		
+					
 class window.EntitySetWidget
 
 	render: (view) ->

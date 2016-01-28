@@ -50,6 +50,13 @@
     return page;
   };
 
+  View.createEl = function(tag, prefix, value) {
+    var el;
+    el = $(tag);
+    el.attr("id", prefix + "_" + value);
+    return el;
+  };
+
   window.WidgetManager = {};
 
   WidgetManager.STORAGE_TAG = "WIDGETS";

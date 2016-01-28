@@ -13,8 +13,7 @@
 
     EntityTitle.prototype.render = function(view) {
       var title;
-      title = $("<h2>");
-      title.attr("id", "title_" + this.entityType.name);
+      title = View.createEl("<h2>", "title", this.entityType.name);
       title.append(this.entityType.name);
       return view.append(title);
     };
