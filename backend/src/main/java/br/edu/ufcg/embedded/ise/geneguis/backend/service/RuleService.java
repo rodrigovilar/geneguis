@@ -12,10 +12,13 @@ import org.springframework.stereotype.Service;
 import br.edu.ufcg.embedded.ise.geneguis.backend.Port;
 import br.edu.ufcg.embedded.ise.geneguis.backend.Rule;
 import br.edu.ufcg.embedded.ise.geneguis.backend.Widget;
+import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.repository.RuleRepository;
 
 @Service
 public class RuleService {
+
+	private static final String ROOT_PORT = "root";
 
 	@Autowired
 	private RuleRepository ruleRepository;
@@ -50,9 +53,10 @@ public class RuleService {
 			updateVersion();
 		}
 		rule.setVersion(++version);
-
-		Port port = portService.getPortByName(rule.getPort().getName());
-		rule.getPort().setId(port.getId());
+		
+		if (ROOT_PORT.equals(rule.getPort().getName())) {
+			createRootPort();
+		}
 
 		Widget widget = rule.getWidget();
 		if (widget.getVersion() != null && widget.getVersion() != 0l) {
@@ -60,13 +64,23 @@ public class RuleService {
 		} else {
 			widget = widgetService.getWidgetByName(widget.getName());
 		}
-		rule.getWidget().setName(widget.getName());
+		rule.setWidget(widget);
 
+		Port port = portService.getPortByName(rule.getPort().getName());
+		rule.setPort(port);
+		
 		return ruleRepository.saveAndFlush(rule);
 	}
 
 	public void clear() {
 		ruleRepository.deleteAll();
+	}
+	
+	private Port createRootPort() {
+		Port rootPort = new Port();
+		rootPort.setName(ROOT_PORT);
+		rootPort.setType(WidgetType.EntitySet);
+		return portService.createPort(rootPort);
 	}
 
 }

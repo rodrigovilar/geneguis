@@ -38,8 +38,11 @@ public class OperationalController {
 	@ResponseBody
 	public <T> ResponseEntity<T> get(@PathVariable String entityType, @PathVariable Long instanceId) {
 		T instance = getContainer().getEntity(entityType, instanceId);
-		if(instance == null)
+		
+		if(instance == null) {
 			return new ResponseEntity<T>(HttpStatus.NOT_FOUND);
+		}
+		
 		return new ResponseEntity<T>(instance, HttpStatus.OK);
 	}
 	
@@ -61,8 +64,10 @@ public class OperationalController {
 	@RequestMapping(value = "{instanceId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity<?> delete(@PathVariable String entityType, @PathVariable Long instanceId) {
-		if(getContainer().deleteEntity(entityType, instanceId))
+		if(getContainer().deleteEntity(entityType, instanceId)) {
 			return new ResponseEntity<Object>(HttpStatus.OK);
+		}
+		
         return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
 	}	
 }

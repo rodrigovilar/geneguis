@@ -125,8 +125,10 @@ public class Converter {
 		RuleRest ruleRest = new RuleRest();
 		ruleRest.setId(rule.getId());
 		ruleRest.setVersion(rule.getVersion());
-		ruleRest.setWidget(toRest(rule.getWidget()));
-		ruleRest.setPort(toRest(rule.getPort()));
+		ruleRest.setWidgetName(rule.getWidget().getName());
+		ruleRest.setWidgetVersion(rule.getWidget().getVersion());
+		ruleRest.setPortName(rule.getPort().getName());
+		ruleRest.setType(rule.getPort().getType().name());
 		ruleRest.setEntityTypeLocator(rule.getEntityTypeLocator());
 		ruleRest.setPropertyTypeLocator(rule.getPropertyTypeLocator());
 		ruleRest.setPropertyTypeTypeLocator(rule.getPropertyTypeTypeLocator());
@@ -142,9 +144,12 @@ public class Converter {
 		rule.setPropertyTypeLocator(ruleRest.getPropertyTypeLocator());
 		rule.setPropertyTypeTypeLocator(ruleRest.getPropertyTypeTypeLocator());
 		rule.setConfiguration(ruleRest.getConfiguration());
-		Widget widget = toDomain(ruleRest.getWidget());
+		Widget widget = new Widget();
+		widget.setName(ruleRest.getWidgetName());
+		widget.setVersion(ruleRest.getWidgetVersion());
 		rule.setWidget(widget);
-		Port port = toDomain(ruleRest.getPort());
+		Port port = new Port();
+		port.setName(ruleRest.getPortName());
 		rule.setPort(port);
 		return rule;
 	}

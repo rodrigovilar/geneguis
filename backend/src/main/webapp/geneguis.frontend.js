@@ -28,7 +28,7 @@
       return tr.click(function() {
         var widget;
         widget = RenderingEngine.getEntitySetWidget('root', entityType);
-        return DataManager.getEntityType(entityType.id, function(entityTypeFull) {
+        return DataManager.getEntityType(entityType.name, function(entityTypeFull) {
           widget.entityType = entityTypeFull;
           return widget.render(View.emptyPage());
         });
@@ -59,7 +59,7 @@
     return $.getJSON(HOST + 'widgets', function(widgetsSpec) {
       return widgetsSpec.forEach(function(widgetSpec) {
         var widget;
-        simpleStorage.set(WidgetManager.STORAGE_TAG + widgetSpec.id + widgetSpec.version, widgetSpec);
+        simpleStorage.set(WidgetManager.STORAGE_TAG + widgetSpec.name + widgetSpec.version, widgetSpec);
         widget = eval(widgetSpec.code);
         if (widget.require && !window[widget.require.name]) {
           return $.getScript(widget.require.url);
@@ -68,13 +68,12 @@
     });
   };
 
-  WidgetManager.getWidget = function(id, version) {
+  WidgetManager.getWidget = function(name, version) {
     var widget, widgetSpec;
-    widgetSpec = simpleStorage.get(WidgetManager.STORAGE_TAG + id + version);
+    widgetSpec = simpleStorage.get(WidgetManager.STORAGE_TAG + name + version);
     widget = eval(widgetSpec.code);
-    widget.id = widgetSpec.id;
-    widget.version = widgetSpec.version;
     widget.name = widgetSpec.name;
+    widget.version = widgetSpec.version;
     widget.type = widgetSpec.type;
     return widget;
   };
@@ -140,13 +139,13 @@
 
   RulesManager.stringfyRule = function(rule) {
     var stringRule;
-    stringRule = RulesManager.STORAGE_TAG + RulesManager.SEPARATOR_CHAR + rule.providedContext.name;
+    stringRule = RulesManager.STORAGE_TAG + RulesManager.SEPARATOR_CHAR + rule.portName;
     if (rule.entityTypeLocator !== null) {
       stringRule += RulesManager.SEPARATOR_CHAR + rule.entityTypeLocator;
     } else {
       stringRule += RulesManager.SEPARATOR_CHAR + '*';
     }
-    if (rule.providedContext.type === 'Property' || rule.providedContext.type === 'Relationship') {
+    if (rule.type === 'Property' || rule.type === 'Relationship') {
       if (rule.propertyTypeLocator !== null) {
         stringRule += RulesManager.SEPARATOR_CHAR + rule.propertyTypeLocator;
       } else {
@@ -157,7 +156,7 @@
       } else {
         stringRule += RulesManager.SEPARATOR_CHAR + '*';
       }
-      if (rule.providedContext.type === 'Relationship') {
+      if (rule.type === 'Relationship') {
         if (rule.relationshipTargetCardinality !== null) {
           stringRule += RulesManager.SEPARATOR_CHAR + rule.relationshipTargetCardinality;
         } else {
@@ -171,9 +170,8 @@
   RulesManager.createRule = function(contextName, contextType, entityTypeLocator, propertyTypeLocator, propertyTypeTypeLocator, relationshipTargetCardinality) {
     var rule;
     rule = {};
-    rule.providedContext = {};
-    rule.providedContext.name = contextName;
-    rule.providedContext.type = contextType;
+    rule.portName = contextName;
+    rule.type = contextType;
     rule.entityTypeLocator = entityTypeLocator;
     rule.propertyTypeLocator = propertyTypeLocator;
     if (entityTypeLocator === null || propertyTypeLocator === null) {
@@ -188,7 +186,7 @@
     return $.getJSON(HOST + 'rules', function(rules) {
       return rules.forEach(function(rule) {
         var key;
-        if (rule.providedContext.type === 'Property' || rule.providedContext.type === 'Relationship') {
+        if (rule.type === 'Property' || rule.type === 'Relationship') {
           if (rule.entityTypeLocator !== null && rule.propertyTypeLocator !== null) {
             rule.propertyTypeTypeLocator = null;
             rule.relationshipTargetCardinality = null;
@@ -203,7 +201,7 @@
   RulesManager.getRule = function(contextName, contextType, entityType, propertyType, propertyTypeType, relationshipTargetCardinality) {
     var rule, ruleQuery;
     ruleQuery = RulesManager.createRule(contextName, contextType, entityType, propertyType, propertyTypeType, relationshipTargetCardinality);
-    if (ruleQuery.providedContext.type === 'Property') {
+    if (ruleQuery.type === 'Property') {
       rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
       if (typeof rule !== "undefined") {
         return rule;
@@ -238,7 +236,7 @@
       if (typeof rule !== "undefined") {
         return rule;
       }
-    } else if (ruleQuery.providedContext.type === 'Relationship') {
+    } else if (ruleQuery.type === 'Relationship') {
       rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
       if (typeof rule !== "undefined") {
         return rule;
@@ -286,7 +284,7 @@
     }
   };
 
-  window.HOST = 'http://localhost:8081/';
+  window.HOST = 'http://localhost:8080/';
 
   window.RenderingEngine = {};
 
@@ -323,7 +321,7 @@
   RenderingEngine.getWidget = function(contextName, contextType, entityType, propertyType, propertyTypeType, relationshipTargetCardinality) {
     var rule, widget;
     rule = RulesManager.getRule(contextName, contextType, entityType, propertyType, propertyTypeType, relationshipTargetCardinality);
-    widget = WidgetManager.getWidget(rule.widget.id, rule.widget.version);
+    widget = WidgetManager.getWidget(rule.widgetName, rule.widgetVersion);
     widget.configuration = $.parseJSON(rule.configuration);
     return widget;
   };
@@ -341,7 +339,7 @@
   };
 
   RenderingEngine.getEntitySetWidget = function(context, entityType) {
-    return RenderingEngine.getWidget(context, 'Entity', entityType.name, null, null, null);
+    return RenderingEngine.getWidget(context, 'EntitySet', entityType.name, null, null, null);
   };
 
   $(function() {

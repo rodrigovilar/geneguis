@@ -4,51 +4,64 @@ import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
 
 public class RuleRest {
 
-	private long id;
-	private long version;
-	private WidgetRest widget;
-	private PortRest port;
+	private Long id;
+	private Long version;
+	private String widgetName;
+	private Long widgetVersion;
+	private String portName;
+	private String type;
 	private String entityTypeLocator;
 	private String propertyTypeLocator;
 	private PropertyTypeType propertyTypeTypeLocator;
 	private String configuration;
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	
-	public PortRest getPort() {
-		return port;
-	}
-
-
-	public void setPort(PortRest port) {
-		this.port = port;
-	}
-
-
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public long getVersion() {
+	public Long getVersion() {
 		return version;
 	}
 
-	public void setVersion(long version) {
+	public void setVersion(Long version) {
 		this.version = version;
 	}
 
-	public WidgetRest getWidget() {
-		return widget;
+	public String getType() {
+		return type;
 	}
 
-
-	public void setWidget(WidgetRest widget) {
-		this.widget = widget;
+	public void setType(String type) {
+		this.type = type;
 	}
 
+	public String getWidgetName() {
+		return widgetName;
+	}
+
+	public void setWidgetName(String widgetName) {
+		this.widgetName = widgetName;
+	}
+
+	public Long getWidgetVersion() {
+		return widgetVersion;
+	}
+
+	public void setWidgetVersion(Long widgetVersion) {
+		this.widgetVersion = widgetVersion;
+	}
+
+	public String getPortName() {
+		return portName;
+	}
+
+	public void setPortName(String portName) {
+		this.portName = portName;
+	}
 
 	public String getEntityTypeLocator() {
 		return entityTypeLocator;
@@ -70,8 +83,7 @@ public class RuleRest {
 		return propertyTypeTypeLocator;
 	}
 
-	public void setPropertyTypeTypeLocator(
-			PropertyTypeType propertyTypeTypeLocator) {
+	public void setPropertyTypeTypeLocator(PropertyTypeType propertyTypeTypeLocator) {
 		this.propertyTypeTypeLocator = propertyTypeTypeLocator;
 	}
 

@@ -9,6 +9,7 @@ import br.edu.ufcg.embedded.ise.geneguis.backend.repository.PortRepository;
 @Service
 public class PortService {
 	
+	
 	@Autowired
 	private PortRepository repository;
 	
@@ -17,6 +18,12 @@ public class PortService {
 	}
 	
 	public Port createPort(Port port) {
+		Port oldPort = getPortByName(port.getName());
+
+		if (oldPort != null) {
+			port.setId(oldPort.getId());
+		}
+		
 		return repository.saveAndFlush(port);
 	}
 	
