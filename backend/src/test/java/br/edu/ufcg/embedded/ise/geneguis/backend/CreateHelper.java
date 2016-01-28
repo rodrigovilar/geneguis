@@ -5,6 +5,7 @@ import java.util.List;
 
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;
+import br.edu.ufcg.embedded.ise.geneguis.backend.controller.RuleRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetCodeRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetRest;
 
@@ -31,44 +32,38 @@ public class CreateHelper {
 		widget.setRequiredPorts(requiredPorts);
 		return widget;
 	}
-	
+
 	public static WidgetCodeRest createWidgetCode(String name, String code) {
 		WidgetCodeRest codeRest = new WidgetCodeRest();
 		codeRest.setCode(code);
 		codeRest.setName(name);
 		return codeRest;
 	}
-	
-	public static Rule createEntityRule(String contextName, String entityTypeLocator, String widgetName) {
-		Rule defaultEntityRule = new Rule();
-		defaultEntityRule.setEntityTypeLocator(entityTypeLocator);
-		
-		Port port = new Port();
-		port.setName(contextName);
-		port.setType(WidgetType.Entity);
-		defaultEntityRule.setPort(port);
-		
-		Widget widget = new Widget();
-		widget.setName(widgetName);
-		defaultEntityRule.setWidget(widget);
-		
-		return defaultEntityRule;
+
+	public static RuleRest createEntitySetRule(String portName, String entityTypeLocator, String widgetName) {
+		RuleRest entitySetRule = new RuleRest();
+		entitySetRule.setEntityTypeLocator(entityTypeLocator);
+		entitySetRule.setPortName(portName);
+		entitySetRule.setWidgetName(widgetName);
+		return entitySetRule;
 	}
-	
-	public static Rule createPropertyRule(String contextName, PropertyTypeType propertyTypeTypeLocator, String propertyTypeLocator, String widgetName) {
-		Rule propertyTypeRule = new Rule();
+
+	public static RuleRest createEntityRule(String portName, String entityTypeLocator, String widgetName) {
+		RuleRest entityRule = new RuleRest();
+		entityRule.setEntityTypeLocator(entityTypeLocator);
+		entityRule.setPortName(portName);
+		entityRule.setWidgetName(widgetName);
+		return entityRule;
+	}
+
+	public static RuleRest createPropertyRule(String portName, PropertyTypeType propertyTypeTypeLocator,
+			String propertyTypeLocator, String widgetName) {
+		
+		RuleRest propertyTypeRule = new RuleRest();
 		propertyTypeRule.setPropertyTypeTypeLocator(propertyTypeTypeLocator);
 		propertyTypeRule.setPropertyTypeLocator(propertyTypeLocator);
-		
-		Port port = new Port();
-		port.setName(contextName);
-		port.setType(WidgetType.Property);
-		propertyTypeRule.setPort(port);
-		
-		Widget widget = new Widget();
-		widget.setName(widgetName);
-		propertyTypeRule.setWidget(widget);
-		
+		propertyTypeRule.setPortName(portName);
+		propertyTypeRule.setWidgetName(widgetName);
 		return propertyTypeRule;
 	}
 }

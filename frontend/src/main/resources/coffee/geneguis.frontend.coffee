@@ -15,7 +15,7 @@ class window.RootRenderer
 		table.append tr
 		tr.click =>
 			widget = RenderingEngine.getEntitySetWidget 'root', entityType 
-			DataManager.getEntityType entityType.id, (entityTypeFull) =>
+			DataManager.getEntityType entityType.name, (entityTypeFull) =>
 				widget.entityType = entityTypeFull
 				widget.render View.emptyPage()
 				
@@ -37,18 +37,17 @@ WidgetManager.STORAGE_TAG = "WIDGETS"
 WidgetManager.downloadAllWidgets = () ->
 	$.getJSON HOST + 'widgets', (widgetsSpec) =>
 		widgetsSpec.forEach (widgetSpec) =>
-			simpleStorage.set(WidgetManager.STORAGE_TAG + widgetSpec.id + widgetSpec.version, widgetSpec)
+			simpleStorage.set(WidgetManager.STORAGE_TAG + widgetSpec.name + widgetSpec.version, widgetSpec)
 			widget = eval widgetSpec.code
 			if(widget.require && !window[widget.require.name])
 				$.getScript widget.require.url
 
 
-WidgetManager.getWidget = (id, version) ->
-	widgetSpec = simpleStorage.get(WidgetManager.STORAGE_TAG + id + version)
+WidgetManager.getWidget = (name, version) ->
+	widgetSpec = simpleStorage.get(WidgetManager.STORAGE_TAG + name + version)
 	widget = eval widgetSpec.code
-	widget.id = widgetSpec.id
-	widget.version = widgetSpec.version
 	widget.name = widgetSpec.name
+	widget.version = widgetSpec.version
 	widget.type = widgetSpec.type
 	widget
 
@@ -99,12 +98,12 @@ RulesManager.STORAGE_TAG = "RULES"
 RulesManager.SEPARATOR_CHAR = '.'
 
 RulesManager.stringfyRule = (rule) =>
-	stringRule = RulesManager.STORAGE_TAG + RulesManager.SEPARATOR_CHAR + rule.providedContext.name
+	stringRule = RulesManager.STORAGE_TAG + RulesManager.SEPARATOR_CHAR + rule.portName
 	if(rule.entityTypeLocator != null)
 			stringRule += RulesManager.SEPARATOR_CHAR + rule.entityTypeLocator
 		else
 			stringRule += RulesManager.SEPARATOR_CHAR + '*'
-	if(rule.providedContext.type == 'Property' || rule.providedContext.type == 'Relationship')
+	if(rule.type == 'Property' || rule.type == 'Relationship')
 		if(rule.propertyTypeLocator != null)
 			stringRule += RulesManager.SEPARATOR_CHAR + rule.propertyTypeLocator
 		else
@@ -113,7 +112,7 @@ RulesManager.stringfyRule = (rule) =>
 			stringRule += RulesManager.SEPARATOR_CHAR + rule.propertyTypeTypeLocator
 		else
 			stringRule += RulesManager.SEPARATOR_CHAR + '*'
-		if(rule.providedContext.type == 'Relationship')
+		if(rule.type == 'Relationship')
 			if(rule.relationshipTargetCardinality != null)
 				stringRule += RulesManager.SEPARATOR_CHAR + rule.relationshipTargetCardinality
 			else
@@ -122,9 +121,8 @@ RulesManager.stringfyRule = (rule) =>
 
 RulesManager.createRule = (contextName, contextType, entityTypeLocator, propertyTypeLocator, propertyTypeTypeLocator, relationshipTargetCardinality) =>
 	rule = {}
-	rule.providedContext = {}
-	rule.providedContext.name = contextName
-	rule.providedContext.type = contextType
+	rule.portName = contextName
+	rule.type = contextType
 	rule.entityTypeLocator = entityTypeLocator
 	rule.propertyTypeLocator = propertyTypeLocator
 	if(entityTypeLocator == null || propertyTypeLocator == null)
@@ -135,7 +133,7 @@ RulesManager.createRule = (contextName, contextType, entityTypeLocator, property
 RulesManager.downloadAllRules = () ->
 	$.getJSON HOST + 'rules', (rules) =>
 		rules.forEach (rule) =>
-			if(rule.providedContext.type == 'Property' || rule.providedContext.type == 'Relationship')
+			if(rule.type == 'Property' || rule.type == 'Relationship')
 				if(rule.entityTypeLocator != null && rule.propertyTypeLocator != null)
 					rule.propertyTypeTypeLocator = null
 					rule.relationshipTargetCardinality = null
@@ -144,7 +142,7 @@ RulesManager.downloadAllRules = () ->
 
 RulesManager.getRule = (contextName, contextType, entityType, propertyType, propertyTypeType, relationshipTargetCardinality) =>
 	ruleQuery = RulesManager.createRule(contextName, contextType, entityType, propertyType, propertyTypeType, relationshipTargetCardinality)
-	if(ruleQuery.providedContext.type == 'Property')
+	if(ruleQuery.type == 'Property')
 	
 		rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery))
 		if(typeof rule != "undefined")
@@ -180,7 +178,7 @@ RulesManager.getRule = (contextName, contextType, entityType, propertyType, prop
 		if(typeof rule != "undefined")
 			return rule
 	
-	else if(ruleQuery.providedContext.type == 'Relationship')
+	else if(ruleQuery.type == 'Relationship')
 	
 		rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery))
 		if(typeof rule != "undefined")
@@ -228,7 +226,7 @@ RulesManager.getRule = (contextName, contextType, entityType, propertyType, prop
 			return rule
 	
 	
-window.HOST = 'http://localhost:8081/'
+window.HOST = 'http://localhost:8080/'
 window.RenderingEngine = {}
 window.WidgetStack = []
 
@@ -253,7 +251,7 @@ RenderingEngine.openApp = (view) ->
 
 RenderingEngine.getWidget = (contextName, contextType, entityType, propertyType, propertyTypeType, relationshipTargetCardinality) =>
 	rule = RulesManager.getRule(contextName, contextType, entityType, propertyType, propertyTypeType, relationshipTargetCardinality)
-	widget = WidgetManager.getWidget(rule.widget.id, rule.widget.version)
+	widget = WidgetManager.getWidget(rule.widgetName, rule.widgetVersion)
 	widget.configuration = $.parseJSON(rule.configuration)
 	widget
 
@@ -267,7 +265,7 @@ RenderingEngine.getEntityWidget = (context, entityType) =>
 	RenderingEngine.getWidget(context, 'Entity', entityType.name, null, null, null)
 
 RenderingEngine.getEntitySetWidget = (context, entityType) =>
-	RenderingEngine.getWidget(context, 'Entity', entityType.name, null, null, null)
+	RenderingEngine.getWidget(context, 'EntitySet', entityType.name, null, null, null)
 
 $ ->
 	$.getScript "https://dl.dropboxusercontent.com/u/14874989/Mestrado/metaguiweb/js/simpleStorage.js", () =>

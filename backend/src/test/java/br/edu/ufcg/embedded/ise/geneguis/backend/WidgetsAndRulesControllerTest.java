@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
+import br.edu.ufcg.embedded.ise.geneguis.backend.controller.RuleRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.RulesController;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetCodeRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetController;
@@ -42,9 +43,9 @@ public class WidgetsAndRulesControllerTest {
 	MockMvc mockMvc;
 
 	@Autowired
-	RuleService rulesContainer;
+	RuleService rulesService;
 	@Autowired
-	WidgetService widgetContainer;
+	WidgetService widgetService;
 
 	@InjectMocks
 	RulesController rulesController;
@@ -55,14 +56,14 @@ public class WidgetsAndRulesControllerTest {
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		this.mockMvc = standaloneSetup(rulesController, widgetController).build();
-		rulesController.setRuleService(rulesContainer);
-		widgetController.setWidgetService(widgetContainer);
+		rulesController.setRuleService(rulesService);
+		widgetController.setWidgetService(widgetService);
 	}
 
 	@After
 	public void tearDown() {
-		rulesContainer.clear();
-		widgetContainer.clear();
+		rulesService.clear();
+		widgetService.clear();
 	}
 
 	@DirtiesContext
@@ -156,7 +157,7 @@ public class WidgetsAndRulesControllerTest {
 		String portName2 = "row";
 		WidgetRest entityWidget = CreateHelper.createSimpleWidget("TableFormWidget", WidgetType.Entity, portName2);
 		post(mockMvc, "/widgets", entityWidget).andExpect(status().isCreated());
-		Rule defaultEntityRule = CreateHelper.createEntityRule(portName, "*", entityWidget.getName());
+		RuleRest defaultEntityRule = CreateHelper.createEntityRule(portName, "*", entityWidget.getName());
 		Map<String, Object> instanceMap = objectToMap(defaultEntityRule);
 		fixRuleInstanceMap(instanceMap);
 
@@ -164,7 +165,7 @@ public class WidgetsAndRulesControllerTest {
 
 		WidgetRest propertyWidget = CreateHelper.createSimpleWidget("StringTextField", WidgetType.Property);
 		post(mockMvc, "/widgets", propertyWidget).andExpect(status().isCreated());
-		Rule propertyTypeRule = CreateHelper.createPropertyRule(portName2, PropertyTypeType.string, "*",
+		RuleRest propertyTypeRule = CreateHelper.createPropertyRule(portName2, PropertyTypeType.string, "*",
 				propertyWidget.getName());
 		instanceMap = objectToMap(propertyTypeRule);
 		fixRuleInstanceMap(instanceMap);
@@ -172,7 +173,7 @@ public class WidgetsAndRulesControllerTest {
 
 		post(mockMvc, "/rules", propertyTypeRule).andExpect(status().isCreated()).andExpect(instance(instanceMap));
 
-		Rule propertyRule = CreateHelper.createPropertyRule(portName2, PropertyTypeType.string, "*.name",
+		RuleRest propertyRule = CreateHelper.createPropertyRule(portName2, PropertyTypeType.string, "*.name",
 				propertyWidget.getName());
 		instanceMap = objectToMap(propertyRule);
 		fixRuleInstanceMap(instanceMap);
@@ -180,7 +181,7 @@ public class WidgetsAndRulesControllerTest {
 
 		post(mockMvc, "/rules", propertyRule).andExpect(status().isCreated()).andExpect(instance(instanceMap));
 
-		Rule entityRule = CreateHelper.createEntityRule(portName, "*Item", entityWidget.getName());
+		RuleRest entityRule = CreateHelper.createEntityRule(portName, "*Item", entityWidget.getName());
 		instanceMap = objectToMap(entityRule);
 		fixRuleInstanceMap(instanceMap);
 
@@ -200,30 +201,30 @@ public class WidgetsAndRulesControllerTest {
 		String contextName2 = "row";
 		WidgetRest entityWidget = CreateHelper.createSimpleWidget("TableFormWidget", WidgetType.Entity, contextName2);
 		post(mockMvc, "/widgets", entityWidget).andExpect(status().isCreated());
-		Rule defaultEntityRule = CreateHelper.createEntityRule(contextName, "*", entityWidget.getName());
+		RuleRest defaultEntityRule = CreateHelper.createEntityRule(contextName, "*", entityWidget.getName());
 
 		MvcResult mvcResult = post(mockMvc, "/rules", defaultEntityRule).andExpect(status().isCreated()).andReturn();
-		defaultEntityRule = getObjectFromResult(mvcResult, Rule.class);
+		defaultEntityRule = getObjectFromResult(mvcResult, RuleRest.class);
 
 		get(mockMvc, "/rules").andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
 
 		WidgetRest propertyWidget = CreateHelper.createSimpleWidget("fooName", WidgetType.Property);
 		post(mockMvc, "/widgets", propertyWidget).andExpect(status().isCreated());
-		Rule propertyTypeRule = CreateHelper.createPropertyRule(contextName2, PropertyTypeType.string, "*",
+		RuleRest propertyTypeRule = CreateHelper.createPropertyRule(contextName2, PropertyTypeType.string, "*",
 				propertyWidget.getName());
 
 		MvcResult mvcResult2 = post(mockMvc, "/rules", propertyTypeRule).andExpect(status().isCreated()).andReturn();
-		propertyTypeRule = getObjectFromResult(mvcResult2, Rule.class);
+		propertyTypeRule = getObjectFromResult(mvcResult2, RuleRest.class);
 
 		get(mockMvc, "/rules").andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(2)));
 
 		get(mockMvc, "/rules?version=" + defaultEntityRule.getVersion()).andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(1)));
 
-		Rule defaultEntityRule2 = CreateHelper.createEntityRule(contextName, "*", entityWidget.getName());
+		RuleRest defaultEntityRule2 = CreateHelper.createEntityRule(contextName, "*", entityWidget.getName());
 
 		MvcResult mvcResult3 = post(mockMvc, "/rules", defaultEntityRule2).andExpect(status().isCreated()).andReturn();
-		defaultEntityRule2 = getObjectFromResult(mvcResult3, Rule.class);
+		defaultEntityRule2 = getObjectFromResult(mvcResult3, RuleRest.class);
 
 		get(mockMvc, "/rules").andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(3)));
 

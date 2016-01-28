@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 import java.util.Date;
 import java.util.Map;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -77,10 +76,6 @@ public class DeployEntityTypeRestTest {
 		EntryPoint.setContainer(new Container(EntryPoint.getDomainModel()));
 	}
 
-	@After
-	public void tearDown() {
-		// getContainer().clear();
-	}
 
 	@DirtiesContext
 	@Test

@@ -52,6 +52,6 @@ public class EntryPoint {
 		} else {
 			Object[] apps = new Object[] { EntryPoint.class, app };			
 			application = SpringApplication.run(apps, args);
-		}
+		}		
 	}
 }

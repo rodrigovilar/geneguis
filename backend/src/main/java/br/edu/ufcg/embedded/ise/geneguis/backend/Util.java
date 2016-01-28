@@ -23,10 +23,9 @@ public class Util {
 		ruleService = application.getBean(RuleService.class);
 		contextService = application.getBean(PortService.class);
 
-		Port rootContext = createContext("root", WidgetType.EntitySet);
-		Port propertyContext = createContext("property", WidgetType.Property);
-		Port formContext = createContext("form", WidgetType.Entity);
-		Port fieldContext = createContext("field", WidgetType.Property);
+		Port propertyContext = createPort("property", WidgetType.Property);
+		Port formContext = createPort("form", WidgetType.Entity);
+		Port fieldContext = createPort("field", WidgetType.Property);
 		Widget listingTableWidget = createWidget("ListingTable", WidgetType.EntitySet,
 				readWidgetFile("ListingTable.js"), propertyContext, formContext);
 		Widget toStringPropertyWidget = createWidget("ToStringProperty", WidgetType.Property,
@@ -37,7 +36,7 @@ public class Util {
 				readWidgetFile("SimpleFormWidget.js"), fieldContext);
 		Widget simpleTextFieldPropertyWidget = createWidget("SimpleTextFieldPropertyWidget", WidgetType.Property,
 				readWidgetFile("SimpleTextFieldProperty.js"));
-		createRule(rootContext.getName(), "*", null, null, listingTableWidget, null);
+		createRule("root", "*", null, null, listingTableWidget, null);
 		createRule(propertyContext.getName(), null, null, "*", toStringPropertyWidget, null);
 		createRule(propertyContext.getName(), null, PropertyTypeType.date, null, DateFormatterWidget,
 				"{\"format\": \"dd-mm-yy\"}");
@@ -45,7 +44,7 @@ public class Util {
 		createRule(fieldContext.getName(), null, null, null, simpleTextFieldPropertyWidget, null);
 	}
 
-	public static Port createContext(String name, WidgetType type) {
+	public static Port createPort(String name, WidgetType type) {
 		Port context = new Port();
 		context.setName(name);
 		context.setType(type);
