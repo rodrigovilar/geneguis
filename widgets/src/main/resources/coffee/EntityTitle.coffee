@@ -1,8 +1,8 @@
-class EntityTitle extends EntitySetWidget
+class EntityTitle extends EntitySetTemplate
 
-	render: (page, entityType) ->
-		title = View.createEl("<h2>", "title", entityType.name)
-		title.append entityType.name
-		page.append title 
+	template: () ->
+		"""<h2 id='title_{{entityType.name}}'>
+		     {{entityType.name}}
+		   </h2>"""
 		
 return new EntityTitle

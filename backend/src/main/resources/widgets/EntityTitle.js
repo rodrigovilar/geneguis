@@ -11,16 +11,13 @@
       return EntityTitle.__super__.constructor.apply(this, arguments);
     }
 
-    EntityTitle.prototype.render = function(page, entityType) {
-      var title;
-      title = View.createEl("<h2>", "title", entityType.name);
-      title.append(entityType.name);
-      return page.append(title);
+    EntityTitle.prototype.template = function() {
+      return "<h2 id='title_{{entityType.name}}'>\n  {{entityType.name}}\n</h2>";
     };
 
     return EntityTitle;
 
-  })(EntitySetWidget);
+  })(EntitySetTemplate);
 
   return new EntityTitle;
 

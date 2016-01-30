@@ -244,6 +244,12 @@ Date.prototype.toISO8601 = () =>
 
 Date.prototype.toJSON = () =>
 	`this.toISO8601()`
+	
+RenderingEngine.renderEntitySet = (port, entityType) ->
+	page = $("<div>")
+	widget = RenderingEngine.getEntitySetWidget port, entityType
+	widget.render page, entityType
+	page.html()
 
 RenderingEngine.pushWidget = (widget) ->
 	WidgetStack.push(widget)
@@ -275,6 +281,7 @@ RenderingEngine.getEntitySetWidget = (context, entityType) =>
 	RenderingEngine.getWidget(context, 'EntitySet', entityType.name, null, null, null)
 
 $ ->
+	Handlebars.registerHelper('renderEntitySet', RenderingEngine.renderEntitySet)
 	$.getScript "https://dl.dropboxusercontent.com/u/14874989/Mestrado/metaguiweb/js/simpleStorage.js", () =>
 		$.getScript "https://dl.dropboxusercontent.com/u/14874989/mestrado/metaguiweb/js/jquery.mask.min.js", () =>
 			RulesManager.downloadAllRules()
@@ -285,6 +292,15 @@ $ ->
 class window.EntitySetWidget
 
 	render: (view, entityType) ->
+		
+		
+class window.EntitySetTemplate extends EntitySetWidget
+
+	render: (view, entityType) ->
+		t = Handlebars.compile( @template() )
+		view.append t( {entityType: entityType} );
+			
+	template: () ->
 		
 		
 class window.EntityWidget

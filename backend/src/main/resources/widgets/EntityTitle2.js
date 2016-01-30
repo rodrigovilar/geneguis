@@ -15,6 +15,10 @@
       return EntityTitle2.__super__.constructor.apply(this, arguments);
     }
 
+    EntityTitle2.prototype.template = function() {
+      return "<h2 id='title_{{entityType.name}}'>\n  {{entityType.name}}\n</h2>\n{{renderEntitySet list entityType}}";
+    };
+
     EntityTitle2.prototype.render = function(page, entityType) {
       this.renderTitle(page, entityType);
       return this.renderList(page, entityType);

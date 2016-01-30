@@ -1,5 +1,12 @@
 class EntityTitle2 extends EntitySetWidget
 
+	template: () ->
+		"""<h2 id='title_{{entityType.name}}'>
+		     {{entityType.name}}
+		   </h2>
+		   {{renderEntitySet list entityType}}
+		"""
+
 	render: (page, entityType) ->
 		@renderTitle page, entityType
 		@renderList page, entityType

@@ -1,5 +1,7 @@
 (function() {
   var _this = this,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.RootRenderer = (function() {
@@ -312,6 +314,14 @@
     return this.toISO8601();
   };
 
+  RenderingEngine.renderEntitySet = function(port, entityType) {
+    var page, widget;
+    page = $("<div>");
+    widget = RenderingEngine.getEntitySetWidget(port, entityType);
+    widget.render(page, entityType);
+    return page.html();
+  };
+
   RenderingEngine.pushWidget = function(widget) {
     return WidgetStack.push(widget);
   };
@@ -355,6 +365,7 @@
 
   $(function() {
     var _this = this;
+    Handlebars.registerHelper('renderEntitySet', RenderingEngine.renderEntitySet);
     return $.getScript("https://dl.dropboxusercontent.com/u/14874989/Mestrado/metaguiweb/js/simpleStorage.js", function() {
       return $.getScript("https://dl.dropboxusercontent.com/u/14874989/mestrado/metaguiweb/js/jquery.mask.min.js", function() {
         RulesManager.downloadAllRules();
@@ -373,6 +384,28 @@
     return EntitySetWidget;
 
   })();
+
+  window.EntitySetTemplate = (function(_super) {
+
+    __extends(EntitySetTemplate, _super);
+
+    function EntitySetTemplate() {
+      return EntitySetTemplate.__super__.constructor.apply(this, arguments);
+    }
+
+    EntitySetTemplate.prototype.render = function(view, entityType) {
+      var t;
+      t = Handlebars.compile(this.template());
+      return view.append(t({
+        entityType: entityType
+      }));
+    };
+
+    EntitySetTemplate.prototype.template = function() {};
+
+    return EntitySetTemplate;
+
+  })(EntitySetWidget);
 
   window.EntityWidget = (function() {
 
