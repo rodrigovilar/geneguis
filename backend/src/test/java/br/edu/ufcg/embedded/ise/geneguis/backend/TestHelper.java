@@ -9,9 +9,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,6 +48,7 @@ import br.edu.ufcg.embedded.ise.geneguis.Cardinality;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.EntityTypeDeployRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.EntityTypeRest;
+import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PropertyTypeRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.RuleRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetRest;
@@ -202,17 +205,20 @@ public class TestHelper {
 		return gson.fromJson(result.getResponse().getContentAsString(), type);
 	}
 
-	static void widget(String name, WidgetType type) {
+	static void widget(String name, WidgetType type, PortRest... ports) {
 		WidgetRest widget = new WidgetRest();
 		widget.setName(name);
 		widget.setType(type.name());
+		widget.setRequiredPorts(Arrays.asList(ports));
+		
 		TestHelper.postJSON(TestHelper.SERVER_URL + "widgets", widget);
 		
 		TestHelper.post(TestHelper.SERVER_URL + "widgets/" + name + "/code", TestHelper.readWidgetFile(name));
 	}
 
 	static String readWidgetFile(String fileName) {
-		String filePath = EntryPoint.class.getResource("/widgets/" + fileName + ".js").getPath();
+		URL resource = EntryPoint.class.getResource("/widgets/" + fileName + ".js");
+		String filePath = resource.getPath();
 		try {
 			Path widgetPath = Paths.get(filePath);
 			return new String(Files.readAllBytes(widgetPath));
@@ -239,8 +245,12 @@ public class TestHelper {
 		EntityWidgetTest.driver.findElement(By.id("entityType_" + entityType.getSimpleName())).click();
 	}
 
-	static void checkEntityType(Class<?> entityType) {
+	static void checkTitle(Class<?> entityType) {
 		EntityWidgetTest.driver.findElement(By.id("title_" + entityType.getSimpleName()));
+	}
+
+	static void checkList(Class<?> entityType) {
+		EntityWidgetTest.driver.findElement(By.id("list_" + entityType.getSimpleName()));
 	}
 
 	static void deployEntityType(Class<?> entityType, Class<?> repository) {

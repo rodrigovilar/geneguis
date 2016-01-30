@@ -1,10 +1,6 @@
 class ListingTable extends EntitySetWidget
 
 	render: (view) ->
-		DataManager.getEntities @entityType.resource, (entities) =>
-			@drawTable(@entityType, entities, view)
-
-	drawTable: (entityType, entities, view) ->
 		title = $("<h2>")
 		title.append entityType.name
 		view.append title 
@@ -13,7 +9,11 @@ class ListingTable extends EntitySetWidget
 		@table = $("<table>")
 		view.append @table
 		@buildTableHead(entityType.propertyTypes, @table);
-		@buildTableBody(entityType, entities, @table)
+		tbody = $("<tbody>");
+		tbody.attr "id", "instances"
+		table.append tbody
+		DataManager.getEntities @entityType.resource, (entity) =>
+			@buildTableLine(entity, entityType, tbody)
 
 	buildTableHead: (properties, table) ->
 		thead = $("<thead>");
@@ -24,16 +24,6 @@ class ListingTable extends EntitySetWidget
 		properties.forEach (property) ->
 			thHead = $("<th>#{property.name}</th>")
 			trHead.append thHead
-
-	buildTableBody: (entityType, entities, table) ->
-		if(entities.length > 0)
-			tbody = $("<tbody>");
-			tbody.attr "id", "instances"
-			table.append tbody
-			entities.forEach (entity) =>
-				@buildTableLine(entity, entityType, tbody)
-		else
-			table.append "There are not instances"
 
 	buildTableLine: (entity, entityType, tbody) ->
 		trbody = $("<tr>")

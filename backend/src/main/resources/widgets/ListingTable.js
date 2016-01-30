@@ -14,14 +14,8 @@
     }
 
     ListingTable.prototype.render = function(view) {
-      var _this = this;
-      return DataManager.getEntities(this.entityType.resource, function(entities) {
-        return _this.drawTable(_this.entityType, entities, view);
-      });
-    };
-
-    ListingTable.prototype.drawTable = function(entityType, entities, view) {
-      var addButton, title;
+      var addButton, tbody, title,
+        _this = this;
       title = $("<h2>");
       title.append(entityType.name);
       view.append(title);
@@ -30,7 +24,12 @@
       this.table = $("<table>");
       view.append(this.table);
       this.buildTableHead(entityType.propertyTypes, this.table);
-      return this.buildTableBody(entityType, entities, this.table);
+      tbody = $("<tbody>");
+      tbody.attr("id", "instances");
+      table.append(tbody);
+      return DataManager.getEntities(this.entityType.resource, function(entity) {
+        return _this.buildTableLine(entity, entityType, tbody);
+      });
     };
 
     ListingTable.prototype.buildTableHead = function(properties, table) {
@@ -45,21 +44,6 @@
         thHead = $("<th>" + property.name + "</th>");
         return trHead.append(thHead);
       });
-    };
-
-    ListingTable.prototype.buildTableBody = function(entityType, entities, table) {
-      var tbody,
-        _this = this;
-      if (entities.length > 0) {
-        tbody = $("<tbody>");
-        tbody.attr("id", "instances");
-        table.append(tbody);
-        return entities.forEach(function(entity) {
-          return _this.buildTableLine(entity, entityType, tbody);
-        });
-      } else {
-        return table.append("There are not instances");
-      }
     };
 
     ListingTable.prototype.buildTableLine = function(entity, entityType, tbody) {

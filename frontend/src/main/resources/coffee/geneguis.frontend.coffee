@@ -16,8 +16,7 @@ class window.RootRenderer
 		tr.click =>
 			widget = RenderingEngine.getEntitySetWidget 'root', entityType 
 			DataManager.getEntityType entityType.name, (entityTypeFull) =>
-				widget.entityType = entityTypeFull
-				widget.render View.emptyPage()
+				widget.render View.emptyPage(), entityTypeFull
 				
 
 window.View = {}
@@ -74,7 +73,9 @@ DataManager.getEntityType = (entityId, callback) ->
 	DataManager.loadData 'entities/' + entityId, callback
 
 DataManager.getEntities = (entityTypeResource, callback) ->
-	DataManager.loadData 'api/' + entityTypeResource, callback
+	DataManager.loadData 'api/' + entityTypeResource, (entities) =>
+			entities.forEach (entity) ->
+				callback(entity)
 
 DataManager.getEntity = (entityTypeResource, entityID, callback) ->
 	DataManager.loadData 'api/' + entityTypeResource + '/' + entityID, callback
@@ -283,12 +284,12 @@ $ ->
 					
 class window.EntitySetWidget
 
-	render: (view) ->
+	render: (view, entityType) ->
 		
 		
 class window.EntityWidget
 
-	render: (view) ->
+	render: (view, entityType, entity) ->
 	
 	
 class window.PropertyWidget
@@ -308,12 +309,11 @@ class window.RelationshipWidget
 	render: (view, relationType, relation) ->
 		
 	populateSelectField: (selectField, resource, propertyKey, relationshipIds) ->
-		DataManager.getEntities resource, (entities) =>
-			entities.forEach (entity) ->
-				option = new Option(entity.id)
-				if(propertyKey)
-					option = new Option(entity[propertyKey], entity.id)
-				selectField.append option
-				if(relationshipIds && relationshipIds.indexOf(entity.id) != -1)
-					option.selected = true
+		DataManager.getEntities resource, (entity) =>
+			option = new Option(entity.id)
+			if(propertyKey)
+				option = new Option(entity[propertyKey], entity.id)
+			selectField.append option
+			if(relationshipIds && relationshipIds.indexOf(entity.id) != -1)
+				option.selected = true
 

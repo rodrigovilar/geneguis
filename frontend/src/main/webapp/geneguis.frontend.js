@@ -29,8 +29,7 @@
         var widget;
         widget = RenderingEngine.getEntitySetWidget('root', entityType);
         return DataManager.getEntityType(entityType.name, function(entityTypeFull) {
-          widget.entityType = entityTypeFull;
-          return widget.render(View.emptyPage());
+          return widget.render(View.emptyPage(), entityTypeFull);
         });
       });
     };
@@ -107,7 +106,12 @@
   };
 
   DataManager.getEntities = function(entityTypeResource, callback) {
-    return DataManager.loadData('api/' + entityTypeResource, callback);
+    var _this = this;
+    return DataManager.loadData('api/' + entityTypeResource, function(entities) {
+      return entities.forEach(function(entity) {
+        return callback(entity);
+      });
+    });
   };
 
   DataManager.getEntity = function(entityTypeResource, entityID, callback) {
@@ -364,7 +368,7 @@
 
     function EntitySetWidget() {}
 
-    EntitySetWidget.prototype.render = function(view) {};
+    EntitySetWidget.prototype.render = function(view, entityType) {};
 
     return EntitySetWidget;
 
@@ -374,7 +378,7 @@
 
     function EntityWidget() {}
 
-    EntityWidget.prototype.render = function(view) {};
+    EntityWidget.prototype.render = function(view, entityType, entity) {};
 
     return EntityWidget;
 
@@ -410,18 +414,16 @@
 
     RelationshipWidget.prototype.populateSelectField = function(selectField, resource, propertyKey, relationshipIds) {
       var _this = this;
-      return DataManager.getEntities(resource, function(entities) {
-        return entities.forEach(function(entity) {
-          var option;
-          option = new Option(entity.id);
-          if (propertyKey) {
-            option = new Option(entity[propertyKey], entity.id);
-          }
-          selectField.append(option);
-          if (relationshipIds && relationshipIds.indexOf(entity.id) !== -1) {
-            return option.selected = true;
-          }
-        });
+      return DataManager.getEntities(resource, function(entity) {
+        var option;
+        option = new Option(entity.id);
+        if (propertyKey) {
+          option = new Option(entity[propertyKey], entity.id);
+        }
+        selectField.append(option);
+        if (relationshipIds && relationshipIds.indexOf(entity.id) !== -1) {
+          return option.selected = true;
+        }
       });
     };
 
