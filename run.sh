@@ -11,5 +11,4 @@ cd backend
 mvn install
 cd ..
 
-java -jar backend-0.1.jar
 

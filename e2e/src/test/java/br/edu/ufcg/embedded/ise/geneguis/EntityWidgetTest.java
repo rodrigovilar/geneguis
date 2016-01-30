@@ -1,20 +1,20 @@
-package br.edu.ufcg.embedded.ise.geneguis.backend;
+package br.edu.ufcg.embedded.ise.geneguis;
 
-import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.checkTitle;
-import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.checkList;
-import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.clickEntityType;
-import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.deployEntityType;
-import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.openApp;
-import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.rule;
-import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.widget;
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkList;
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkTitle;
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.clickEntityType;
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.deployEntityType;
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.openApp;
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.rule;
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.widget;
 
 import java.util.concurrent.TimeUnit;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
+import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.Customer;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerRepository;
@@ -29,7 +29,6 @@ public class EntityWidgetTest {
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 	}
 
-	@Ignore
 	@Test
 	public void testEntityTitle() {
 		Class<?> entityType = Customer.class;
