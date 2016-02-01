@@ -74,23 +74,15 @@
     var _this = this;
     return $.getJSON(HOST + 'widgets', function(widgetsSpec) {
       return widgetsSpec.forEach(function(widgetSpec) {
-        var widget;
-        simpleStorage.set(WidgetManager.STORAGE_TAG + widgetSpec.name + widgetSpec.version, widgetSpec);
-        widget = eval(widgetSpec.code);
-        if (widget.require && !window[widget.require.name]) {
-          return $.getScript(widget.require.url);
-        }
+        return simpleStorage.set(WidgetManager.STORAGE_TAG + widgetSpec.name + widgetSpec.version, widgetSpec);
       });
     });
   };
 
   WidgetManager.getWidget = function(name, version) {
-    var widget, widgetSpec;
-    widgetSpec = simpleStorage.get(WidgetManager.STORAGE_TAG + name + version);
-    widget = eval(widgetSpec.code);
-    widget.name = widgetSpec.name;
-    widget.version = widgetSpec.version;
-    widget.type = widgetSpec.type;
+    var widget;
+    widget = simpleStorage.get(WidgetManager.STORAGE_TAG + name + version);
+    widget.render = Handlebars.compile(widget.code);
     return widget;
   };
 
@@ -409,7 +401,8 @@
     DataManager.getEntityType(entityTypeName, function(entityTypeFull) {
       return DataManager.getEntities(entityTypeName, function(entities) {
         return entities.forEach(function(entity) {
-          return RenderingEngine.appendTempDiv(viewId, widget.render(entityTypeFull, entity));
+          entity.type = entityTypeFull;
+          return RenderingEngine.appendTempDiv(viewId, widget.render(entity));
         });
       });
     });
