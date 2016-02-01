@@ -4,6 +4,14 @@ public class PortRest {
 
 	private String name;
 	private String type;
+	
+	
+	public PortRest() {}
+
+	public PortRest(String name, String type) {
+		this.name = name;
+		this.type = type;
+	}
 
 	public String getName() {
 		return name;
@@ -48,6 +56,9 @@ public class PortRest {
 			return false;
 		return true;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return "PortRest [name=" + name + ", type=" + type + "]";
+	}
 }

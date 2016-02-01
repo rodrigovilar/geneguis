@@ -1,5 +1,7 @@
 (function() {
   var _this = this,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.RootRenderer = (function() {
@@ -27,10 +29,12 @@
       table.append(tr);
       return tr.click(function() {
         var widget;
-        widget = RenderingEngine.getEntitySetWidget('root', entityType);
+        widget = RenderingEngine.getEntitySetWidget('root', entityType.name);
         return DataManager.getEntityType(entityType.name, function(entityTypeFull) {
-          widget.entityType = entityTypeFull;
-          return widget.render(View.emptyPage());
+          var div, html;
+          div = View.emptyPage();
+          html = widget.render(entityTypeFull);
+          return div.append(html);
         });
       });
     };
@@ -39,6 +43,10 @@
 
   })();
 
+  window.ID = function() {
+    return '_' + Math.random().toString(36).substr(2, 9);
+  };
+
   window.View = {};
 
   View.emptyPage = function() {
@@ -46,8 +54,16 @@
     body = $("body");
     body.empty();
     page = $('<div>');
+    page.attr("id", "page_view");
     body.append(page);
     return page;
+  };
+
+  View.createEl = function(tag, prefix, value) {
+    var el;
+    el = $(tag);
+    el.attr("id", prefix + "_" + value);
+    return el;
   };
 
   window.WidgetManager = {};
@@ -100,7 +116,10 @@
   };
 
   DataManager.getEntities = function(entityTypeResource, callback) {
-    return DataManager.loadData('api/' + entityTypeResource, callback);
+    var _this = this;
+    return DataManager.loadData('api/' + entityTypeResource, function(entities) {
+      return callback(entities);
+    });
   };
 
   DataManager.getEntity = function(entityTypeResource, entityID, callback) {
@@ -326,24 +345,26 @@
     return widget;
   };
 
-  RenderingEngine.getRelationshipWidget = function(context, entityType, relationshipType) {
-    return RenderingEngine.getWidget(context, 'Relationship', entityType.name, relationshipType.name, relationshipType.targetType.name, relationshipType.targetCardinality);
+  RenderingEngine.getRelationshipWidget = function(context, entityTypeName, relationshipType) {
+    return RenderingEngine.getWidget(context, 'Relationship', entityTypeName, relationshipType.name, relationshipType.targetType.name, relationshipType.targetCardinality);
   };
 
-  RenderingEngine.getPropertyWidget = function(context, entityType, propertyType) {
-    return RenderingEngine.getWidget(context, 'Property', entityType.name, propertyType.name, propertyType.type, null);
+  RenderingEngine.getPropertyWidget = function(context, entityTypeName, propertyType) {
+    return RenderingEngine.getWidget(context, 'Property', entityTypeName, propertyType.name, propertyType.type, null);
   };
 
-  RenderingEngine.getEntityWidget = function(context, entityType) {
-    return RenderingEngine.getWidget(context, 'Entity', entityType.name, null, null, null);
+  RenderingEngine.getEntityWidget = function(context, entityTypeName) {
+    return RenderingEngine.getWidget(context, 'Entity', entityTypeName, null, null, null);
   };
 
-  RenderingEngine.getEntitySetWidget = function(context, entityType) {
-    return RenderingEngine.getWidget(context, 'EntitySet', entityType.name, null, null, null);
+  RenderingEngine.getEntitySetWidget = function(context, entityTypeName) {
+    return RenderingEngine.getWidget(context, 'EntitySet', entityTypeName, null, null, null);
   };
 
   $(function() {
     var _this = this;
+    Handlebars.registerHelper('renderEntitySet', RenderingEngine.renderEntitySet);
+    Handlebars.registerHelper('renderEntities', RenderingEngine.renderEntities);
     return $.getScript("https://dl.dropboxusercontent.com/u/14874989/Mestrado/metaguiweb/js/simpleStorage.js", function() {
       return $.getScript("https://dl.dropboxusercontent.com/u/14874989/mestrado/metaguiweb/js/jquery.mask.min.js", function() {
         RulesManager.downloadAllRules();
@@ -353,25 +374,112 @@
     });
   });
 
+  RenderingEngine.tempDiv = function(viewId) {
+    return new Handlebars.SafeString("<div id='" + viewId + "'></div>");
+  };
+
+  RenderingEngine.populateTempDiv = function(viewId, el) {
+    var div;
+    div = $("#" + viewId);
+    return div.html(el);
+  };
+
+  RenderingEngine.appendTempDiv = function(viewId, el) {
+    var div;
+    div = $("#" + viewId);
+    return div.append(el);
+  };
+
+  RenderingEngine.renderEntitySet = function(port, entityTypeName) {
+    var viewId, widget;
+    console.log('renderEntitySet: ' + port + ', ' + entityTypeName);
+    viewId = ID();
+    widget = RenderingEngine.getEntitySetWidget(port, entityTypeName);
+    DataManager.getEntityType(entityTypeName, function(entityTypeFull) {
+      return RenderingEngine.populateTempDiv(viewId, widget.render(entityTypeFull));
+    });
+    return RenderingEngine.tempDiv(viewId);
+  };
+
+  RenderingEngine.renderEntities = function(port, entityTypeName) {
+    var viewId, widget;
+    console.log('renderEntities: ' + port + ', ' + entityTypeName);
+    viewId = ID();
+    widget = RenderingEngine.getEntityWidget(port, entityTypeName);
+    DataManager.getEntityType(entityTypeName, function(entityTypeFull) {
+      return DataManager.getEntities(entityTypeName, function(entities) {
+        return entities.forEach(function(entity) {
+          return RenderingEngine.appendTempDiv(viewId, widget.render(entityTypeFull, entity));
+        });
+      });
+    });
+    return RenderingEngine.tempDiv(viewId);
+  };
+
   window.EntitySetWidget = (function() {
 
     function EntitySetWidget() {}
 
-    EntitySetWidget.prototype.render = function(view) {};
+    EntitySetWidget.prototype.render = function(entityType) {};
 
     return EntitySetWidget;
 
   })();
 
+  window.EntitySetTemplate = (function(_super) {
+
+    __extends(EntitySetTemplate, _super);
+
+    function EntitySetTemplate() {
+      return EntitySetTemplate.__super__.constructor.apply(this, arguments);
+    }
+
+    EntitySetTemplate.prototype.render = function(entityType) {
+      var t;
+      console.log(this.constructor.name + ': ' + entityType.name);
+      t = Handlebars.compile(this.template());
+      return t(entityType);
+    };
+
+    EntitySetTemplate.prototype.template = function() {};
+
+    return EntitySetTemplate;
+
+  })(EntitySetWidget);
+
   window.EntityWidget = (function() {
 
     function EntityWidget() {}
 
-    EntityWidget.prototype.render = function(view) {};
+    EntityWidget.prototype.render = function(entityType, entity) {};
 
     return EntityWidget;
 
   })();
+
+  window.EntityTemplate = (function(_super) {
+
+    __extends(EntityTemplate, _super);
+
+    function EntityTemplate() {
+      return EntityTemplate.__super__.constructor.apply(this, arguments);
+    }
+
+    EntityTemplate.prototype.render = function(entityType, entity) {
+      var t;
+      console.log(this.constructor.name + ': ' + entityType.name);
+      t = Handlebars.compile(this.template());
+      return t({
+        entityType: entityType,
+        entity: entity
+      });
+    };
+
+    EntityTemplate.prototype.template = function() {};
+
+    return EntityTemplate;
+
+  })(EntityWidget);
 
   window.PropertyWidget = (function() {
 

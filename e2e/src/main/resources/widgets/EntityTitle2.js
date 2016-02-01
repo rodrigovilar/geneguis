@@ -1,24 +1,24 @@
 (function() {
-  var EntityTitle,
+  var EntityTitle2,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  EntityTitle = (function(_super) {
+  EntityTitle2 = (function(_super) {
 
-    __extends(EntityTitle, _super);
+    __extends(EntityTitle2, _super);
 
-    function EntityTitle() {
-      return EntityTitle.__super__.constructor.apply(this, arguments);
+    function EntityTitle2() {
+      return EntityTitle2.__super__.constructor.apply(this, arguments);
     }
 
-    EntityTitle.prototype.template = function() {
-      return "<h2 id='title_{{entityType.name}}'>\n  {{entityType.name}}\n</h2>";
+    EntityTitle2.prototype.template = function() {
+      return "<h2 id='title_{{name}}'>\n  {{name}}\n</h2>\n{{renderEntitySet 'list' name}}";
     };
 
-    return EntityTitle;
+    return EntityTitle2;
 
   })(EntitySetTemplate);
 
-  return new EntityTitle;
+  return new EntityTitle2;
 
 }).call(this);

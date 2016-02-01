@@ -1,9 +1,8 @@
-class EntityTitle extends EntitySetWidget
+class EntityTitle extends EntitySetTemplate
 
-	render: (view) ->
-		title = $("<h2>")
-		title.attr "id", "title_" + @entityType.name
-		title.append @entityType.name
-		view.append title 
+	template: () ->
+		"""<h2 id='title_{{entityType.name}}'>
+		     {{entityType.name}}
+		   </h2>"""
 		
 return new EntityTitle
