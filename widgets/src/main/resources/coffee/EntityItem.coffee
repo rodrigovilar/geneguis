@@ -1,7 +1,6 @@
-class EntityItem extends EntityWidget
+class EntityItem extends EntityTemplate
 
-	render: (list, entityType, entity) ->
-		item = View.createEl("<li>#{entity}</li>", "li", entity.id)
-		list.append item
-		
+	template: () ->
+		"""<li id='li_{{entity.id}}'>{{entity.id}}</li>"""
+
 return new EntityItem

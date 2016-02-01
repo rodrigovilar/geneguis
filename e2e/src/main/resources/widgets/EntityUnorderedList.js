@@ -11,25 +11,13 @@
       return EntityUnorderedList.__super__.constructor.apply(this, arguments);
     }
 
-    EntityUnorderedList.prototype.render = function(page, entityType) {
-      var list;
-      list = View.createEl("<ul>", "list", entityType.name);
-      page.append(list);
-      return this.renderItems(list, entityType);
-    };
-
-    EntityUnorderedList.prototype.renderItems = function(list, entityType) {
-      var itemWidget,
-        _this = this;
-      itemWidget = RenderingEngine.getEntityWidget('item', entityType);
-      return DataManager.getEntities(entityType.name, function(entity) {
-        return itemWidget.render(list, entityType, entity);
-      });
+    EntityUnorderedList.prototype.template = function() {
+      return "<ul id='list_{{name}}'> \n  {{renderEntities 'item' name}}\n</ul>";
     };
 
     return EntityUnorderedList;
 
-  })(EntitySetWidget);
+  })(EntitySetTemplate);
 
   return new EntityUnorderedList;
 

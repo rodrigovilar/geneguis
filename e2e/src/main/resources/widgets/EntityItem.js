@@ -11,15 +11,13 @@
       return EntityItem.__super__.constructor.apply(this, arguments);
     }
 
-    EntityItem.prototype.render = function(list, entityType, entity) {
-      var item;
-      item = View.createEl("<li>" + entity + "</li>", "li", entity.id);
-      return list.append(item);
+    EntityItem.prototype.template = function() {
+      return "<li id='li_{{entity.id}}'>{{entity.id}}</li>";
     };
 
     return EntityItem;
 
-  })(EntityWidget);
+  })(EntityTemplate);
 
   return new EntityItem;
 

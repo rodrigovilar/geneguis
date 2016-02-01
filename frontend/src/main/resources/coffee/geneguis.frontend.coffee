@@ -14,10 +14,15 @@ class window.RootRenderer
 		tr.attr "id", "entityType_" + entityType.name
 		table.append tr
 		tr.click =>
-			widget = RenderingEngine.getEntitySetWidget 'root', entityType 
+			widget = RenderingEngine.getEntitySetWidget 'root', entityType.name 
 			DataManager.getEntityType entityType.name, (entityTypeFull) =>
-				widget.render View.emptyPage(), entityTypeFull
+				div = View.emptyPage()
+				html = widget.render entityTypeFull
+				div.append html
+			
 				
+window.ID = ->
+  '_' + Math.random().toString(36).substr(2, 9)
 
 window.View = {}
 
@@ -25,6 +30,7 @@ View.emptyPage = ->
 	body  = $("body")
 	body.empty()  
 	page = $('<div>')
+	page.attr "id", "page_view"
 	body.append page
 	page
 	
@@ -74,8 +80,7 @@ DataManager.getEntityType = (entityId, callback) ->
 
 DataManager.getEntities = (entityTypeResource, callback) ->
 	DataManager.loadData 'api/' + entityTypeResource, (entities) =>
-			entities.forEach (entity) ->
-				callback(entity)
+		callback(entities)
 
 DataManager.getEntity = (entityTypeResource, entityID, callback) ->
 	DataManager.loadData 'api/' + entityTypeResource + '/' + entityID, callback
@@ -245,12 +250,6 @@ Date.prototype.toISO8601 = () =>
 Date.prototype.toJSON = () =>
 	`this.toISO8601()`
 	
-RenderingEngine.renderEntitySet = (port, entityType) ->
-	page = $("<div>")
-	widget = RenderingEngine.getEntitySetWidget port, entityType
-	widget.render page, entityType
-	page.html()
-
 RenderingEngine.pushWidget = (widget) ->
 	WidgetStack.push(widget)
 
@@ -268,45 +267,86 @@ RenderingEngine.getWidget = (contextName, contextType, entityType, propertyType,
 	widget.configuration = $.parseJSON(rule.configuration)
 	widget
 
-RenderingEngine.getRelationshipWidget = (context, entityType, relationshipType) =>
-	RenderingEngine.getWidget(context, 'Relationship', entityType.name, relationshipType.name, relationshipType.targetType.name, relationshipType.targetCardinality)
+RenderingEngine.getRelationshipWidget = (context, entityTypeName, relationshipType) =>
+	RenderingEngine.getWidget(context, 'Relationship', entityTypeName, relationshipType.name, relationshipType.targetType.name, relationshipType.targetCardinality)
 
-RenderingEngine.getPropertyWidget = (context, entityType, propertyType) =>
-	RenderingEngine.getWidget(context, 'Property', entityType.name, propertyType.name, propertyType.type, null)
+RenderingEngine.getPropertyWidget = (context, entityTypeName, propertyType) =>
+	RenderingEngine.getWidget(context, 'Property', entityTypeName, propertyType.name, propertyType.type, null)
 
-RenderingEngine.getEntityWidget = (context, entityType) =>
-	RenderingEngine.getWidget(context, 'Entity', entityType.name, null, null, null)
+RenderingEngine.getEntityWidget = (context, entityTypeName) =>
+	RenderingEngine.getWidget(context, 'Entity', entityTypeName, null, null, null)
 
-RenderingEngine.getEntitySetWidget = (context, entityType) =>
-	RenderingEngine.getWidget(context, 'EntitySet', entityType.name, null, null, null)
+RenderingEngine.getEntitySetWidget = (context, entityTypeName) =>
+	RenderingEngine.getWidget(context, 'EntitySet', entityTypeName, null, null, null)
 
 $ ->
 	Handlebars.registerHelper('renderEntitySet', RenderingEngine.renderEntitySet)
+	Handlebars.registerHelper('renderEntities', RenderingEngine.renderEntities)
 	$.getScript "https://dl.dropboxusercontent.com/u/14874989/Mestrado/metaguiweb/js/simpleStorage.js", () =>
 		$.getScript "https://dl.dropboxusercontent.com/u/14874989/mestrado/metaguiweb/js/jquery.mask.min.js", () =>
 			RulesManager.downloadAllRules()
 			WidgetManager.downloadAllWidgets()
 			RenderingEngine.openApp View.emptyPage()
-		
+
+
+RenderingEngine.tempDiv = (viewId) ->
+	new Handlebars.SafeString("<div id='" + viewId + "'></div>")
+
+RenderingEngine.populateTempDiv = (viewId, el) ->
+		div = $("#" + viewId)
+		div.html el
+
+RenderingEngine.appendTempDiv = (viewId, el) ->
+		div = $("#" + viewId)
+		div.append el
+			
+RenderingEngine.renderEntitySet = (port, entityTypeName) =>
+	console.log 'renderEntitySet: ' + port + ', ' + entityTypeName
+	viewId = ID()
+	widget = RenderingEngine.getEntitySetWidget port, entityTypeName 
+	DataManager.getEntityType entityTypeName, (entityTypeFull) =>
+		RenderingEngine.populateTempDiv viewId, widget.render(entityTypeFull)
+	RenderingEngine.tempDiv viewId
+
+RenderingEngine.renderEntities = (port, entityTypeName) =>
+	console.log 'renderEntities: ' + port + ', ' + entityTypeName
+	viewId = ID()
+	widget = RenderingEngine.getEntityWidget port, entityTypeName 
+	DataManager.getEntityType entityTypeName, (entityTypeFull) =>
+		DataManager.getEntities entityTypeName, (entities) =>
+			entities.forEach (entity) ->
+				RenderingEngine.appendTempDiv viewId, widget.render(entityTypeFull, entity)
+	RenderingEngine.tempDiv viewId
 					
 class window.EntitySetWidget
 
-	render: (view, entityType) ->
+	render: (entityType) ->
 		
 		
 class window.EntitySetTemplate extends EntitySetWidget
 
-	render: (view, entityType) ->
+	render: (entityType) ->
+		console.log @constructor.name + ': ' + entityType.name
 		t = Handlebars.compile( @template() )
-		view.append t( {entityType: entityType} );
+		t( entityType )
 			
 	template: () ->
 		
 		
 class window.EntityWidget
 
-	render: (view, entityType, entity) ->
+	render: (entityType, entity) ->
 	
+
+class window.EntityTemplate extends EntityWidget
+
+	render: (entityType, entity) ->
+		console.log @constructor.name + ': ' + entityType.name
+		t = Handlebars.compile( @template() )
+		t( {entityType: entityType, entity: entity} )
+			
+	template: () ->
+
 	
 class window.PropertyWidget
 
@@ -325,11 +365,12 @@ class window.RelationshipWidget
 	render: (view, relationType, relation) ->
 		
 	populateSelectField: (selectField, resource, propertyKey, relationshipIds) ->
-		DataManager.getEntities resource, (entity) =>
-			option = new Option(entity.id)
-			if(propertyKey)
-				option = new Option(entity[propertyKey], entity.id)
-			selectField.append option
-			if(relationshipIds && relationshipIds.indexOf(entity.id) != -1)
-				option.selected = true
+		DataManager.getEntities resource, (entities) =>
+			entities.forEach (entity) ->			
+				option = new Option(entity.id)
+				if(propertyKey)
+					option = new Option(entity[propertyKey], entity.id)
+				selectField.append option
+				if(relationshipIds && relationshipIds.indexOf(entity.id) != -1)
+					option.selected = true
 

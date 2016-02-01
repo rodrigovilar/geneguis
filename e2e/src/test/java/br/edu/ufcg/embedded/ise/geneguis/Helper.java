@@ -12,6 +12,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 
@@ -81,6 +82,10 @@ public class Helper {
 		rest.setRepository(repository.getName());
 		postJSON(SERVER_URL + "entities", rest);
 	}
+	
+	static void postEntity(Object entity) {
+		postJSON(SERVER_URL + "api/" + entity.getClass().getSimpleName(), entity);
+	}
 
 	static void postJSON(String url, Object data) {
 	
@@ -93,13 +98,15 @@ public class Helper {
 			CloseableHttpResponse response = httpClient.execute(request);
 	
 			Assert.assertEquals(201, response.getStatusLine().getStatusCode());
+			
+//			String s = response.getEntity().getContent().toString();
 	
 		} catch (IOException e) {
 			Assert.fail(e.getMessage());
 		}
 	}
 	
-	static void post(String url, String data) {
+	static String post(String url, String data) {
 		
 		try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 	
@@ -110,9 +117,14 @@ public class Helper {
 			CloseableHttpResponse response = httpClient.execute(request);
 	
 			Assert.assertEquals(201, response.getStatusLine().getStatusCode());
+			
+			return EntityUtils.toString(response.getEntity());
+			
 	
 		} catch (IOException e) {
 			Assert.fail(e.getMessage());
 		}
+		
+		return null;
 	}
 }

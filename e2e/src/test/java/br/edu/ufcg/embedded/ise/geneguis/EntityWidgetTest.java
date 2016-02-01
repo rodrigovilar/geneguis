@@ -5,12 +5,14 @@ import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkTitle;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.clickEntityType;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.deployEntityType;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.openApp;
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.postEntity;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.rule;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.widget;
 
 import java.util.concurrent.TimeUnit;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
@@ -29,6 +31,7 @@ public class EntityWidgetTest {
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 	}
 
+	@Ignore
 	@Test
 	public void testEntityTitle() {
 		Class<?> entityType = Customer.class;
@@ -60,6 +63,9 @@ public class EntityWidgetTest {
 		openApp();
 		clickEntityType(entityType);
 		checkList(entityType);
+		
+		postEntity(new Customer());
+		postEntity(new Customer());
 		
 		//TODO Add Customer and see their list items
 	}
