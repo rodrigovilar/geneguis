@@ -49,17 +49,10 @@ WidgetManager.downloadAllWidgets = () ->
 	$.getJSON HOST + 'widgets', (widgetsSpec) =>
 		widgetsSpec.forEach (widgetSpec) =>
 			simpleStorage.set(WidgetManager.STORAGE_TAG + widgetSpec.name + widgetSpec.version, widgetSpec)
-			widget = eval widgetSpec.code
-			if(widget.require && !window[widget.require.name])
-				$.getScript widget.require.url
-
 
 WidgetManager.getWidget = (name, version) ->
-	widgetSpec = simpleStorage.get(WidgetManager.STORAGE_TAG + name + version)
-	widget = eval widgetSpec.code
-	widget.name = widgetSpec.name
-	widget.version = widgetSpec.version
-	widget.type = widgetSpec.type
+	widget = simpleStorage.get(WidgetManager.STORAGE_TAG + name + version)
+	widget.render = Handlebars.compile( widget.code )
 	widget
 
 WidgetManager.getRootRenderer = (callback) ->
@@ -315,7 +308,8 @@ RenderingEngine.renderEntities = (port, entityTypeName) =>
 	DataManager.getEntityType entityTypeName, (entityTypeFull) =>
 		DataManager.getEntities entityTypeName, (entities) =>
 			entities.forEach (entity) ->
-				RenderingEngine.appendTempDiv viewId, widget.render(entityTypeFull, entity)
+				entity.type = entityTypeFull
+				RenderingEngine.appendTempDiv viewId, widget.render(entity)
 	RenderingEngine.tempDiv viewId
 					
 class window.EntitySetWidget

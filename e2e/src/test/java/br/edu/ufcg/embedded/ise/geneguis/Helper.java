@@ -57,7 +57,7 @@ public class Helper {
 	}
 
 	static String readWidgetFile(String fileName) {
-		URL resource = EntryPoint.class.getResource("/widgets/" + fileName + ".js");
+		URL resource = EntryPoint.class.getResource("/widgets/" + fileName + ".hbs");
 		String filePath = resource.getPath();
 		try {
 			Path widgetPath = Paths.get(filePath);
