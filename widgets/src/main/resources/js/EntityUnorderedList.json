@@ -1,6 +1,0 @@
-{ name: EntityUnorderedList, 
-  type: EntitySet,
-  requiredPorts: [
-      {name: "item", type: "Entity"}
-  ]
-}

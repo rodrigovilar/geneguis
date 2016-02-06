@@ -1,5 +1,6 @@
 package br.edu.ufcg.embedded.ise.geneguis;
 
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkId;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkList;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkTitle;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.clickEntityType;
@@ -60,14 +61,15 @@ public class EntityWidgetTest {
 		rule("list", "EntityUnorderedList");
 		rule("item", "EntityItem");
 
-		openApp();
+		Customer c1 = postEntity(new Customer());
+		Customer c2 = postEntity(new Customer());
+		
+		openApp();		
 		clickEntityType(entityType);
 		checkList(entityType);
 		
-		postEntity(new Customer());
-		postEntity(new Customer());
-		
-		//TODO Add Customer and see their list items
+		checkId("li_" + c1.getId());
+		checkId("li_" + c2.getId());
 	}
 
 }
