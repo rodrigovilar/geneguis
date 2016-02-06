@@ -1,11 +1,13 @@
 package br.edu.ufcg.embedded.ise.geneguis;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Date;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -15,8 +17,14 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 
 import br.edu.ufcg.embedded.ise.geneguis.backend.EntryPoint;
 import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
@@ -34,15 +42,19 @@ public class Helper {
 	}
 
 	static void clickEntityType(Class<?> entityType) {
-		EntityWidgetTest.driver.findElement(By.id("entityType_" + entityType.getSimpleName())).click();
+		checkId("entityType_" + entityType.getSimpleName()).click();
 	}
 
 	static void checkTitle(Class<?> entityType) {
-		EntityWidgetTest.driver.findElement(By.id("title_" + entityType.getSimpleName()));
+		checkId("title_" + entityType.getSimpleName());
 	}
 
 	static void checkList(Class<?> entityType) {
-		EntityWidgetTest.driver.findElement(By.id("list_" + entityType.getSimpleName()));
+		checkId("list_" + entityType.getSimpleName());
+	}
+
+	static WebElement checkId(String id) {
+		return EntityWidgetTest.driver.findElement(By.id(id));
 	}
 
 	static void widget(String name, WidgetType type, PortRest... ports) {
@@ -83,11 +95,12 @@ public class Helper {
 		postJSON(SERVER_URL + "entities", rest);
 	}
 	
-	static void postEntity(Object entity) {
-		postJSON(SERVER_URL + "api/" + entity.getClass().getSimpleName(), entity);
+	static <T> T postEntity(T entity) {
+		return postJSON(SERVER_URL + "api/" + entity.getClass().getSimpleName(), entity);
 	}
 
-	static void postJSON(String url, Object data) {
+	@SuppressWarnings("unchecked")
+	static <T> T postJSON(String url, T data) {
 	
 		try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 	
@@ -99,10 +112,21 @@ public class Helper {
 	
 			Assert.assertEquals(201, response.getStatusLine().getStatusCode());
 			
-//			String s = response.getEntity().getContent().toString();
-	
+			Gson gson = new GsonBuilder().registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
+
+				public Date deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context)
+						throws JsonParseException {
+					return new Date(jsonElement.getAsLong());
+				}
+			}).create();
+			
+			String json = EntityUtils.toString(response.getEntity(), "UTF-8");
+
+			return (T) gson.fromJson(json, data.getClass());
+			
 		} catch (IOException e) {
 			Assert.fail(e.getMessage());
+			return null;
 		}
 	}
 	
