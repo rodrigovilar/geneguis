@@ -10,13 +10,6 @@ public class App {
 	public static void main(String[] args) {
 		JpaDomainModel domainModel = new JpaDomainModel();
 		EntryPoint.run(App.class, domainModel, args);
-		//deployDomain(domainModel);
 	}
 
-//	private static void deployDomain(JpaDomainModel domainModel) {
-//		CustomerRepository customerRepository = EntryPoint.getBean(CustomerRepository.class);
-//		EntryPoint.getDomainModel().deployEntityType(Customer.class, customerRepository);
-//		CustomerDetailsRepository customerDetailsRepository = EntryPoint.getBean(CustomerDetailsRepository.class);
-//		EntryPoint.getDomainModel().deployEntityType(CustomerDetails.class, customerDetailsRepository);
-//	}
 }

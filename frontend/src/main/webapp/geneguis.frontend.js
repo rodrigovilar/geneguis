@@ -354,16 +354,11 @@
   };
 
   $(function() {
-    var _this = this;
     Handlebars.registerHelper('renderEntitySet', RenderingEngine.renderEntitySet);
     Handlebars.registerHelper('renderEntities', RenderingEngine.renderEntities);
-    return $.getScript("https://dl.dropboxusercontent.com/u/14874989/Mestrado/metaguiweb/js/simpleStorage.js", function() {
-      return $.getScript("https://dl.dropboxusercontent.com/u/14874989/mestrado/metaguiweb/js/jquery.mask.min.js", function() {
-        RulesManager.downloadAllRules();
-        WidgetManager.downloadAllWidgets();
-        return RenderingEngine.openApp(View.emptyPage());
-      });
-    });
+    RulesManager.downloadAllRules();
+    WidgetManager.downloadAllWidgets();
+    return RenderingEngine.openApp(View.emptyPage());
   });
 
   RenderingEngine.tempDiv = function(viewId) {

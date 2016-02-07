@@ -3,11 +3,12 @@ package br.edu.ufcg.embedded.ise.geneguis.backend;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -27,7 +28,7 @@ public class Widget {
 	@NotNull
 	private WidgetType type;
 	
-	@OneToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER, cascade=CascadeType.PERSIST, mappedBy="widgets")
 	private List<Port> requiredPorts = new ArrayList<Port>();
 
 	public String getName() {
@@ -115,6 +116,5 @@ public class Widget {
 			return false;
 		return true;
 	}
-	
 	
 }
