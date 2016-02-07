@@ -275,11 +275,9 @@ RenderingEngine.getEntitySetWidget = (context, entityTypeName) =>
 $ ->
 	Handlebars.registerHelper('renderEntitySet', RenderingEngine.renderEntitySet)
 	Handlebars.registerHelper('renderEntities', RenderingEngine.renderEntities)
-	$.getScript "https://dl.dropboxusercontent.com/u/14874989/Mestrado/metaguiweb/js/simpleStorage.js", () =>
-		$.getScript "https://dl.dropboxusercontent.com/u/14874989/mestrado/metaguiweb/js/jquery.mask.min.js", () =>
-			RulesManager.downloadAllRules()
-			WidgetManager.downloadAllWidgets()
-			RenderingEngine.openApp View.emptyPage()
+	RulesManager.downloadAllRules()
+	WidgetManager.downloadAllWidgets()
+	RenderingEngine.openApp View.emptyPage()
 
 
 RenderingEngine.tempDiv = (viewId) ->

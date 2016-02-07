@@ -12,17 +12,17 @@ import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetRest;
 public class CreateHelper {
 
 	public static WidgetRest createSimpleWidget(String name, WidgetType type, String... requiredPorts) {
-		List<PortRest> contexts = null;
+		List<PortRest> ports = null;
 		if (requiredPorts.length > 0) {
-			contexts = new ArrayList<PortRest>();
+			ports = new ArrayList<PortRest>();
 			for (String contextName : requiredPorts) {
 				PortRest port = new PortRest();
 				port.setName(contextName);
 				port.setType(type.name());
-				contexts.add(port);
+				ports.add(port);
 			}
 		}
-		return createWidget(name, type, contexts);
+		return createWidget(name, type, ports);
 	}
 
 	public static WidgetRest createWidget(String name, WidgetType type, List<PortRest> requiredPorts) {

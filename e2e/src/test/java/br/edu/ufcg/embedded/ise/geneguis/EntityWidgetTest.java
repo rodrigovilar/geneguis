@@ -1,7 +1,7 @@
 package br.edu.ufcg.embedded.ise.geneguis;
 
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkId;
-import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkList;
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkIds;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkTitle;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.clickEntityType;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.deployEntityType;
@@ -35,24 +35,18 @@ public class EntityWidgetTest {
 	@Ignore
 	@Test
 	public void testEntityTitle() {
-		Class<?> entityType = Customer.class;
-		Class<?> repository = CustomerRepository.class;
-		
-		deployEntityType(entityType, repository);
+		deployEntityType(Customer.class, CustomerRepository.class);
 		widget("EntityTitle", WidgetType.EntitySet);
 		rule("root", "EntityTitle");
 
 		openApp();
-		clickEntityType(entityType);
-		checkTitle(entityType);
+		clickEntityType(Customer.class);
+		checkTitle(Customer.class);
 	}
 	
 	@Test
 	public void testEntityTitleWithThreeWidgets() {
-		Class<?> entityType = Customer.class;
-		Class<?> repository = CustomerRepository.class;
-		
-		deployEntityType(entityType, repository);
+		deployEntityType(Customer.class, CustomerRepository.class);
 		widget("EntityTitle2", WidgetType.EntitySet, new PortRest("list", WidgetType.EntitySet.name()));
 		widget("EntityUnorderedList", WidgetType.EntitySet, new PortRest("item", WidgetType.Entity.name()));
 		widget("EntityItem", WidgetType.Entity);
@@ -65,11 +59,20 @@ public class EntityWidgetTest {
 		Customer c2 = postEntity(new Customer());
 		
 		openApp();		
-		clickEntityType(entityType);
-		checkList(entityType);
+		clickEntityType(Customer.class);
+		checkId("list_" + Customer.class.getSimpleName());
 		
-		checkId("li_" + c1.getId());
-		checkId("li_" + c2.getId());
+		checkIds("li_" + c1.getId(), "li_" + c2.getId());
+	}
+	
+	@Test
+	public void testChangeWidget() {
+		widget("EntityOrderedList", WidgetType.EntitySet, new PortRest("item", WidgetType.Entity.name()));
+		rule("list", "EntityOrderedList");
+
+		openApp();		
+		clickEntityType(Customer.class);
+		checkId("olist_" + Customer.class.getSimpleName());
 	}
 
 }

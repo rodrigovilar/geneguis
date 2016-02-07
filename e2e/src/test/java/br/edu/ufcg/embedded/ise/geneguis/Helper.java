@@ -49,12 +49,14 @@ public class Helper {
 		checkId("title_" + entityType.getSimpleName());
 	}
 
-	static void checkList(Class<?> entityType) {
-		checkId("list_" + entityType.getSimpleName());
-	}
-
 	static WebElement checkId(String id) {
 		return EntityWidgetTest.driver.findElement(By.id(id));
+	}
+
+	static void checkIds(String... ids) {
+		for (String id : ids) {
+			EntityWidgetTest.driver.findElement(By.id(id));
+		}
 	}
 
 	static void widget(String name, WidgetType type, PortRest... ports) {

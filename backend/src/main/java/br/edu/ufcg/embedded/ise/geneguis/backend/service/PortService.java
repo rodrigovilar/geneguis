@@ -18,12 +18,6 @@ public class PortService {
 	}
 	
 	public Port createPort(Port port) {
-		Port oldPort = getPortByName(port.getName());
-
-		if (oldPort != null) {
-			port.setId(oldPort.getId());
-		}
-		
 		return repository.saveAndFlush(port);
 	}
 	

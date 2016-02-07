@@ -37,14 +37,25 @@ public class JpaDomainModel implements DomainModel {
 		checkJpaEntity(clazz);
 
 		String name = clazz.getSimpleName();
+		int position = checkUnique(name);
+		
+		EntityType entityType = null;
+				
+		if (position >= 0) {
+			entityType = entityTypes.get(position);
+			repositories.set(position, repository);
+			classes.set(position, clazz);
+			entityType.getPropertyTypes().clear();
+			entityType.getRelationshipTypes().clear();
 
-		EntityType entityType = new EntityType();
-		entityType.setName(name);
-
-		entityTypes.add(entityType);
-		repositories.add(repository);
-		classes.add(clazz);
-
+		} else {
+			entityType = new EntityType();
+			entityType.setName(name);			
+			entityTypes.add(entityType);
+			repositories.add(repository);
+			classes.add(clazz);
+		}
+		
 		for (Field field : clazz.getSuperclass().getDeclaredFields()) {
 			processField(entityType, field);
 		}
@@ -52,6 +63,19 @@ public class JpaDomainModel implements DomainModel {
 		for (Field field : clazz.getDeclaredFields()) {
 			processField(entityType, field);
 		}
+	}
+
+	private int checkUnique(String name) {
+		
+		for (int i = 0; i < entityTypes.size(); i++) {
+			EntityType entityType = entityTypes.get(i);
+			if (entityType.getName().equals(name)) {
+				return i;
+			}
+			
+		}
+		
+		return -1;
 	}
 
 	private static void processField(EntityType entityType, Field field) {

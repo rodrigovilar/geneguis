@@ -34,30 +34,41 @@ public class WidgetService {
 
 	public Widget getWidgetByNameAndVersion(String name, Long version) {
 		List<Widget> widgets = widgetRepository.findByNameAndVersion(name, version);
-		Widget widget = safeGetFirst(widgets);
-		return widget;
+		return safeGetFirst(widgets);
 	}
 
 	private Widget safeGetFirst(List<Widget> widgets) {
-		Widget widget = widgets.size() > 0 ? widgets.get(0) : null;
-		return widget;
+		return widgets.size() > 0 ? widgets.get(0) : null;
 	}
 	
 	public Widget saveWidget(Widget widget) {
+		updateVersion(widget);
+		updatePort(widget);
+		return widgetRepository.saveAndFlush(widget);
+	}
+
+	private void updateVersion(Widget widget) {
 		widget.setVersion(1l);
 		
 		Widget widgetSameName = getWidgetByName(widget.getName());
+		
 		if (widgetSameName != null) {
 			widget.setVersion(widgetSameName.getVersion() + 1);
 		}
-		
+	}
+
+	private void updatePort(Widget widget) {
 		if (widget.getRequiredPorts() != null) {
-			for (Port context : widget.getRequiredPorts()) {
-				context.setId(portService.createPort(context).getId());
+			for (Port port : widget.getRequiredPorts()) {
+				
+				Port existingPort = portService.getPortByName(port.getName());
+				
+				if (existingPort == null) {
+					portService.createPort(port);
+					port.getWidgets().add(widget);
+				} 
 			}
 		}
-		
-		return widgetRepository.saveAndFlush(widget);
 	}
 
 	public void clear() {
