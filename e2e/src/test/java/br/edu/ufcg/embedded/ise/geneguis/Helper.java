@@ -6,6 +6,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -118,7 +120,13 @@ public class Helper {
 
 				public Date deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context)
 						throws JsonParseException {
-					return new Date(jsonElement.getAsLong());
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+					
+				    try {
+						return sdf.parse(jsonElement.getAsString());
+					} catch (ParseException e) {
+						throw new JsonParseException(e);
+					}
 				}
 			}).create();
 			

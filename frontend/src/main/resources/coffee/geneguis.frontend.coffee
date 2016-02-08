@@ -17,6 +17,7 @@ class window.RootRenderer
 			widget = RenderingEngine.getEntitySetWidget 'root', entityType.name 
 			DataManager.getEntityType entityType.name, (entityTypeFull) =>
 				div = View.emptyPage()
+				entityTypeFull.templateType = "EntitySet"
 				html = widget.render entityTypeFull
 				div.append html
 			
@@ -275,70 +276,65 @@ RenderingEngine.getEntitySetWidget = (context, entityTypeName) =>
 $ ->
 	Handlebars.registerHelper('renderEntitySet', RenderingEngine.renderEntitySet)
 	Handlebars.registerHelper('renderEntities', RenderingEngine.renderEntities)
+	Handlebars.registerHelper('renderProperties', RenderingEngine.renderProperties)
 	RulesManager.downloadAllRules()
 	WidgetManager.downloadAllWidgets()
 	RenderingEngine.openApp View.emptyPage()
 
 
-RenderingEngine.tempDiv = (viewId) ->
-	new Handlebars.SafeString("<div id='" + viewId + "'></div>")
+RenderingEngine.tempTag = (viewId) ->
+	RenderingEngine.tempTagWithText(viewId, "")
 
-RenderingEngine.populateTempDiv = (viewId, el) ->
-		div = $("#" + viewId)
-		div.html el
+RenderingEngine.tempTagWithText = (viewId, text) ->
+	new Handlebars.SafeString("<span id='" + viewId + "'>" + text + "</span>")
 
-RenderingEngine.appendTempDiv = (viewId, el) ->
-		div = $("#" + viewId)
-		div.append el
+RenderingEngine.populateTempTag = (viewId, el) ->
+		tag = $("#" + viewId)
+		tag.html el
+
+RenderingEngine.appendTempTag = (viewId, el) ->
+		tag = $("#" + viewId)
+		tag.append el
 			
-RenderingEngine.renderEntitySet = (port, entityTypeName) =>
-	console.log 'renderEntitySet: ' + port + ', ' + entityTypeName
+RenderingEngine.renderEntitySet = (port) ->
+	console.log 'renderEntitySet: ' + port
 	viewId = ID()
-	widget = RenderingEngine.getEntitySetWidget port, entityTypeName 
-	DataManager.getEntityType entityTypeName, (entityTypeFull) =>
-		RenderingEngine.populateTempDiv viewId, widget.render(entityTypeFull)
-	RenderingEngine.tempDiv viewId
+	widget = RenderingEngine.getEntitySetWidget port, this.name 
+	DataManager.getEntityType this.name, (entityTypeFull) =>
+		entityTypeFull.templateType = "EntitySet"
+		RenderingEngine.populateTempTag viewId, widget.render(entityTypeFull)
+	RenderingEngine.tempTag viewId
 
-RenderingEngine.renderEntities = (port, entityTypeName) =>
-	console.log 'renderEntities: ' + port + ', ' + entityTypeName
+RenderingEngine.renderEntities = (port) ->
+	console.log 'renderEntities: ' + port
 	viewId = ID()
-	widget = RenderingEngine.getEntityWidget port, entityTypeName 
-	DataManager.getEntityType entityTypeName, (entityTypeFull) =>
-		DataManager.getEntities entityTypeName, (entities) =>
+	widget = RenderingEngine.getEntityWidget port, this.name 
+	DataManager.getEntityType this.name, (entityTypeFull) =>
+		DataManager.getEntities this.name, (entities) =>
 			entities.forEach (entity) ->
-				entity.type = entityTypeFull
-				RenderingEngine.appendTempDiv viewId, widget.render(entity)
-	RenderingEngine.tempDiv viewId
+				entity.entityType = entityTypeFull
+				entity.templateType = "Entity"
+				RenderingEngine.appendTempTag viewId, widget.render(entity)
+	RenderingEngine.tempTag viewId
+
+RenderingEngine.renderProperties = (port) ->
+	console.log 'renderProperties: ' + port
+	viewId = ID()
+	entity = this
+	entityType = this.entityType
+	text = ""
+	if (this.templateType == "EntitySet") 
+		entityType = this
+	entityType.propertyTypes.forEach (propertyType) ->
+		widget = RenderingEngine.getPropertyWidget port, entityType.name, propertyType
+		propertyType.entity = entityType
+		propertyValue = entity[propertyType.name]
+		property = {value: propertyValue, type: propertyType}
+		property.templateType = "Property"
+		el = widget.render(property)
+		text += el
+	RenderingEngine.tempTagWithText viewId, text
 					
-class window.EntitySetWidget
-
-	render: (entityType) ->
-		
-		
-class window.EntitySetTemplate extends EntitySetWidget
-
-	render: (entityType) ->
-		console.log @constructor.name + ': ' + entityType.name
-		t = Handlebars.compile( @template() )
-		t( entityType )
-			
-	template: () ->
-		
-		
-class window.EntityWidget
-
-	render: (entityType, entity) ->
-	
-
-class window.EntityTemplate extends EntityWidget
-
-	render: (entityType, entity) ->
-		console.log @constructor.name + ': ' + entityType.name
-		t = Handlebars.compile( @template() )
-		t( {entityType: entityType, entity: entity} )
-			
-	template: () ->
-
 	
 class window.PropertyWidget
 

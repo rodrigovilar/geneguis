@@ -17,6 +17,15 @@ public class CustomerDetails {
 	private String name;
 	private Date birthdate;
 	private double credit;
+	
+	public CustomerDetails() {}
+
+	public CustomerDetails(String ssn, String name, Date birthdate, double credit) {
+		this.ssn = ssn;
+		this.name = name;
+		this.birthdate = birthdate;
+		this.credit = credit;
+	}
 
 	public Long getId() {
 		return id;

@@ -1,0 +1,6 @@
+{ name: TableLine, 
+  type: Entity,
+  requiredPorts: [
+      {name: “line_cell”, type: "Property"}
+  ]
+}

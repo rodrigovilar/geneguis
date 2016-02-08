@@ -1,7 +1,5 @@
 (function() {
   var _this = this,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.RootRenderer = (function() {
@@ -33,6 +31,7 @@
         return DataManager.getEntityType(entityType.name, function(entityTypeFull) {
           var div, html;
           div = View.emptyPage();
+          entityTypeFull.templateType = "EntitySet";
           html = widget.render(entityTypeFull);
           return div.append(html);
         });
@@ -356,118 +355,88 @@
   $(function() {
     Handlebars.registerHelper('renderEntitySet', RenderingEngine.renderEntitySet);
     Handlebars.registerHelper('renderEntities', RenderingEngine.renderEntities);
+    Handlebars.registerHelper('renderProperties', RenderingEngine.renderProperties);
     RulesManager.downloadAllRules();
     WidgetManager.downloadAllWidgets();
     return RenderingEngine.openApp(View.emptyPage());
   });
 
-  RenderingEngine.tempDiv = function(viewId) {
-    return new Handlebars.SafeString("<div id='" + viewId + "'></div>");
+  RenderingEngine.tempTag = function(viewId) {
+    return RenderingEngine.tempTagWithText(viewId, "");
   };
 
-  RenderingEngine.populateTempDiv = function(viewId, el) {
-    var div;
-    div = $("#" + viewId);
-    return div.html(el);
+  RenderingEngine.tempTagWithText = function(viewId, text) {
+    return new Handlebars.SafeString("<span id='" + viewId + "'>" + text + "</span>");
   };
 
-  RenderingEngine.appendTempDiv = function(viewId, el) {
-    var div;
-    div = $("#" + viewId);
-    return div.append(el);
+  RenderingEngine.populateTempTag = function(viewId, el) {
+    var tag;
+    tag = $("#" + viewId);
+    return tag.html(el);
   };
 
-  RenderingEngine.renderEntitySet = function(port, entityTypeName) {
-    var viewId, widget;
-    console.log('renderEntitySet: ' + port + ', ' + entityTypeName);
+  RenderingEngine.appendTempTag = function(viewId, el) {
+    var tag;
+    tag = $("#" + viewId);
+    return tag.append(el);
+  };
+
+  RenderingEngine.renderEntitySet = function(port) {
+    var viewId, widget,
+      _this = this;
+    console.log('renderEntitySet: ' + port);
     viewId = ID();
-    widget = RenderingEngine.getEntitySetWidget(port, entityTypeName);
-    DataManager.getEntityType(entityTypeName, function(entityTypeFull) {
-      return RenderingEngine.populateTempDiv(viewId, widget.render(entityTypeFull));
+    widget = RenderingEngine.getEntitySetWidget(port, this.name);
+    DataManager.getEntityType(this.name, function(entityTypeFull) {
+      entityTypeFull.templateType = "EntitySet";
+      return RenderingEngine.populateTempTag(viewId, widget.render(entityTypeFull));
     });
-    return RenderingEngine.tempDiv(viewId);
+    return RenderingEngine.tempTag(viewId);
   };
 
-  RenderingEngine.renderEntities = function(port, entityTypeName) {
-    var viewId, widget;
-    console.log('renderEntities: ' + port + ', ' + entityTypeName);
+  RenderingEngine.renderEntities = function(port) {
+    var viewId, widget,
+      _this = this;
+    console.log('renderEntities: ' + port);
     viewId = ID();
-    widget = RenderingEngine.getEntityWidget(port, entityTypeName);
-    DataManager.getEntityType(entityTypeName, function(entityTypeFull) {
-      return DataManager.getEntities(entityTypeName, function(entities) {
+    widget = RenderingEngine.getEntityWidget(port, this.name);
+    DataManager.getEntityType(this.name, function(entityTypeFull) {
+      return DataManager.getEntities(_this.name, function(entities) {
         return entities.forEach(function(entity) {
-          entity.type = entityTypeFull;
-          return RenderingEngine.appendTempDiv(viewId, widget.render(entity));
+          entity.entityType = entityTypeFull;
+          entity.templateType = "Entity";
+          return RenderingEngine.appendTempTag(viewId, widget.render(entity));
         });
       });
     });
-    return RenderingEngine.tempDiv(viewId);
+    return RenderingEngine.tempTag(viewId);
   };
 
-  window.EntitySetWidget = (function() {
-
-    function EntitySetWidget() {}
-
-    EntitySetWidget.prototype.render = function(entityType) {};
-
-    return EntitySetWidget;
-
-  })();
-
-  window.EntitySetTemplate = (function(_super) {
-
-    __extends(EntitySetTemplate, _super);
-
-    function EntitySetTemplate() {
-      return EntitySetTemplate.__super__.constructor.apply(this, arguments);
+  RenderingEngine.renderProperties = function(port) {
+    var entity, entityType, text, viewId;
+    console.log('renderProperties: ' + port);
+    viewId = ID();
+    entity = this;
+    entityType = this.entityType;
+    text = "";
+    if (this.templateType === "EntitySet") {
+      entityType = this;
     }
-
-    EntitySetTemplate.prototype.render = function(entityType) {
-      var t;
-      console.log(this.constructor.name + ': ' + entityType.name);
-      t = Handlebars.compile(this.template());
-      return t(entityType);
-    };
-
-    EntitySetTemplate.prototype.template = function() {};
-
-    return EntitySetTemplate;
-
-  })(EntitySetWidget);
-
-  window.EntityWidget = (function() {
-
-    function EntityWidget() {}
-
-    EntityWidget.prototype.render = function(entityType, entity) {};
-
-    return EntityWidget;
-
-  })();
-
-  window.EntityTemplate = (function(_super) {
-
-    __extends(EntityTemplate, _super);
-
-    function EntityTemplate() {
-      return EntityTemplate.__super__.constructor.apply(this, arguments);
-    }
-
-    EntityTemplate.prototype.render = function(entityType, entity) {
-      var t;
-      console.log(this.constructor.name + ': ' + entityType.name);
-      t = Handlebars.compile(this.template());
-      return t({
-        entityType: entityType,
-        entity: entity
-      });
-    };
-
-    EntityTemplate.prototype.template = function() {};
-
-    return EntityTemplate;
-
-  })(EntityWidget);
+    entityType.propertyTypes.forEach(function(propertyType) {
+      var el, property, propertyValue, widget;
+      widget = RenderingEngine.getPropertyWidget(port, entityType.name, propertyType);
+      propertyType.entity = entityType;
+      propertyValue = entity[propertyType.name];
+      property = {
+        value: propertyValue,
+        type: propertyType
+      };
+      property.templateType = "Property";
+      el = widget.render(property);
+      return text += el;
+    });
+    return RenderingEngine.tempTagWithText(viewId, text);
+  };
 
   window.PropertyWidget = (function() {
 
