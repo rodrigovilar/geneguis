@@ -2,6 +2,14 @@
   var _this = this,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
+  nunjucks.configure({
+    autoescape: false
+  });
+
+  window.env = new nunjucks.Environment(null, {
+    autoescape: false
+  });
+
   window.RootRenderer = (function() {
 
     function RootRenderer() {}
@@ -29,11 +37,12 @@
         var widget;
         widget = RenderingEngine.getEntitySetWidget('root', entityType.name);
         return DataManager.getEntityType(entityType.name, function(entityTypeFull) {
-          var div, html;
+          var div;
           div = View.emptyPage();
           entityTypeFull.templateType = "EntitySet";
-          html = widget.render(entityTypeFull);
-          return div.append(html);
+          return widget.template.render(entityTypeFull, function(err, html) {
+            return div.append(html);
+          });
         });
       });
     };
@@ -73,16 +82,14 @@
     var _this = this;
     return $.getJSON(HOST + 'widgets', function(widgetsSpec) {
       return widgetsSpec.forEach(function(widgetSpec) {
+        widgetsSpec.template = new nunjucks.Template(widgetSpec.code, window.env);
         return simpleStorage.set(WidgetManager.STORAGE_TAG + widgetSpec.name + widgetSpec.version, widgetSpec);
       });
     });
   };
 
   WidgetManager.getWidget = function(name, version) {
-    var widget;
-    widget = simpleStorage.get(WidgetManager.STORAGE_TAG + name + version);
-    widget.render = Handlebars.compile(widget.code);
-    return widget;
+    return simpleStorage.get(WidgetManager.STORAGE_TAG + name + version);
   };
 
   WidgetManager.getRootRenderer = function(callback) {
@@ -353,9 +360,9 @@
   };
 
   $(function() {
-    Handlebars.registerHelper('renderEntitySet', RenderingEngine.renderEntitySet);
-    Handlebars.registerHelper('renderEntities', RenderingEngine.renderEntities);
-    Handlebars.registerHelper('renderProperties', RenderingEngine.renderProperties);
+    env.addFilter('renderEntitySet', RenderingEngine.renderEntitySet, true);
+    env.addFilter('renderEntities', RenderingEngine.renderEntities, true);
+    env.addFilter('renderProperties', RenderingEngine.renderProperties, true);
     RulesManager.downloadAllRules();
     WidgetManager.downloadAllWidgets();
     return RenderingEngine.openApp(View.emptyPage());
@@ -381,49 +388,58 @@
     return tag.append(el);
   };
 
-  RenderingEngine.renderEntitySet = function(port) {
-    var viewId, widget,
+  RenderingEngine.renderEntitySet = function(port, callback) {
+    var widget,
       _this = this;
     console.log('renderEntitySet: ' + port);
-    viewId = ID();
-    widget = RenderingEngine.getEntitySetWidget(port, this.name);
-    DataManager.getEntityType(this.name, function(entityTypeFull) {
+    widget = RenderingEngine.getEntitySetWidget(port, this.ctx.name);
+    return DataManager.getEntityType(this.ctx.name, function(entityTypeFull) {
       entityTypeFull.templateType = "EntitySet";
-      return RenderingEngine.populateTempTag(viewId, widget.render(entityTypeFull));
+      return widget.template.render(entityTypeFull, function(err, html) {
+        return callback(null, html);
+      });
     });
-    return RenderingEngine.tempTag(viewId);
   };
 
-  RenderingEngine.renderEntities = function(port) {
-    var viewId, widget,
+  RenderingEngine.renderEntities = function(port, callback) {
+    var widget,
       _this = this;
     console.log('renderEntities: ' + port);
-    viewId = ID();
-    widget = RenderingEngine.getEntityWidget(port, this.name);
-    DataManager.getEntityType(this.name, function(entityTypeFull) {
-      return DataManager.getEntities(_this.name, function(entities) {
+    widget = RenderingEngine.getEntityWidget(port, this.ctx.name);
+    return DataManager.getEntityType(this.ctx.name, function(entityTypeFull) {
+      return DataManager.getEntities(_this.ctx.name, function(entities) {
+        var i, len, result;
+        result = "";
+        i = 1;
+        len = entities.length;
         return entities.forEach(function(entity) {
           entity.entityType = entityTypeFull;
           entity.templateType = "Entity";
-          return RenderingEngine.appendTempTag(viewId, widget.render(entity));
+          return widget.template.render(entity, function(err, html) {
+            result += html;
+            if (i === len) {
+              callback(null, result);
+            }
+            return i++;
+          });
         });
       });
     });
-    return RenderingEngine.tempTag(viewId);
   };
 
-  RenderingEngine.renderProperties = function(port) {
-    var entity, entityType, text, viewId;
+  RenderingEngine.renderProperties = function(port, callback) {
+    var entity, entityType, i, len, result;
     console.log('renderProperties: ' + port);
-    viewId = ID();
-    entity = this;
-    entityType = this.entityType;
-    text = "";
-    if (this.templateType === "EntitySet") {
-      entityType = this;
+    entity = this.ctx;
+    entityType = this.ctx.entityType;
+    if (this.ctx.templateType === "EntitySet") {
+      entityType = this.ctx;
     }
-    entityType.propertyTypes.forEach(function(propertyType) {
-      var el, property, propertyValue, widget;
+    result = "";
+    i = 1;
+    len = entityType.propertyTypes.length;
+    return entityType.propertyTypes.forEach(function(propertyType) {
+      var property, propertyValue, widget;
       widget = RenderingEngine.getPropertyWidget(port, entityType.name, propertyType);
       propertyType.entity = entityType;
       propertyValue = entity[propertyType.name];
@@ -432,10 +448,14 @@
         type: propertyType
       };
       property.templateType = "Property";
-      el = widget.render(property);
-      return text += el;
+      return widget.template.render(property, function(err, html) {
+        result += html;
+        if (i === len) {
+          callback(null, result);
+        }
+        return i++;
+      });
     });
-    return RenderingEngine.tempTagWithText(viewId, text);
   };
 
   window.PropertyWidget = (function() {

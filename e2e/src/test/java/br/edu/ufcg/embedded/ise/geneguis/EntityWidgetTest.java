@@ -32,7 +32,7 @@ public class EntityWidgetTest {
 	@BeforeClass
 	public static void openBrowser() {
 		driver = new FirefoxDriver();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
 	}
 
 	@Ignore

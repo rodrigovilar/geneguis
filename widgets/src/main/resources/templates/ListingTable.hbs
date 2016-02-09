@@ -1,9 +1,12 @@
-<table id='table_{{name}}'>
+<table id='table_{{name}}' border=1>
+  <thead>
+    <tr>
+      {{'table_head' | renderProperties}}
+    </tr>
+  </thead>
 
-  <tr>
-      {{renderProperties 'table_head'}}
-  </tr>
-  
-  {{renderEntities 'table_line'}}
+  <tbody>  
+    {{'table_line' | renderEntities}}
+  </tbody>  
   
 </table>

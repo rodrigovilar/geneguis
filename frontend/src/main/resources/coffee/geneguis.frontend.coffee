@@ -1,3 +1,6 @@
+nunjucks.configure({ autoescape: false });
+window.env = new nunjucks.Environment(null, { autoescape: false })
+
 class window.RootRenderer
 
 	render: (view, entitesType) ->
@@ -18,9 +21,9 @@ class window.RootRenderer
 			DataManager.getEntityType entityType.name, (entityTypeFull) =>
 				div = View.emptyPage()
 				entityTypeFull.templateType = "EntitySet"
-				html = widget.render entityTypeFull
-				div.append html
-			
+				widget.template.render entityTypeFull, (err, html) ->
+					div.append html
+
 				
 window.ID = ->
   '_' + Math.random().toString(36).substr(2, 9)
@@ -53,7 +56,7 @@ WidgetManager.downloadAllWidgets = () ->
 
 WidgetManager.getWidget = (name, version) ->
 	widget = simpleStorage.get(WidgetManager.STORAGE_TAG + name + version)
-	widget.render = Handlebars.compile( widget.code )
+	widget.template = new nunjucks.Template(widget.code, window.env)
 	widget
 
 WidgetManager.getRootRenderer = (callback) ->
@@ -273,10 +276,11 @@ RenderingEngine.getEntityWidget = (context, entityTypeName) =>
 RenderingEngine.getEntitySetWidget = (context, entityTypeName) =>
 	RenderingEngine.getWidget(context, 'EntitySet', entityTypeName, null, null, null)
 
+
 $ ->
-	Handlebars.registerHelper('renderEntitySet', RenderingEngine.renderEntitySet)
-	Handlebars.registerHelper('renderEntities', RenderingEngine.renderEntities)
-	Handlebars.registerHelper('renderProperties', RenderingEngine.renderProperties)
+	env.addFilter('renderEntitySet', RenderingEngine.renderEntitySet, true)
+	env.addFilter('renderEntities', RenderingEngine.renderEntities, true)
+	env.addFilter('renderProperties', RenderingEngine.renderProperties, true)
 	RulesManager.downloadAllRules()
 	WidgetManager.downloadAllWidgets()
 	RenderingEngine.openApp View.emptyPage()
@@ -296,45 +300,51 @@ RenderingEngine.appendTempTag = (viewId, el) ->
 		tag = $("#" + viewId)
 		tag.append el
 			
-RenderingEngine.renderEntitySet = (port) ->
+RenderingEngine.renderEntitySet = (port, callback) ->
 	console.log 'renderEntitySet: ' + port
-	viewId = ID()
-	widget = RenderingEngine.getEntitySetWidget port, this.name 
-	DataManager.getEntityType this.name, (entityTypeFull) =>
+	widget = RenderingEngine.getEntitySetWidget port, this.ctx.name 
+	DataManager.getEntityType this.ctx.name, (entityTypeFull) =>
 		entityTypeFull.templateType = "EntitySet"
-		RenderingEngine.populateTempTag viewId, widget.render(entityTypeFull)
-	RenderingEngine.tempTag viewId
+		widget.template.render entityTypeFull, (err, html) ->
+			callback(null, html)
 
-RenderingEngine.renderEntities = (port) ->
+RenderingEngine.renderEntities = (port, callback) ->
 	console.log 'renderEntities: ' + port
-	viewId = ID()
-	widget = RenderingEngine.getEntityWidget port, this.name 
-	DataManager.getEntityType this.name, (entityTypeFull) =>
-		DataManager.getEntities this.name, (entities) =>
+	widget = RenderingEngine.getEntityWidget port, this.ctx.name 
+	DataManager.getEntityType this.ctx.name, (entityTypeFull) =>
+		DataManager.getEntities this.ctx.name, (entities) =>
+			result = ""
+			i = 1
+			len = entities.length
 			entities.forEach (entity) ->
 				entity.entityType = entityTypeFull
 				entity.templateType = "Entity"
-				RenderingEngine.appendTempTag viewId, widget.render(entity)
-	RenderingEngine.tempTag viewId
+				widget.template.render entity, (err, html) ->
+					result += html
+					if (i == len)
+						callback(null, result)
+					i++;
 
-RenderingEngine.renderProperties = (port) ->
+RenderingEngine.renderProperties = (port, callback) ->
 	console.log 'renderProperties: ' + port
-	viewId = ID()
-	entity = this
-	entityType = this.entityType
-	text = ""
-	if (this.templateType == "EntitySet") 
-		entityType = this
+	entity = this.ctx
+	entityType = this.ctx.entityType
+	if (this.ctx.templateType == "EntitySet") 
+		entityType = this.ctx
+	result = ""
+	i = 1
+	len = entityType.propertyTypes.length
 	entityType.propertyTypes.forEach (propertyType) ->
 		widget = RenderingEngine.getPropertyWidget port, entityType.name, propertyType
 		propertyType.entity = entityType
 		propertyValue = entity[propertyType.name]
 		property = {value: propertyValue, type: propertyType}
 		property.templateType = "Property"
-		el = widget.render(property)
-		text += el
-	RenderingEngine.tempTagWithText viewId, text
-					
+		widget.template.render property, (err, html) ->
+			result += html
+			if (i == len)
+				callback(null, result)
+			i++;
 	
 class window.PropertyWidget
 
