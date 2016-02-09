@@ -1,8 +1,14 @@
 (function() {
   var _this = this,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  nunjucks.configure({
+    autoescape: false
+  });
+
+  window.env = new nunjucks.Environment(null, {
+    autoescape: false
+  });
 
   window.RootRenderer = (function() {
 
@@ -31,10 +37,12 @@
         var widget;
         widget = RenderingEngine.getEntitySetWidget('root', entityType.name);
         return DataManager.getEntityType(entityType.name, function(entityTypeFull) {
-          var div, html;
+          var div;
           div = View.emptyPage();
-          html = widget.render(entityTypeFull);
-          return div.append(html);
+          entityTypeFull.templateType = "EntitySet";
+          return widget.template.render(entityTypeFull, function(err, html) {
+            return div.append(html);
+          });
         });
       });
     };
@@ -74,16 +82,14 @@
     var _this = this;
     return $.getJSON(HOST + 'widgets', function(widgetsSpec) {
       return widgetsSpec.forEach(function(widgetSpec) {
+        widgetsSpec.template = new nunjucks.Template(widgetSpec.code, window.env);
         return simpleStorage.set(WidgetManager.STORAGE_TAG + widgetSpec.name + widgetSpec.version, widgetSpec);
       });
     });
   };
 
   WidgetManager.getWidget = function(name, version) {
-    var widget;
-    widget = simpleStorage.get(WidgetManager.STORAGE_TAG + name + version);
-    widget.render = Handlebars.compile(widget.code);
-    return widget;
+    return simpleStorage.get(WidgetManager.STORAGE_TAG + name + version);
   };
 
   WidgetManager.getRootRenderer = function(callback) {
@@ -354,120 +360,103 @@
   };
 
   $(function() {
-    Handlebars.registerHelper('renderEntitySet', RenderingEngine.renderEntitySet);
-    Handlebars.registerHelper('renderEntities', RenderingEngine.renderEntities);
+    env.addFilter('renderEntitySet', RenderingEngine.renderEntitySet, true);
+    env.addFilter('renderEntities', RenderingEngine.renderEntities, true);
+    env.addFilter('renderProperties', RenderingEngine.renderProperties, true);
     RulesManager.downloadAllRules();
     WidgetManager.downloadAllWidgets();
     return RenderingEngine.openApp(View.emptyPage());
   });
 
-  RenderingEngine.tempDiv = function(viewId) {
-    return new Handlebars.SafeString("<div id='" + viewId + "'></div>");
+  RenderingEngine.tempTag = function(viewId) {
+    return RenderingEngine.tempTagWithText(viewId, "");
   };
 
-  RenderingEngine.populateTempDiv = function(viewId, el) {
-    var div;
-    div = $("#" + viewId);
-    return div.html(el);
+  RenderingEngine.tempTagWithText = function(viewId, text) {
+    return new Handlebars.SafeString("<span id='" + viewId + "'>" + text + "</span>");
   };
 
-  RenderingEngine.appendTempDiv = function(viewId, el) {
-    var div;
-    div = $("#" + viewId);
-    return div.append(el);
+  RenderingEngine.populateTempTag = function(viewId, el) {
+    var tag;
+    tag = $("#" + viewId);
+    return tag.html(el);
   };
 
-  RenderingEngine.renderEntitySet = function(port, entityTypeName) {
-    var viewId, widget;
-    console.log('renderEntitySet: ' + port + ', ' + entityTypeName);
-    viewId = ID();
-    widget = RenderingEngine.getEntitySetWidget(port, entityTypeName);
-    DataManager.getEntityType(entityTypeName, function(entityTypeFull) {
-      return RenderingEngine.populateTempDiv(viewId, widget.render(entityTypeFull));
+  RenderingEngine.appendTempTag = function(viewId, el) {
+    var tag;
+    tag = $("#" + viewId);
+    return tag.append(el);
+  };
+
+  RenderingEngine.renderEntitySet = function(port, callback) {
+    var widget,
+      _this = this;
+    console.log('renderEntitySet: ' + port);
+    widget = RenderingEngine.getEntitySetWidget(port, this.ctx.name);
+    return DataManager.getEntityType(this.ctx.name, function(entityTypeFull) {
+      entityTypeFull.templateType = "EntitySet";
+      return widget.template.render(entityTypeFull, function(err, html) {
+        return callback(null, html);
+      });
     });
-    return RenderingEngine.tempDiv(viewId);
   };
 
-  RenderingEngine.renderEntities = function(port, entityTypeName) {
-    var viewId, widget;
-    console.log('renderEntities: ' + port + ', ' + entityTypeName);
-    viewId = ID();
-    widget = RenderingEngine.getEntityWidget(port, entityTypeName);
-    DataManager.getEntityType(entityTypeName, function(entityTypeFull) {
-      return DataManager.getEntities(entityTypeName, function(entities) {
+  RenderingEngine.renderEntities = function(port, callback) {
+    var widget,
+      _this = this;
+    console.log('renderEntities: ' + port);
+    widget = RenderingEngine.getEntityWidget(port, this.ctx.name);
+    return DataManager.getEntityType(this.ctx.name, function(entityTypeFull) {
+      return DataManager.getEntities(_this.ctx.name, function(entities) {
+        var i, len, result;
+        result = "";
+        i = 1;
+        len = entities.length;
         return entities.forEach(function(entity) {
-          entity.type = entityTypeFull;
-          return RenderingEngine.appendTempDiv(viewId, widget.render(entity));
+          entity.entityType = entityTypeFull;
+          entity.templateType = "Entity";
+          return widget.template.render(entity, function(err, html) {
+            result += html;
+            if (i === len) {
+              callback(null, result);
+            }
+            return i++;
+          });
         });
       });
     });
-    return RenderingEngine.tempDiv(viewId);
   };
 
-  window.EntitySetWidget = (function() {
-
-    function EntitySetWidget() {}
-
-    EntitySetWidget.prototype.render = function(entityType) {};
-
-    return EntitySetWidget;
-
-  })();
-
-  window.EntitySetTemplate = (function(_super) {
-
-    __extends(EntitySetTemplate, _super);
-
-    function EntitySetTemplate() {
-      return EntitySetTemplate.__super__.constructor.apply(this, arguments);
+  RenderingEngine.renderProperties = function(port, callback) {
+    var entity, entityType, i, len, result;
+    console.log('renderProperties: ' + port);
+    entity = this.ctx;
+    entityType = this.ctx.entityType;
+    if (this.ctx.templateType === "EntitySet") {
+      entityType = this.ctx;
     }
-
-    EntitySetTemplate.prototype.render = function(entityType) {
-      var t;
-      console.log(this.constructor.name + ': ' + entityType.name);
-      t = Handlebars.compile(this.template());
-      return t(entityType);
-    };
-
-    EntitySetTemplate.prototype.template = function() {};
-
-    return EntitySetTemplate;
-
-  })(EntitySetWidget);
-
-  window.EntityWidget = (function() {
-
-    function EntityWidget() {}
-
-    EntityWidget.prototype.render = function(entityType, entity) {};
-
-    return EntityWidget;
-
-  })();
-
-  window.EntityTemplate = (function(_super) {
-
-    __extends(EntityTemplate, _super);
-
-    function EntityTemplate() {
-      return EntityTemplate.__super__.constructor.apply(this, arguments);
-    }
-
-    EntityTemplate.prototype.render = function(entityType, entity) {
-      var t;
-      console.log(this.constructor.name + ': ' + entityType.name);
-      t = Handlebars.compile(this.template());
-      return t({
-        entityType: entityType,
-        entity: entity
+    result = "";
+    i = 1;
+    len = entityType.propertyTypes.length;
+    return entityType.propertyTypes.forEach(function(propertyType) {
+      var property, propertyValue, widget;
+      widget = RenderingEngine.getPropertyWidget(port, entityType.name, propertyType);
+      propertyType.entity = entityType;
+      propertyValue = entity[propertyType.name];
+      property = {
+        value: propertyValue,
+        type: propertyType
+      };
+      property.templateType = "Property";
+      return widget.template.render(property, function(err, html) {
+        result += html;
+        if (i === len) {
+          callback(null, result);
+        }
+        return i++;
       });
-    };
-
-    EntityTemplate.prototype.template = function() {};
-
-    return EntityTemplate;
-
-  })(EntityWidget);
+    });
+  };
 
   window.PropertyWidget = (function() {
 

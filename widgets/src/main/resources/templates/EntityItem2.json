@@ -1,0 +1,6 @@
+{ name: EntityItem2, 
+  type: Entity,
+  requiredPorts: [
+      {name: "prop", type: "Property"}
+  ]
+}
