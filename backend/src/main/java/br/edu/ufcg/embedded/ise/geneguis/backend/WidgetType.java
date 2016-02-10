@@ -1,5 +1,5 @@
 package br.edu.ufcg.embedded.ise.geneguis.backend;
 
 public enum WidgetType {
-	EntitySet, Entity, Property, Relationship
+	EntityTypeSet, EntityType, Entity, PropertyType, Property, RelationshipType, Relationship
 }

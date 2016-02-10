@@ -1,6 +1,6 @@
 { name: EntityTitle2, 
-  type: EntitySet,
+  type: EntityType,
   requiredPorts: [
-      {name: "list", type: "EntitySet"}
+      {name: “entity_list", type: "EntityType”}
   ]
 }

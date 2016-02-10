@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
@@ -35,12 +34,16 @@ public class EntityWidgetTest {
 		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
 	}
 
-	@Ignore
 	@Test
 	public void testEntityTitle() {
 		deployEntityType(Customer.class, CustomerRepository.class);
-		widget("EntityTitle", WidgetType.EntitySet);
-		rule("root", "EntityTitle");
+		widget("EntityTypeList", WidgetType.EntityTypeSet,
+				new PortRest("entity_type_item", WidgetType.EntityType.name()));
+		widget("EntityTypeItem", WidgetType.EntityType, new PortRest("entity_type_page", WidgetType.EntityType.name()));
+		widget("EntityTitle", WidgetType.EntityType);
+		rule("root", "EntityTypeList");
+		rule("entity_type_item", "EntityTypeItem");
+		rule("entity_type_page", "EntityTitle");
 
 		openApp();
 		clickEntityType(Customer.class);
@@ -49,14 +52,13 @@ public class EntityWidgetTest {
 
 	@Test
 	public void testEntityTitleWithThreeWidgets() {
-		deployEntityType(Customer.class, CustomerRepository.class);
-		widget("EntityTitle2", WidgetType.EntitySet, new PortRest("list", WidgetType.EntitySet.name()));
-		widget("EntityUnorderedList", WidgetType.EntitySet, new PortRest("item", WidgetType.Entity.name()));
+		widget("EntityTitle2", WidgetType.EntityType, new PortRest("entity_list", WidgetType.EntityType.name()));
+		widget("EntityUnorderedList", WidgetType.EntityType, new PortRest("entity_item", WidgetType.Entity.name()));
 		widget("EntityItem", WidgetType.Entity);
 
-		rule("root", "EntityTitle2");
-		rule("list", "EntityUnorderedList");
-		rule("item", "EntityItem");
+		rule("entity_type_page", "EntityTitle2");
+		rule("entity_list", "EntityUnorderedList");
+		rule("entity_item", "EntityItem");
 
 		Customer c1 = postEntity(new Customer());
 		Customer c2 = postEntity(new Customer());
@@ -70,8 +72,8 @@ public class EntityWidgetTest {
 
 	@Test
 	public void testChangeWidget() {
-		widget("EntityOrderedList", WidgetType.EntitySet, new PortRest("item", WidgetType.Entity.name()));
-		rule("list", "EntityOrderedList");
+		widget("EntityOrderedList", WidgetType.EntityType, new PortRest("entity_item", WidgetType.Entity.name()));
+		rule("entity_list", "EntityOrderedList");
 
 		openApp();
 		clickEntityType(Customer.class);
@@ -82,11 +84,11 @@ public class EntityWidgetTest {
 	public void testPropertyWidget() {
 		deployEntityType(CustomerDetails.class, CustomerDetailsRepository.class);
 
-		widget("EntityItem2", WidgetType.Entity, new PortRest("prop", WidgetType.Property.name()));
+		widget("EntityItem2", WidgetType.Entity, new PortRest("property_value", WidgetType.Property.name()));
 		widget("SimpleValue", WidgetType.Property);
 
-		rule("item", "EntityItem2");
-		rule("prop", "SimpleValue");
+		rule("entity_item", "EntityItem2");
+		rule("property_value", "SimpleValue");
 
 		postEntity(new CustomerDetails("ssn1", "name1", new Date(), 1.0));
 		postEntity(new CustomerDetails("ssn2", "name2", new Date(), 2.0));
@@ -97,13 +99,13 @@ public class EntityWidgetTest {
 
 	@Test
 	public void testListingTable() {
-		widget("ListingTable", WidgetType.EntitySet, new PortRest("table_head", WidgetType.Property.name()),
+		widget("ListingTable", WidgetType.EntityType, new PortRest("table_head", WidgetType.PropertyType.name()),
 				new PortRest("table_line", WidgetType.Entity.name()));
-		widget("TableHead", WidgetType.Property);
-		widget("TableCell", WidgetType.Property);
+		widget("TableHead", WidgetType.PropertyType);
 		widget("TableLine", WidgetType.Entity, new PortRest("line_cell", WidgetType.Property.name()));
-		
-		rule("root", "ListingTable");
+		widget("TableCell", WidgetType.Property);
+
+		rule("entity_type_page", "ListingTable");
 		rule("table_head", "TableHead");
 		rule("table_line", "TableLine");
 		rule("line_cell", "TableCell");
