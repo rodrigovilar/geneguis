@@ -151,11 +151,11 @@ public class WidgetsAndRulesControllerTest {
 	public void testCreateRules() throws Exception {
 
 		String portName = "form";
-		WidgetRest entitySetWidget = CreateHelper.createSimpleWidget("CRUDComponent", WidgetType.EntitySet,
+		WidgetRest entitySetWidget = CreateHelper.createSimpleWidget("CRUDComponent", WidgetType.EntityType,
 				portName);
 		post(mockMvc, "/widgets", entitySetWidget).andExpect(status().isCreated());
 		String portName2 = "row";
-		WidgetRest entityWidget = CreateHelper.createSimpleWidget("TableFormWidget", WidgetType.Entity, portName2);
+		WidgetRest entityWidget = CreateHelper.createSimpleWidget("TableFormWidget", WidgetType.EntityType, portName2);
 		post(mockMvc, "/widgets", entityWidget).andExpect(status().isCreated());
 		RuleRest defaultEntityRule = CreateHelper.createEntityRule(portName, "*", entityWidget.getName());
 		Map<String, Object> instanceMap = objectToMap(defaultEntityRule);
@@ -195,11 +195,11 @@ public class WidgetsAndRulesControllerTest {
 		get(mockMvc, "/rules").andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
 
 		String contextName = "form";
-		WidgetRest entitySetWidget = CreateHelper.createSimpleWidget("CRUDComponent", WidgetType.EntitySet,
+		WidgetRest entitySetWidget = CreateHelper.createSimpleWidget("CRUDComponent", WidgetType.EntityType,
 				contextName);
 		post(mockMvc, "/widgets", entitySetWidget).andExpect(status().isCreated());
 		String contextName2 = "row";
-		WidgetRest entityWidget = CreateHelper.createSimpleWidget("TableFormWidget", WidgetType.Entity, contextName2);
+		WidgetRest entityWidget = CreateHelper.createSimpleWidget("TableFormWidget", WidgetType.EntityType, contextName2);
 		post(mockMvc, "/widgets", entityWidget).andExpect(status().isCreated());
 		RuleRest defaultEntityRule = CreateHelper.createEntityRule(contextName, "*", entityWidget.getName());
 

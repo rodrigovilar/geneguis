@@ -1,0 +1,8 @@
+{ name: ListingTableWithCreate, 
+  type: EntitySet,
+  requiredPorts: [
+      {name: “table_head”, type: “Property”},
+      {name: “table_line”, type: “Entity”},
+      {name: “creation_form”, type: “Property”}
+  ]
+}

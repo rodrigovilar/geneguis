@@ -1,0 +1,14 @@
+<table id='table_{{name}}' border=1>
+  <thead>
+    <tr>
+      {{'table_head' | renderProperties}}
+    </tr>
+  </thead>
+
+  <tbody>  
+    {{'table_line' | renderEntities}}
+  </tbody>  
+  
+</table>
+
+<button onClick="RenderingEngine.newPageProperties('creation_form')">Create new {{name}}</button>

@@ -1,6 +1,5 @@
 (function() {
-  var _this = this,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var _this = this;
 
   nunjucks.configure({
     autoescape: false
@@ -9,303 +8,6 @@
   window.env = new nunjucks.Environment(null, {
     autoescape: false
   });
-
-  window.RootRenderer = (function() {
-
-    function RootRenderer() {}
-
-    RootRenderer.prototype.render = function(view, entitesType) {
-      var table, th,
-        _this = this;
-      table = $("<table>");
-      view.append(table);
-      th = $("<tr><th>Entities</th></tr>");
-      th.attr("id", "entities");
-      table.append(th);
-      return entitesType.forEach(function(entityType) {
-        return _this.drawLine(table, entityType);
-      });
-    };
-
-    RootRenderer.prototype.drawLine = function(table, entityType) {
-      var tr,
-        _this = this;
-      tr = $("<tr><td>" + entityType.name + "</td></tr>");
-      tr.attr("id", "entityType_" + entityType.name);
-      table.append(tr);
-      return tr.click(function() {
-        var widget;
-        widget = RenderingEngine.getEntitySetWidget('root', entityType.name);
-        return DataManager.getEntityType(entityType.name, function(entityTypeFull) {
-          var div;
-          div = View.emptyPage();
-          entityTypeFull.templateType = "EntitySet";
-          return widget.template.render(entityTypeFull, function(err, html) {
-            return div.append(html);
-          });
-        });
-      });
-    };
-
-    return RootRenderer;
-
-  })();
-
-  window.ID = function() {
-    return '_' + Math.random().toString(36).substr(2, 9);
-  };
-
-  window.View = {};
-
-  View.emptyPage = function() {
-    var body, page;
-    body = $("body");
-    body.empty();
-    page = $('<div>');
-    page.attr("id", "page_view");
-    body.append(page);
-    return page;
-  };
-
-  View.createEl = function(tag, prefix, value) {
-    var el;
-    el = $(tag);
-    el.attr("id", prefix + "_" + value);
-    return el;
-  };
-
-  window.WidgetManager = {};
-
-  WidgetManager.STORAGE_TAG = "WIDGETS";
-
-  WidgetManager.downloadAllWidgets = function() {
-    var _this = this;
-    return $.getJSON(HOST + 'widgets', function(widgetsSpec) {
-      return widgetsSpec.forEach(function(widgetSpec) {
-        widgetsSpec.template = new nunjucks.Template(widgetSpec.code, window.env);
-        return simpleStorage.set(WidgetManager.STORAGE_TAG + widgetSpec.name + widgetSpec.version, widgetSpec);
-      });
-    });
-  };
-
-  WidgetManager.getWidget = function(name, version) {
-    return simpleStorage.get(WidgetManager.STORAGE_TAG + name + version);
-  };
-
-  WidgetManager.getRootRenderer = function(callback) {
-    return callback(new RootRenderer);
-  };
-
-  window.DataManager = {};
-
-  DataManager.loadData = function(url, callback) {
-    var _this = this;
-    return $.getJSON(HOST + url, function(json) {
-      return callback(json);
-    });
-  };
-
-  DataManager.getAllEntitiesTypes = function(callback) {
-    return DataManager.loadData('entities', callback);
-  };
-
-  DataManager.getEntityType = function(entityId, callback) {
-    return DataManager.loadData('entities/' + entityId, callback);
-  };
-
-  DataManager.getEntities = function(entityTypeResource, callback) {
-    var _this = this;
-    return DataManager.loadData('api/' + entityTypeResource, function(entities) {
-      return callback(entities);
-    });
-  };
-
-  DataManager.getEntity = function(entityTypeResource, entityID, callback) {
-    return DataManager.loadData('api/' + entityTypeResource + '/' + entityID, callback);
-  };
-
-  DataManager.createEntity = function(entityTypeResource, entity) {
-    return $.ajax({
-      url: HOST + "api/" + entityTypeResource,
-      type: "POST",
-      data: JSON.stringify(entity),
-      contentType: "application/json; charset=utf-8"
-    });
-  };
-
-  DataManager.updateEntity = function(entityTypeResource, entity) {
-    return $.ajax({
-      url: HOST + "api/" + entityTypeResource + "/" + entity.id,
-      type: "PUT",
-      data: JSON.stringify(entity)
-    });
-  };
-
-  DataManager.deleteEntity = function(entityTypeResource, entityID, success, error) {
-    return $.ajax({
-      url: HOST + "api/" + entityTypeResource + "/" + entityID,
-      type: "DELETE"
-    });
-  };
-
-  window.RulesManager = {};
-
-  RulesManager.STORAGE_TAG = "RULES";
-
-  RulesManager.SEPARATOR_CHAR = '.';
-
-  RulesManager.stringfyRule = function(rule) {
-    var stringRule;
-    stringRule = RulesManager.STORAGE_TAG + RulesManager.SEPARATOR_CHAR + rule.portName;
-    if (rule.entityTypeLocator !== null) {
-      stringRule += RulesManager.SEPARATOR_CHAR + rule.entityTypeLocator;
-    } else {
-      stringRule += RulesManager.SEPARATOR_CHAR + '*';
-    }
-    if (rule.type === 'Property' || rule.type === 'Relationship') {
-      if (rule.propertyTypeLocator !== null) {
-        stringRule += RulesManager.SEPARATOR_CHAR + rule.propertyTypeLocator;
-      } else {
-        stringRule += RulesManager.SEPARATOR_CHAR + '*';
-      }
-      if (rule.propertyTypeTypeLocator !== null) {
-        stringRule += RulesManager.SEPARATOR_CHAR + rule.propertyTypeTypeLocator;
-      } else {
-        stringRule += RulesManager.SEPARATOR_CHAR + '*';
-      }
-      if (rule.type === 'Relationship') {
-        if (rule.relationshipTargetCardinality !== null) {
-          stringRule += RulesManager.SEPARATOR_CHAR + rule.relationshipTargetCardinality;
-        } else {
-          stringRule += RulesManager.SEPARATOR_CHAR + '*';
-        }
-      }
-    }
-    return stringRule;
-  };
-
-  RulesManager.createRule = function(contextName, contextType, entityTypeLocator, propertyTypeLocator, propertyTypeTypeLocator, relationshipTargetCardinality) {
-    var rule;
-    rule = {};
-    rule.portName = contextName;
-    rule.type = contextType;
-    rule.entityTypeLocator = entityTypeLocator;
-    rule.propertyTypeLocator = propertyTypeLocator;
-    if (entityTypeLocator === null || propertyTypeLocator === null) {
-      rule.propertyTypeTypeLocator = propertyTypeTypeLocator;
-      rule.relationshipTargetCardinality = relationshipTargetCardinality;
-    }
-    return rule;
-  };
-
-  RulesManager.downloadAllRules = function() {
-    var _this = this;
-    return $.getJSON(HOST + 'rules', function(rules) {
-      return rules.forEach(function(rule) {
-        var key;
-        if (rule.type === 'Property' || rule.type === 'Relationship') {
-          if (rule.entityTypeLocator !== null && rule.propertyTypeLocator !== null) {
-            rule.propertyTypeTypeLocator = null;
-            rule.relationshipTargetCardinality = null;
-          }
-        }
-        key = RulesManager.stringfyRule(rule);
-        return simpleStorage.set(key, rule);
-      });
-    });
-  };
-
-  RulesManager.getRule = function(contextName, contextType, entityType, propertyType, propertyTypeType, relationshipTargetCardinality) {
-    var rule, ruleQuery;
-    ruleQuery = RulesManager.createRule(contextName, contextType, entityType, propertyType, propertyTypeType, relationshipTargetCardinality);
-    if (ruleQuery.type === 'Property') {
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-      ruleQuery = RulesManager.createRule(contextName, contextType, entityType, null, propertyTypeType, null);
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-      ruleQuery = RulesManager.createRule(contextName, contextType, entityType, null, null, null);
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-      ruleQuery = RulesManager.createRule(contextName, contextType, null, propertyType, propertyTypeType, null);
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-      ruleQuery = RulesManager.createRule(contextName, contextType, null, propertyType, null, null);
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-      ruleQuery = RulesManager.createRule(contextName, contextType, null, null, propertyTypeType, null);
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-      ruleQuery = RulesManager.createRule(contextName, contextType, null, null, null, null);
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-    } else if (ruleQuery.type === 'Relationship') {
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-      ruleQuery = RulesManager.createRule(contextName, contextType, entityType, null, propertyTypeType, relationshipTargetCardinality);
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-      ruleQuery = RulesManager.createRule(contextName, contextType, entityType, null, null, relationshipTargetCardinality);
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-      ruleQuery = RulesManager.createRule(contextName, contextType, null, propertyType, propertyTypeType, relationshipTargetCardinality);
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-      ruleQuery = RulesManager.createRule(contextName, contextType, null, propertyType, null, relationshipTargetCardinality);
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-      ruleQuery = RulesManager.createRule(contextName, contextType, null, null, propertyTypeType, relationshipTargetCardinality);
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-      ruleQuery = RulesManager.createRule(contextName, contextType, null, null, null, relationshipTargetCardinality);
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-    } else {
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-      ruleQuery.entityTypeLocator = '*';
-      rule = simpleStorage.get(RulesManager.stringfyRule(ruleQuery));
-      if (typeof rule !== "undefined") {
-        return rule;
-      }
-    }
-  };
-
-  window.HOST = 'http://localhost:8080/';
-
-  window.RenderingEngine = {};
-
-  window.WidgetStack = [];
 
   Date.prototype.toISO8601 = function() {
     self = this;
@@ -318,193 +20,256 @@
     return this.toISO8601();
   };
 
-  RenderingEngine.pushWidget = function(widget) {
-    return WidgetStack.push(widget);
-  };
+  window.HOST = 'http://localhost:8080/';
 
-  RenderingEngine.popAndRender = function(view) {
-    return WidgetStack.pop().render(view);
-  };
+  window.RulesCache = [];
 
-  RenderingEngine.openApp = function(view) {
+  window.WidgetCache = {};
+
+  window.WidgetStack = [];
+
+  window.GUI = {};
+
+  window.API = {};
+
+  GUI.downloadAllRules = function(callback) {
     var _this = this;
-    return WidgetManager.getRootRenderer(function(rootRenderer) {
-      return DataManager.getAllEntitiesTypes(function(allEntitiesTypes) {
-        return rootRenderer.render(view, allEntitiesTypes);
+    return $.getJSON(HOST + 'rules', function(rules) {
+      rules.forEach(function(rule) {
+        return RulesCache.push(rule);
       });
+      return callback();
     });
   };
 
-  RenderingEngine.getWidget = function(contextName, contextType, entityType, propertyType, propertyTypeType, relationshipTargetCardinality) {
-    var rule, widget;
-    rule = RulesManager.getRule(contextName, contextType, entityType, propertyType, propertyTypeType, relationshipTargetCardinality);
-    widget = WidgetManager.getWidget(rule.widgetName, rule.widgetVersion);
-    widget.configuration = $.parseJSON(rule.configuration);
-    return widget;
+  GUI.getWidget = function(portName, entityTypeName, propertyType, callback) {
+    var found, widget,
+      _this = this;
+    found = null;
+    RulesCache.forEach(function(rule) {
+      if (rule.portName === portName) {
+        return found = rule;
+      }
+    });
+    if (found) {
+      widget = WidgetCache[found.widgetName + found.widgetVersion];
+      widget.configuration = $.parseJSON(found.configuration);
+      console.log('getWidget: ' + portName + '->' + widget.name);
+      return callback(widget);
+    }
   };
 
-  RenderingEngine.getRelationshipWidget = function(context, entityTypeName, relationshipType) {
-    return RenderingEngine.getWidget(context, 'Relationship', entityTypeName, relationshipType.name, relationshipType.targetType.name, relationshipType.targetCardinality);
+  GUI.downloadAllWidgets = function(callback) {
+    var _this = this;
+    return $.getJSON(HOST + 'widgets', function(widgetSpecs) {
+      widgetSpecs.forEach(function(widgetSpec) {
+        widgetSpec.template = new nunjucks.Template(widgetSpec.code, window.env, null, true);
+        return WidgetCache[widgetSpec.name + widgetSpec.version] = widgetSpec;
+      });
+      return callback();
+    });
   };
 
-  RenderingEngine.getPropertyWidget = function(context, entityTypeName, propertyType) {
-    return RenderingEngine.getWidget(context, 'Property', entityTypeName, propertyType.name, propertyType.type, null);
+  GUI.newPage = function(portName, entityTypeName, callback) {
+    var body, page;
+    body = $("body");
+    body.empty();
+    page = $('<div>');
+    page.attr("id", "page_view");
+    body.append(page);
+    return GUI.getWidget(portName, entityTypeName, null, function(widget) {
+      page.rootWidget = widget;
+      WidgetStack.push(page.rootWidget);
+      return callback(page);
+    });
   };
 
-  RenderingEngine.getEntityWidget = function(context, entityTypeName) {
-    return RenderingEngine.getWidget(context, 'Entity', entityTypeName, null, null, null);
+  API.loadData = function(url, callback) {
+    var _this = this;
+    return $.getJSON(HOST + url, function(json) {
+      return callback(json);
+    });
   };
 
-  RenderingEngine.getEntitySetWidget = function(context, entityTypeName) {
-    return RenderingEngine.getWidget(context, 'EntitySet', entityTypeName, null, null, null);
+  API.getEntitiesTypes = function(callback) {
+    return API.loadData('entities', callback);
+  };
+
+  API.getEntityType = function(entityId, callback) {
+    return API.loadData('entities/' + entityId, callback);
+  };
+
+  API.getEntities = function(entityTypeResource, callback) {
+    var _this = this;
+    return API.loadData('api/' + entityTypeResource, function(entities) {
+      return callback(entities);
+    });
+  };
+
+  API.getEntity = function(entityTypeResource, entityID, callback) {
+    return API.loadData('api/' + entityTypeResource + '/' + entityID, callback);
+  };
+
+  API.createEntity = function(entityTypeResource, entity) {
+    return $.ajax({
+      url: HOST + "api/" + entityTypeResource,
+      type: "POST",
+      data: JSON.stringify(entity),
+      contentType: "application/json; charset=utf-8"
+    });
+  };
+
+  API.updateEntity = function(entityTypeResource, entity) {
+    return $.ajax({
+      url: HOST + "api/" + entityTypeResource + "/" + entity.id,
+      type: "PUT",
+      data: JSON.stringify(entity)
+    });
+  };
+
+  API.deleteEntity = function(entityTypeResource, entityID, success, error) {
+    return $.ajax({
+      url: HOST + "api/" + entityTypeResource + "/" + entityID,
+      type: "DELETE"
+    });
+  };
+
+  GUI.newPageByPort = function(portName, entityTypeName) {
+    console.log('newPageByPort: ' + portName);
+    return GUI.newPage(portName, entityTypeName, function(view) {
+      var _this = this;
+      if (view.rootWidget.type === "EntityTypeSet") {
+        API.getEntitiesTypes(function(entitiesTypes) {
+          return view.rootWidget.template.render(entitiesTypes, function(err, html) {
+            return view.html(html);
+          });
+        });
+      }
+      if (view.rootWidget.type === "EntityType") {
+        return API.getEntityType(entityTypeName, function(entityType) {
+          return view.rootWidget.template.render(entityType, function(err, html) {
+            return view.html(html);
+          });
+        });
+      }
+    });
+  };
+
+  GUI.openApp = function() {
+    return GUI.newPageByPort('root');
+  };
+
+  GUI.renderPortFilter = function(port, callback) {
+    var _this = this;
+    console.log('renderPortFilter: ' + port);
+    return GUI.getWidget(port, this.ctx.name, null, function(widget) {
+      var entity, entityType, i, j, len, result;
+      if (widget.type === "EntityTypeSet") {
+        API.getEntitiesTypes(function(entitiesTypes) {
+          return widget.template.render(entitiesTypes, function(err, html) {
+            return callback(null, html);
+          });
+        });
+      }
+      if (widget.type === "EntityType") {
+        if (_this.ctx.name) {
+          API.getEntityType(_this.ctx.name, function(entityType) {
+            return widget.template.render(entityType, function(err, html) {
+              return callback(null, html);
+            });
+          });
+        } else {
+          i = 0;
+          j = 0;
+          result = "";
+          while (true) {
+            entityType = _this.ctx[i];
+            if (entityType) {
+              widget.template.render(entityType, function(err, html) {
+                result += html;
+                j++;
+                if (i === j) {
+                  return callback(null, result);
+                }
+              });
+            } else {
+              return;
+            }
+            i++;
+          }
+        }
+      }
+      if (widget.type === "Entity") {
+        API.getEntities(_this.ctx.name, function(entities) {
+          var len;
+          result = "";
+          i = 1;
+          len = entities.length;
+          return entities.forEach(function(entity) {
+            entity.entityType = _this.ctx;
+            return widget.template.render(entity, function(err, html) {
+              result += html;
+              if (i === len) {
+                callback(null, result);
+              }
+              return i++;
+            });
+          });
+        });
+      }
+      if (widget.type === "PropertyType") {
+        entityType = _this.ctx;
+        result = "";
+        i = 1;
+        len = entityType.propertyTypes.length;
+        entityType.propertyTypes.forEach(function(propertyType) {
+          return GUI.getWidget(port, entityType.name, propertyType, function(widget) {
+            propertyType.entity = entityType;
+            return widget.template.render(propertyType, function(err, html) {
+              result += html;
+              if (i === len) {
+                callback(null, result);
+              }
+              return i++;
+            });
+          });
+        });
+      }
+      if (widget.type === "Property") {
+        entity = _this.ctx;
+        entityType = _this.ctx.entityType;
+        result = "";
+        i = 1;
+        len = entityType.propertyTypes.length;
+        return entityType.propertyTypes.forEach(function(propertyType) {
+          return GUI.getWidget(port, entityType.name, propertyType, function(widget) {
+            var property, propertyValue;
+            propertyType.entity = entityType;
+            propertyValue = entity[propertyType.name];
+            property = {
+              value: propertyValue,
+              type: propertyType
+            };
+            return widget.template.render(property, function(err, html) {
+              result += html;
+              if (i === len) {
+                callback(null, result);
+              }
+              return i++;
+            });
+          });
+        });
+      }
+    });
   };
 
   $(function() {
-    env.addFilter('renderEntitySet', RenderingEngine.renderEntitySet, true);
-    env.addFilter('renderEntities', RenderingEngine.renderEntities, true);
-    env.addFilter('renderProperties', RenderingEngine.renderProperties, true);
-    RulesManager.downloadAllRules();
-    WidgetManager.downloadAllWidgets();
-    return RenderingEngine.openApp(View.emptyPage());
+    env.addFilter('port', GUI.renderPortFilter, true);
+    return GUI.downloadAllRules(function() {
+      return GUI.downloadAllWidgets(function() {
+        return GUI.openApp();
+      });
+    });
   });
-
-  RenderingEngine.tempTag = function(viewId) {
-    return RenderingEngine.tempTagWithText(viewId, "");
-  };
-
-  RenderingEngine.tempTagWithText = function(viewId, text) {
-    return new Handlebars.SafeString("<span id='" + viewId + "'>" + text + "</span>");
-  };
-
-  RenderingEngine.populateTempTag = function(viewId, el) {
-    var tag;
-    tag = $("#" + viewId);
-    return tag.html(el);
-  };
-
-  RenderingEngine.appendTempTag = function(viewId, el) {
-    var tag;
-    tag = $("#" + viewId);
-    return tag.append(el);
-  };
-
-  RenderingEngine.renderEntitySet = function(port, callback) {
-    var widget,
-      _this = this;
-    console.log('renderEntitySet: ' + port);
-    widget = RenderingEngine.getEntitySetWidget(port, this.ctx.name);
-    return DataManager.getEntityType(this.ctx.name, function(entityTypeFull) {
-      entityTypeFull.templateType = "EntitySet";
-      return widget.template.render(entityTypeFull, function(err, html) {
-        return callback(null, html);
-      });
-    });
-  };
-
-  RenderingEngine.renderEntities = function(port, callback) {
-    var widget,
-      _this = this;
-    console.log('renderEntities: ' + port);
-    widget = RenderingEngine.getEntityWidget(port, this.ctx.name);
-    return DataManager.getEntityType(this.ctx.name, function(entityTypeFull) {
-      return DataManager.getEntities(_this.ctx.name, function(entities) {
-        var i, len, result;
-        result = "";
-        i = 1;
-        len = entities.length;
-        return entities.forEach(function(entity) {
-          entity.entityType = entityTypeFull;
-          entity.templateType = "Entity";
-          return widget.template.render(entity, function(err, html) {
-            result += html;
-            if (i === len) {
-              callback(null, result);
-            }
-            return i++;
-          });
-        });
-      });
-    });
-  };
-
-  RenderingEngine.renderProperties = function(port, callback) {
-    var entity, entityType, i, len, result;
-    console.log('renderProperties: ' + port);
-    entity = this.ctx;
-    entityType = this.ctx.entityType;
-    if (this.ctx.templateType === "EntitySet") {
-      entityType = this.ctx;
-    }
-    result = "";
-    i = 1;
-    len = entityType.propertyTypes.length;
-    return entityType.propertyTypes.forEach(function(propertyType) {
-      var property, propertyValue, widget;
-      widget = RenderingEngine.getPropertyWidget(port, entityType.name, propertyType);
-      propertyType.entity = entityType;
-      propertyValue = entity[propertyType.name];
-      property = {
-        value: propertyValue,
-        type: propertyType
-      };
-      property.templateType = "Property";
-      return widget.template.render(property, function(err, html) {
-        result += html;
-        if (i === len) {
-          callback(null, result);
-        }
-        return i++;
-      });
-    });
-  };
-
-  window.PropertyWidget = (function() {
-
-    function PropertyWidget() {
-      this.createInputElement = __bind(this.createInputElement, this);
-
-    }
-
-    PropertyWidget.prototype.render = function(view) {};
-
-    PropertyWidget.prototype.injectValue = function(entity) {};
-
-    PropertyWidget.prototype.createInputElement = function() {
-      var input;
-      input = $("<input>");
-      input.attr("id", this.propertyType.name);
-      return input;
-    };
-
-    return PropertyWidget;
-
-  })();
-
-  window.RelationshipWidget = (function() {
-
-    function RelationshipWidget() {}
-
-    RelationshipWidget.prototype.render = function(view, relationType, relation) {};
-
-    RelationshipWidget.prototype.populateSelectField = function(selectField, resource, propertyKey, relationshipIds) {
-      var _this = this;
-      return DataManager.getEntities(resource, function(entities) {
-        return entities.forEach(function(entity) {
-          var option;
-          option = new Option(entity.id);
-          if (propertyKey) {
-            option = new Option(entity[propertyKey], entity.id);
-          }
-          selectField.append(option);
-          if (relationshipIds && relationshipIds.indexOf(entity.id) !== -1) {
-            return option.selected = true;
-          }
-        });
-      });
-    };
-
-    return RelationshipWidget;
-
-  })();
 
 }).call(this);

@@ -1,7 +1,7 @@
 { name: ListingTable, 
   type: EntitySet,
   requiredPorts: [
-      {name: “table_head”, type: “Property”},
+      {name: “table_head”, type: “PropertyType”},
       {name: “table_line”, type: “Entity”}
   ]
 }

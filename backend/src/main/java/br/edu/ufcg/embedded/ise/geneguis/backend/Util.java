@@ -26,7 +26,7 @@ public class Util {
 		Port propertyContext = createPort("property", WidgetType.Property);
 		Port formContext = createPort("form", WidgetType.Entity);
 		Port fieldContext = createPort("field", WidgetType.Property);
-		Widget listingTableWidget = createWidget("ListingTable", WidgetType.EntitySet,
+		Widget listingTableWidget = createWidget("ListingTable", WidgetType.EntityType,
 				readWidgetFile("ListingTable.js"), propertyContext, formContext);
 		Widget toStringPropertyWidget = createWidget("ToStringProperty", WidgetType.Property,
 				readWidgetFile("ToStringProperty.js"));

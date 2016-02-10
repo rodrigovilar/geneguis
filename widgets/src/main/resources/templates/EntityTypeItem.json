@@ -1,0 +1,6 @@
+{ name: EntityTypeItem, 
+  type: EntityType,
+  requiredPorts: [
+      {name: “entity_type_page”, type: "EntityType"}
+  ]
+}

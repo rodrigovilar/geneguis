@@ -79,7 +79,7 @@ public class RuleService {
 	private Port createRootPort() {
 		Port rootPort = new Port();
 		rootPort.setName(ROOT_PORT);
-		rootPort.setType(WidgetType.EntitySet);
+		rootPort.setType(WidgetType.EntityTypeSet);
 		return portService.createPort(rootPort);
 	}
 
