@@ -44,7 +44,11 @@ public class Helper {
 	}
 
 	static void clickEntityType(Class<?> entityType) {
-		checkId("entityType_" + entityType.getSimpleName()).click();
+		click("entityType_" + entityType.getSimpleName());
+	}
+	
+	static void click(String id) {
+		checkId(id).click();
 	}
 
 	static void checkTitle(Class<?> entityType) {

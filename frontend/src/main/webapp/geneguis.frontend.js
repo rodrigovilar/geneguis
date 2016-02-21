@@ -79,8 +79,23 @@
     body.append(page);
     return GUI.getWidget(portName, entityTypeName, null, function(widget) {
       page.rootWidget = widget;
-      WidgetStack.push(page.rootWidget);
+      page.rootWidget.context = this.ctx;
+      WidgetStack.push(page);
       return callback(page);
+    });
+  };
+
+  GUI.back = function() {
+    var body, page, widget;
+    body = $("body");
+    body.empty();
+    page = $('<div>');
+    page.attr("id", "page_view");
+    body.append(page);
+    WidgetStack.pop();
+    widget = WidgetStack[WidgetStack.length - 1].rootWidget;
+    return widget.template.render(widget.context, function(err, html) {
+      return page.html(html);
     });
   };
 
@@ -110,12 +125,14 @@
     return API.loadData('api/' + entityTypeResource + '/' + entityID, callback);
   };
 
-  API.createEntity = function(entityTypeResource, entity) {
+  API.createEntity = function(entityTypeResource, entity, callback) {
     return $.ajax({
       url: HOST + "api/" + entityTypeResource,
       type: "POST",
       data: JSON.stringify(entity),
       contentType: "application/json; charset=utf-8"
+    }).done(function() {
+      return callback();
     });
   };
 
@@ -134,12 +151,28 @@
     });
   };
 
+  GUI.postAndBack = function(entityTypeName) {
+    var entity, formData,
+      _this = this;
+    console.log('postAndBack: ' + entityTypeName);
+    formData = $("#create_" + entityTypeName).serializeArray();
+    entity = {};
+    formData.forEach(function(field) {
+      return entity[field.name.substring(18)] = field.value === "" ? null : field.value;
+    });
+    return API.createEntity(entityTypeName, entity, function() {
+      console.log('POST OK: ' + entityTypeName + ' ' + JSON.stringify(entity));
+      return GUI.back();
+    });
+  };
+
   GUI.newPageByPort = function(portName, entityTypeName) {
     console.log('newPageByPort: ' + portName);
     return GUI.newPage(portName, entityTypeName, function(view) {
       var _this = this;
       if (view.rootWidget.type === "EntityTypeSet") {
         API.getEntitiesTypes(function(entitiesTypes) {
+          view.rootWidget.context = entitiesTypes;
           return view.rootWidget.template.render(entitiesTypes, function(err, html) {
             return view.html(html);
           });
@@ -147,6 +180,7 @@
       }
       if (view.rootWidget.type === "EntityType") {
         return API.getEntityType(entityTypeName, function(entityType) {
+          view.rootWidget.context = entityType;
           return view.rootWidget.template.render(entityType, function(err, html) {
             return view.html(html);
           });
@@ -263,8 +297,18 @@
     });
   };
 
+  GUI.renderNewPageFilter = function(port, callback) {
+    return "onClick=\"GUI.newPageByPort('" + port + "','" + this.ctx.name + "')\"";
+  };
+
+  GUI.renderPostFilter = function(port, callback) {
+    return "onClick=\"GUI.postAndBack('" + this.ctx.name + "');return false;\"";
+  };
+
   $(function() {
     env.addFilter('port', GUI.renderPortFilter, true);
+    env.addFilter('newPage', GUI.renderNewPageFilter, false);
+    env.addFilter('post', GUI.renderPostFilter, false);
     return GUI.downloadAllRules(function() {
       return GUI.downloadAllWidgets(function() {
         return GUI.openApp();

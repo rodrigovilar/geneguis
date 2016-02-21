@@ -3,6 +3,7 @@ package br.edu.ufcg.embedded.ise.geneguis;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkId;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkIds;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkTitle;
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.click;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.clickEntityType;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.deployEntityType;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.openApp;
@@ -112,6 +113,25 @@ public class EntityWidgetTest {
 
 		openApp();
 		clickEntityType(CustomerDetails.class);
+	}
+
+	@Test
+	public void testListingTableCreateButton() {
+		widget("ListingTableWithCreate", WidgetType.EntityType,
+				new PortRest("table_head", WidgetType.PropertyType.name()),
+				new PortRest("table_line", WidgetType.Entity.name()),
+				new PortRest("creation_form", WidgetType.EntityType.name()));
+		widget("CreateForm", WidgetType.EntityType,
+				new PortRest("form_line", WidgetType.PropertyType.name()));
+		widget("FormLine", WidgetType.PropertyType);
+
+		rule("entity_type_page", "ListingTableWithCreate");
+		rule("creation_form", "CreateForm");
+		rule("form_line", "FormLine");
+
+		openApp();
+		clickEntityType(CustomerDetails.class);
+		click("button_new_" + CustomerDetails.class.getSimpleName());
 	}
 
 }
