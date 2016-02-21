@@ -1,0 +1,6 @@
+{ name: CreateForm, 
+  type: EntitySet,
+  requiredPorts: [
+      {name: “form_line”, type: “PropertyType”}
+  ]
+}

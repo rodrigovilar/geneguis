@@ -50,9 +50,21 @@ GUI.newPage = (portName, entityTypeName, callback) ->
 	body.append page
 	GUI.getWidget portName, entityTypeName, null, (widget) ->
 		page.rootWidget = widget
-		WidgetStack.push page.rootWidget
+		page.rootWidget.context = this.ctx
+		WidgetStack.push page
 		callback(page)
-
+		
+GUI.back = () ->
+	body  = $("body")
+	body.empty()  
+	page = $('<div>')
+	page.attr "id", "page_view"
+	body.append page
+	WidgetStack.pop()
+	widget = WidgetStack[WidgetStack.length - 1].rootWidget
+	widget.template.render widget.context, (err, html) ->
+		page.html html
+		
 API.loadData = (url, callback) ->
 	$.getJSON HOST + url, (json) =>
 			callback(json)
@@ -70,12 +82,14 @@ API.getEntities = (entityTypeResource, callback) ->
 API.getEntity = (entityTypeResource, entityID, callback) ->
 	API.loadData 'api/' + entityTypeResource + '/' + entityID, callback
 	
-API.createEntity = (entityTypeResource, entity) =>
+API.createEntity = (entityTypeResource, entity, callback) =>
 	$.ajax
 		url: HOST + "api/" + entityTypeResource
 		type: "POST"
 		data: JSON.stringify(entity)
 		contentType: "application/json; charset=utf-8"
+	.done () ->
+		callback()
 
 API.updateEntity = (entityTypeResource, entity) =>
 	$.ajax
@@ -88,15 +102,27 @@ API.deleteEntity = (entityTypeResource, entityID, success, error) =>
 		url: HOST + "api/" + entityTypeResource + "/" + entityID
 		type: "DELETE"
 
+GUI.postAndBack = (entityTypeName) ->
+	console.log 'postAndBack: ' + entityTypeName
+	formData = $("#create_" + entityTypeName).serializeArray()
+	entity = {}
+	formData.forEach (field) =>
+		entity[field.name.substring(18)] = if (field.value == "") then null else field.value
+	API.createEntity entityTypeName, entity, () ->
+		console.log 'POST OK: ' + entityTypeName + ' ' + JSON.stringify(entity)
+		GUI.back()
+
 GUI.newPageByPort = (portName, entityTypeName) ->
 	console.log 'newPageByPort: ' + portName
 	GUI.newPage portName, entityTypeName, (view) -> 
 		if (view.rootWidget.type == "EntityTypeSet")
 			API.getEntitiesTypes (entitiesTypes) =>
+				view.rootWidget.context = entitiesTypes
 				view.rootWidget.template.render entitiesTypes, (err, html) ->
 					view.html html
 		if (view.rootWidget.type == "EntityType")
 			API.getEntityType entityTypeName, (entityType) =>
+				view.rootWidget.context = entityType
 				view.rootWidget.template.render entityType, (err, html) ->
 					view.html html
 	
@@ -172,8 +198,16 @@ GUI.renderPortFilter = (port, callback) ->
 							callback(null, result)
 						i++;	
 
+GUI.renderNewPageFilter = (port, callback) ->
+	"onClick=\"GUI.newPageByPort('" + port + "','" + this.ctx.name + "')\""
+
+GUI.renderPostFilter = (port, callback) ->
+	"onClick=\"GUI.postAndBack('" + this.ctx.name + "');return false;\""
+
 $ ->
 	env.addFilter('port', GUI.renderPortFilter, true)
+	env.addFilter('newPage', GUI.renderNewPageFilter, false)
+	env.addFilter('post', GUI.renderPostFilter, false)
 	GUI.downloadAllRules () ->
 		GUI.downloadAllWidgets () ->
 			GUI.openApp()

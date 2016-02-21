@@ -1,14 +1,14 @@
 <table id='table_{{name}}' border=1>
   <thead>
     <tr>
-      {{'table_head' | renderProperties}}
+      {{'table_head' | port}}
     </tr>
   </thead>
 
   <tbody>  
-    {{'table_line' | renderEntities}}
+    {{'table_line' | port}}
   </tbody>  
   
 </table>
 
-<button onClick="RenderingEngine.newPageProperties('creation_form')">Create new {{name}}</button>
+<button id='button_new_{{name}}' {{'creation_form' | newPage}}>Create new {{name}}</button>
