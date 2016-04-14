@@ -3,7 +3,7 @@ package br.edu.ufcg.embedded.ise.geneguis.test;
 import java.util.Iterator;
 
 import br.edu.ufcg.embedded.ise.geneguis.EntityType;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class Helper {
 
