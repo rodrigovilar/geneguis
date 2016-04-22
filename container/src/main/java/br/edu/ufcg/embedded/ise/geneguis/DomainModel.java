@@ -16,4 +16,5 @@ public interface DomainModel {
 
 	boolean deleteEntity(String name, Long entityId);
 
+	void clear();
 }

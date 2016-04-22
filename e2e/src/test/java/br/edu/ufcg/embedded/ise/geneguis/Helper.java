@@ -40,7 +40,7 @@ public class Helper {
 	static final String SERVER_URL = "http://localhost:8080/";
 	
 	static void openApp() {
-		EntityWidgetTest.driver.get(SERVER_URL);
+		WebBrowserTestCase.driver.get(SERVER_URL);
 	}
 
 	static void clickEntityType(Class<?> entityType) {
@@ -56,12 +56,12 @@ public class Helper {
 	}
 
 	static WebElement checkId(String id) {
-		return EntityWidgetTest.driver.findElement(By.id(id));
+		return WebBrowserTestCase.driver.findElement(By.id(id));
 	}
 
 	static void checkIds(String... ids) {
 		for (String id : ids) {
-			EntityWidgetTest.driver.findElement(By.id(id));
+			WebBrowserTestCase.driver.findElement(By.id(id));
 		}
 	}
 

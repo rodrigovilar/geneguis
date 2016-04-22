@@ -79,20 +79,26 @@
     body.append(page);
     return GUI.getWidget(portName, entityTypeName, null, function(widget) {
       page.rootWidget = widget;
-      page.rootWidget.context = this.ctx;
+      page.rootWidget.context = {
+        name: entityTypeName
+      };
       WidgetStack.push(page);
       return callback(page);
     });
   };
 
   GUI.back = function() {
+    WidgetStack.pop();
+    return GUI.refresh();
+  };
+
+  GUI.refresh = function() {
     var body, page, widget;
     body = $("body");
     body.empty();
     page = $('<div>');
     page.attr("id", "page_view");
     body.append(page);
-    WidgetStack.pop();
     widget = WidgetStack[WidgetStack.length - 1].rootWidget;
     return widget.template.render(widget.context, function(err, html) {
       return page.html(html);
@@ -136,11 +142,14 @@
     });
   };
 
-  API.updateEntity = function(entityTypeResource, entity) {
+  API.updateEntity = function(entityTypeResource, entity, callback) {
     return $.ajax({
       url: HOST + "api/" + entityTypeResource + "/" + entity.id,
       type: "PUT",
-      data: JSON.stringify(entity)
+      data: JSON.stringify(entity),
+      contentType: "application/json; charset=utf-8"
+    }).done(function() {
+      return callback();
     });
   };
 
@@ -166,7 +175,26 @@
     });
   };
 
-  GUI.newPageByPort = function(portName, entityTypeName) {
+  GUI.putAndBack = function(entityTypeName) {
+    var entity, formData,
+      _this = this;
+    console.log('putAndBack: ' + entityTypeName);
+    formData = $("#edit_" + entityTypeName).serializeArray();
+    entity = {};
+    formData.forEach(function(field) {
+      return entity[field.name.substring(16)] = field.value === "" ? null : field.value;
+    });
+    return API.updateEntity(entityTypeName, entity, function() {
+      console.log('PUT OK: ' + entityTypeName + ' ' + JSON.stringify(entity));
+      return GUI.back();
+    });
+  };
+
+  GUI.remove = function(entityTypeName, entityID) {
+    return API.deleteEntity(entityTypeName, entityID);
+  };
+
+  GUI.newPageByPort = function(portName, entityTypeName, entityId) {
     console.log('newPageByPort: ' + portName);
     return GUI.newPage(portName, entityTypeName, function(view) {
       var _this = this;
@@ -179,10 +207,21 @@
         });
       }
       if (view.rootWidget.type === "EntityType") {
-        return API.getEntityType(entityTypeName, function(entityType) {
+        API.getEntityType(entityTypeName, function(entityType) {
           view.rootWidget.context = entityType;
           return view.rootWidget.template.render(entityType, function(err, html) {
             return view.html(html);
+          });
+        });
+      }
+      if (view.rootWidget.type === "Entity") {
+        return API.getEntityType(entityTypeName, function(entityType) {
+          return API.getEntity(entityTypeName, entityId, function(entity) {
+            entity.entityType = entityType;
+            view.rootWidget.context = entity;
+            return view.rootWidget.template.render(entity, function(err, html) {
+              return view.html(html);
+            });
           });
         });
       }
@@ -271,7 +310,7 @@
       }
       if (widget.type === "Property") {
         entity = _this.ctx;
-        entityType = _this.ctx.entityType;
+        entityType = _this.ctx.entityType ? _this.ctx.entityType : _this.ctx.type;
         result = "";
         i = 1;
         len = entityType.propertyTypes.length;
@@ -297,18 +336,30 @@
     });
   };
 
-  GUI.renderNewPageFilter = function(port, callback) {
-    return "onClick=\"GUI.newPageByPort('" + port + "','" + this.ctx.name + "')\"";
+  GUI.renderNewPageFilter = function(port) {
+    var entityTypeName;
+    entityTypeName = this.ctx.entityType ? this.ctx.entityType.name : this.ctx.name;
+    return "onClick=\"GUI.newPageByPort('" + port + "','" + entityTypeName + "'," + this.ctx.id + ")\"";
   };
 
-  GUI.renderPostFilter = function(port, callback) {
+  GUI.renderPostFilter = function(port) {
     return "onClick=\"GUI.postAndBack('" + this.ctx.name + "');return false;\"";
+  };
+
+  GUI.renderPutFilter = function(port) {
+    return "onClick=\"GUI.putAndBack('" + this.ctx.entityType.name + "');return false;\"";
+  };
+
+  GUI.renderActionFilter = function(action) {
+    return "onClick=\"GUI." + action + "('" + this.ctx.entityType.name + "', " + this.ctx.id + ");GUI.refresh();\"";
   };
 
   $(function() {
     env.addFilter('port', GUI.renderPortFilter, true);
     env.addFilter('newPage', GUI.renderNewPageFilter, false);
     env.addFilter('post', GUI.renderPostFilter, false);
+    env.addFilter('put', GUI.renderPutFilter, false);
+    env.addFilter('action', GUI.renderActionFilter, false);
     return GUI.downloadAllRules(function() {
       return GUI.downloadAllWidgets(function() {
         return GUI.openApp();

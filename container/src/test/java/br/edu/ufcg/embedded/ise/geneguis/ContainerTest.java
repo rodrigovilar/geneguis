@@ -74,4 +74,7 @@ class DomainWithoutEntityTypes implements DomainModel {
 	public boolean deleteEntity(String name, Long entityId) {
 		return false;
 	}
+
+	public void clear() {
+	}
 }

@@ -1,0 +1,7 @@
+{ name: TableLineCrud, 
+  type: Entity,
+  requiredPorts: [
+      {name: “line_cell”, type: "Property”},
+      {name: “edition_form”, type: “Entity”}
+  ]
+}
