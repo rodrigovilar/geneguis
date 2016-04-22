@@ -23,8 +23,10 @@ public abstract class WebBrowserTestCase {
 
 	@BeforeClass
 	public static void openBrowser() {
-		driver = new FirefoxDriver();
-		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
+		if (driver == null) {
+			driver = new FirefoxDriver();
+			driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
+		}
 	}
 	
 	@Before
