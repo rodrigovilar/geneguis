@@ -1,5 +1,6 @@
 package br.edu.ufcg.embedded.ise.geneguis;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -78,7 +79,8 @@ public class Helper {
 
 	static String readWidgetFile(String fileName) {
 		URL resource = EntryPoint.class.getResource("/widgets/" + fileName + ".hbs");
-		String filePath = resource.getPath();
+		File file = new File(resource.getFile());
+		String filePath = file.getAbsolutePath();
 		try {
 			Path widgetPath = Paths.get(filePath);
 			return new String(Files.readAllBytes(widgetPath));
