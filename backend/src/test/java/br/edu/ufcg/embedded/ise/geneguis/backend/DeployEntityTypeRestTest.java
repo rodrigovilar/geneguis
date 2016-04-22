@@ -6,7 +6,6 @@ import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.delete;
 import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.deploy;
 import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.entityType;
 import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.get;
-import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.getDate;
 import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.getObjectFromResult;
 import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.instance;
 import static br.edu.ufcg.embedded.ise.geneguis.backend.TestHelper.objectToMap;
@@ -19,7 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
-import java.util.Date;
 import java.util.Map;
 
 import org.junit.Before;
@@ -133,8 +131,7 @@ public class DeployEntityTypeRestTest {
 				.andExpect(propertyType(0, "id", PropertyTypeType.integer))
 				.andExpect(propertyType(1, "ssn", PropertyTypeType.string))
 				.andExpect(propertyType(2, "name", PropertyTypeType.string))
-				.andExpect(propertyType(3, "birthdate", PropertyTypeType.date))
-				.andExpect(propertyType(4, "credit", PropertyTypeType.real));
+				.andExpect(propertyType(3, "credit", PropertyTypeType.real));
 
 		get(mockMvc, "/api/" + "CustomerDetails").andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
 	}
@@ -146,12 +143,10 @@ public class DeployEntityTypeRestTest {
 
 		String name = "FooName";
 		String ssn = null;
-		Date birthdate = getDate(2015, 01, 01, 0, 0, 0);
-		CustomerDetails customer = createCustomerDetails(name, ssn, birthdate, 0);
+		CustomerDetails customer = createCustomerDetails(name, ssn, 0);
 
 		Map<String, Object> instanceMap = objectToMap(customer);
 		instanceMap.remove("id");
-		instanceMap.put("birthdate", birthdate.getTime());
 
 		MvcResult result = post(mockMvc, "/api/" + "CustomerDetails", customer).andExpect(status().isCreated())
 				.andExpect(instance(instanceMap)).andReturn();
@@ -162,7 +157,6 @@ public class DeployEntityTypeRestTest {
 
 		instanceMap = objectToMap(customer);
 		instanceMap.put("id", customer.getId().intValue());
-		instanceMap.put("birthdate", birthdate.getTime());
 
 		result = put(mockMvc, "/api/" + "CustomerDetails/" + customer.getId(), customer).andExpect(status().isCreated())
 				.andExpect(instance(instanceMap)).andReturn();
@@ -179,11 +173,10 @@ public class DeployEntityTypeRestTest {
 
 	}
 
-	private CustomerDetails createCustomerDetails(String name, String ssn, Date birthdate, int credit) {
+	private CustomerDetails createCustomerDetails(String name, String ssn, int credit) {
 		CustomerDetails customer = new CustomerDetails();
 		customer.setName(name);
 		customer.setSsn(ssn);
-		customer.setBirthdate(birthdate);
 		customer.setCredit(credit);
 		return customer;
 	}

@@ -1,0 +1,15 @@
+<table id='table_{{name}}' border=1>
+  <thead>
+    <tr>
+      {{'table_head' | port}}
+      <td colspan="2">Actions</td>
+    </tr>
+  </thead>
+
+  <tbody>  
+    {{'table_line' | port}}
+  </tbody>  
+  
+</table>
+
+<button id='button_new_{{name}}' {{'creation_form' | newPage}}>Create new {{name}}</button>

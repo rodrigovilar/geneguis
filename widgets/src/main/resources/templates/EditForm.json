@@ -1,0 +1,6 @@
+{ name: EditForm, 
+  type: Entity,
+  requiredPorts: [
+      {name: “edit_form_line”, type: “Property”}
+  ]
+}

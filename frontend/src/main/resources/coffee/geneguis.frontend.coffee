@@ -50,21 +50,24 @@ GUI.newPage = (portName, entityTypeName, callback) ->
 	body.append page
 	GUI.getWidget portName, entityTypeName, null, (widget) ->
 		page.rootWidget = widget
-		page.rootWidget.context = this.ctx
+		page.rootWidget.context = { name: entityTypeName }
 		WidgetStack.push page
 		callback(page)
 		
 GUI.back = () ->
+	WidgetStack.pop()
+	GUI.refresh()
+		
+GUI.refresh = () ->
 	body  = $("body")
 	body.empty()  
 	page = $('<div>')
 	page.attr "id", "page_view"
 	body.append page
-	WidgetStack.pop()
 	widget = WidgetStack[WidgetStack.length - 1].rootWidget
 	widget.template.render widget.context, (err, html) ->
 		page.html html
-		
+
 API.loadData = (url, callback) ->
 	$.getJSON HOST + url, (json) =>
 			callback(json)
@@ -91,11 +94,14 @@ API.createEntity = (entityTypeResource, entity, callback) =>
 	.done () ->
 		callback()
 
-API.updateEntity = (entityTypeResource, entity) =>
+API.updateEntity = (entityTypeResource, entity, callback) =>
 	$.ajax
 		url: HOST + "api/" + entityTypeResource + "/" + entity.id
 		type: "PUT"
 		data: JSON.stringify(entity)
+		contentType: "application/json; charset=utf-8"
+	.done () ->
+		callback()
 
 API.deleteEntity = (entityTypeResource, entityID, success, error) =>
 	$.ajax
@@ -112,7 +118,20 @@ GUI.postAndBack = (entityTypeName) ->
 		console.log 'POST OK: ' + entityTypeName + ' ' + JSON.stringify(entity)
 		GUI.back()
 
-GUI.newPageByPort = (portName, entityTypeName) ->
+GUI.putAndBack = (entityTypeName) ->
+	console.log 'putAndBack: ' + entityTypeName
+	formData = $("#edit_" + entityTypeName).serializeArray()
+	entity = {}
+	formData.forEach (field) =>
+		entity[field.name.substring(16)] = if (field.value == "") then null else field.value
+	API.updateEntity entityTypeName, entity, () ->
+		console.log 'PUT OK: ' + entityTypeName + ' ' + JSON.stringify(entity)
+		GUI.back()
+		
+GUI.remove = (entityTypeName, entityID) ->
+	API.deleteEntity(entityTypeName, entityID)
+
+GUI.newPageByPort = (portName, entityTypeName, entityId) ->
 	console.log 'newPageByPort: ' + portName
 	GUI.newPage portName, entityTypeName, (view) -> 
 		if (view.rootWidget.type == "EntityTypeSet")
@@ -125,6 +144,13 @@ GUI.newPageByPort = (portName, entityTypeName) ->
 				view.rootWidget.context = entityType
 				view.rootWidget.template.render entityType, (err, html) ->
 					view.html html
+		if (view.rootWidget.type == "Entity")
+			API.getEntityType entityTypeName, (entityType) =>
+				API.getEntity entityTypeName, entityId, (entity) =>
+					entity.entityType = entityType
+					view.rootWidget.context = entity
+					view.rootWidget.template.render entity, (err, html) ->
+						view.html html
 	
 GUI.openApp = () ->
 	GUI.newPageByPort 'root'
@@ -183,7 +209,7 @@ GUI.renderPortFilter = (port, callback) ->
 						i++;
 		if (widget.type == "Property")
 			entity = this.ctx
-			entityType = this.ctx.entityType
+			entityType = if this.ctx.entityType then this.ctx.entityType else this.ctx.type
 			result = ""
 			i = 1
 			len = entityType.propertyTypes.length
@@ -198,16 +224,25 @@ GUI.renderPortFilter = (port, callback) ->
 							callback(null, result)
 						i++;	
 
-GUI.renderNewPageFilter = (port, callback) ->
-	"onClick=\"GUI.newPageByPort('" + port + "','" + this.ctx.name + "')\""
+GUI.renderNewPageFilter = (port) ->
+	entityTypeName = if this.ctx.entityType then this.ctx.entityType.name else this.ctx.name
+	"onClick=\"GUI.newPageByPort('" + port + "','" + entityTypeName + "'," +  this.ctx.id + ")\""
 
-GUI.renderPostFilter = (port, callback) ->
+GUI.renderPostFilter = (port) ->
 	"onClick=\"GUI.postAndBack('" + this.ctx.name + "');return false;\""
+
+GUI.renderPutFilter = (port) ->
+	"onClick=\"GUI.putAndBack('" + this.ctx.entityType.name + "');return false;\""
+
+GUI.renderActionFilter = (action) ->
+	"onClick=\"GUI." + action + "('" + this.ctx.entityType.name + "', " + this.ctx.id + ");GUI.refresh();\""
 
 $ ->
 	env.addFilter('port', GUI.renderPortFilter, true)
 	env.addFilter('newPage', GUI.renderNewPageFilter, false)
 	env.addFilter('post', GUI.renderPostFilter, false)
+	env.addFilter('put', GUI.renderPutFilter, false)
+	env.addFilter('action', GUI.renderActionFilter, false)
 	GUI.downloadAllRules () ->
 		GUI.downloadAllWidgets () ->
 			GUI.openApp()

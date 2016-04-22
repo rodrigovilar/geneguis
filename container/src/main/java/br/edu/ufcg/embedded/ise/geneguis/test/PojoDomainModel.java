@@ -39,4 +39,8 @@ public class PojoDomainModel implements DomainModel {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public void clear() {
+		
+	}
 }

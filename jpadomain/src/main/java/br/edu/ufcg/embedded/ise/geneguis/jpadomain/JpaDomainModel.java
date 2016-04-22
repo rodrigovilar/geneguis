@@ -221,4 +221,13 @@ public class JpaDomainModel implements DomainModel {
 		repository.delete(entityId);
 		return true;
 	}
+
+	public void clear() {
+		entityTypes = new ArrayList<EntityType>();
+		classes = new ArrayList<Class<?>>();
+		for (JpaRepository<?, ?> repository : repositories) {
+			repository.deleteAll();
+		}
+		repositories = new ArrayList<JpaRepository<?, ?>>();
+	}
 }

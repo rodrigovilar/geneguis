@@ -21,4 +21,8 @@ public class PortService {
 		return repository.saveAndFlush(port);
 	}
 	
+	public void clear() {
+		repository.deleteAll();
+	}
+	
 }
