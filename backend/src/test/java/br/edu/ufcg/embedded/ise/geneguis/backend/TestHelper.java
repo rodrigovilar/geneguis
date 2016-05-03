@@ -32,6 +32,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 
 import br.edu.ufcg.embedded.ise.geneguis.Cardinality;
+import br.edu.ufcg.embedded.ise.geneguis.FieldKind;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.EntityTypeRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PropertyTypeRest;
@@ -56,7 +57,7 @@ public class TestHelper {
 		PropertyTypeRest prop = new PropertyTypeRest();
 		prop.setName(name);
 		prop.setType(type);
-		expected.getPropertyTypes().add(prop);
+		expected.getFieldTypes().add(prop);
 	}
 
 	public static void equals(ResultActions actions, long id, String name) throws Exception {
@@ -101,8 +102,10 @@ public class TestHelper {
 			final PropertyTypeType type) {
 		return new ResultMatcher() {
 			public void match(MvcResult result) throws Exception {
-				jsonPath("$.propertyTypes[" + propertyTypePosition + "].name").value(name).match(result);
-				jsonPath("$.propertyTypes[" + propertyTypePosition + "].type").value(type.name()).match(result);
+				jsonPath("$.fieldTypes[" + propertyTypePosition + "].name").value(name).match(result);
+				jsonPath("$.fieldTypes[" + propertyTypePosition + "].type").value(type.name()).match(result);
+				jsonPath("$.fieldTypes[" + propertyTypePosition + "].kind").value(FieldKind.Property.name())
+						.match(result);
 			}
 		};
 	}
@@ -111,13 +114,15 @@ public class TestHelper {
 			final String targetTypeName, final Cardinality sourceCardinality, final Cardinality targetCardinality) {
 		return new ResultMatcher() {
 			public void match(MvcResult result) throws Exception {
-				jsonPath("$.relationshipTypes[" + relationshipTypePosition + "].name").value(name).match(result);
-				jsonPath("$.relationshipTypes[" + relationshipTypePosition + "].targetType").value(targetTypeName)
+				jsonPath("$.fieldTypes[" + relationshipTypePosition + "].name").value(name).match(result);
+				jsonPath("$.fieldTypes[" + relationshipTypePosition + "].targetType").value(targetTypeName)
 						.match(result);
-				jsonPath("$.relationshipTypes[" + relationshipTypePosition + "].targetCardinality")
+				jsonPath("$.fieldTypes[" + relationshipTypePosition + "].targetCardinality")
 						.value(targetCardinality.name()).match(result);
-				jsonPath("$.relationshipTypes[" + relationshipTypePosition + "].sourceCardinality")
+				jsonPath("$.fieldTypes[" + relationshipTypePosition + "].sourceCardinality")
 						.value(sourceCardinality.name()).match(result);
+				jsonPath("$.fieldTypes[" + relationshipTypePosition + "].kind").value(FieldKind.Relationship.name())
+						.match(result);
 			}
 		};
 	}

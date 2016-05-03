@@ -14,7 +14,7 @@ import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerRepository;
 
 public class T01_EntityTitle extends WebBrowserTestCase {
 
-	void deployEntityTypes() {
+	void deployEntityTypes() throws Exception {
 		deployEntityType(Customer.class, CustomerRepository.class);
 	}
 	
@@ -26,9 +26,9 @@ public class T01_EntityTitle extends WebBrowserTestCase {
 	}
 
 	void addRules() {
-		rule("root", "EntityTypeList");
-		rule("entity_type_item", "EntityTypeItem");
-		rule("entity_type_page", "EntityTitle");
+		rule("root", "EntityTypeList", EntityTypeSet);
+		rule("entity_type_item", "EntityTypeItem", EntityType);
+		rule("entity_type_page", "EntityTitle", EntityType);
 	}
 
 	void steps() {

@@ -15,7 +15,7 @@ import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerDetailsReposit
 public class T06_ListingTableCreateButton extends WebBrowserTestCase {
 
 	@Override
-	void deployEntityTypes() {
+	void deployEntityTypes() throws Exception {
 		deployEntityType(CustomerDetails.class, CustomerDetailsRepository.class);
 	}
 
@@ -34,14 +34,14 @@ public class T06_ListingTableCreateButton extends WebBrowserTestCase {
 
 	@Override
 	void addRules() {
-		rule("root", "EntityTypeList");
-		rule("entity_type_item", "EntityTypeItem");
-		rule("entity_type_page", "ListingTableWithCreate");
-		rule("table_head", "TableHead");
-		rule("table_line", "TableLine");
-		rule("line_cell", "TableCell");
-		rule("creation_form", "CreateForm");
-		rule("form_line", "FormLine");
+		rule("root", "EntityTypeList", EntityTypeSet);
+		rule("entity_type_item", "EntityTypeItem", EntityType);
+		rule("entity_type_page", "ListingTableWithCreate", EntityType);
+		rule("table_head", "TableHead", PropertyType);
+		rule("table_line", "TableLine", Entity);
+		rule("line_cell", "TableCell", Property);
+		rule("creation_form", "CreateForm", EntityType);
+		rule("form_line", "FormLine", PropertyType);
 	}
 
 	@Override

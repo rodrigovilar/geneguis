@@ -1,0 +1,7 @@
+{ name: FieldListingTable, 
+  type: EntitySet,
+  requiredPorts: [
+      {name: “table_head”, type: “FieldType”},
+      {name: “table_line”, type: “Entity”}
+  ]
+}

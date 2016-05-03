@@ -16,6 +16,10 @@ public abstract class WebBrowserTestCase {
 	static WidgetType Entity = WidgetType.Entity;
 	static WidgetType PropertyType = WidgetType.PropertyType;
 	static WidgetType Property = WidgetType.Property;
+	static WidgetType RelationshipType = WidgetType.RelationshipType;
+	static WidgetType Relationship = WidgetType.Relationship;
+	static WidgetType FieldType = WidgetType.FieldType;
+	static WidgetType Field = WidgetType.Field;
 	
 	
 
@@ -35,14 +39,14 @@ public abstract class WebBrowserTestCase {
 	}
 
 	@Test
-	public void testCase() {
+	public void testCase() throws Exception {
 		deployEntityTypes();
 		addWidgets();
 		addRules();
 		steps();
 	}
 
-	abstract void deployEntityTypes();
+	abstract void deployEntityTypes() throws Exception;
 	abstract void addWidgets();
 	abstract void addRules();
 	abstract void steps();

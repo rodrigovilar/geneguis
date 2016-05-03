@@ -1,0 +1,12 @@
+<table id='table_{{name}}' border=1>
+  <thead>
+    <tr>
+      {{'table_head' | forEachFieldType}}
+    </tr>
+  </thead>
+
+  <tbody>  
+    {{'table_line' | forEachEntity}}
+  </tbody>  
+  
+</table>

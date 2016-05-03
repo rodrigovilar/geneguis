@@ -16,7 +16,7 @@ import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerDetailsReposit
 public class T04_PropertyWidget extends WebBrowserTestCase {
 
 	@Override
-	void deployEntityTypes() {
+	void deployEntityTypes() throws Exception {
 		deployEntityType(CustomerDetails.class, CustomerDetailsRepository.class);
 	}
 
@@ -32,12 +32,12 @@ public class T04_PropertyWidget extends WebBrowserTestCase {
 
 	@Override
 	void addRules() {
-		rule("root", "EntityTypeList");
-		rule("entity_type_item", "EntityTypeItem");
-		rule("entity_type_page", "EntityTitle2");
-		rule("entity_list", "EntityOrderedList");
-		rule("entity_item", "EntityItem2");
-		rule("property_value", "SimpleValue");
+		rule("root", "EntityTypeList", EntityTypeSet);
+		rule("entity_type_item", "EntityTypeItem", EntityType);
+		rule("entity_type_page", "EntityTitle2", EntityType);
+		rule("entity_list", "EntityOrderedList", EntityType);
+		rule("entity_item", "EntityItem2", Entity);
+		rule("property_value", "SimpleValue", Property);
 	}
 
 	@Override

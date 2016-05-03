@@ -1,14 +1,14 @@
 <table id='table_{{name}}' border=1>
   <thead>
     <tr>
-      {{'table_head' | port}}
+      {{'table_head' | forEachPropertyType}}
     </tr>
   </thead>
 
   <tbody>  
-    {{'table_line' | port}}
+    {{'table_line' | forEachEntity}}
   </tbody>  
   
 </table>
 
-<button id='button_new_{{name}}' {{'creation_form' | newPage}}>Create new {{name}}</button>
+<button id='button_new_{{name}}' {{'creation_form' | newPageForEntityType}}>Create new {{name}}</button>
