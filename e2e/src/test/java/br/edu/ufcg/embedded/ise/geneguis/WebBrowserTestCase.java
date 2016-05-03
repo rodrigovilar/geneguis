@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 
 import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
 
@@ -40,9 +40,9 @@ public abstract class WebBrowserTestCase {
 	@BeforeClass
 	public static void openBrowser() {
 		if (driver == null) {
-			System.setProperty("webdriver.chrome.driver", "/home/anderson/Downloads/chromedriver");
-			driver = new ChromeDriver();
-//			driver = new FirefoxDriver();
+//			System.setProperty("webdriver.chrome.driver", "/home/anderson/Downloads/chromedriver");
+//			driver = new ChromeDriver();
+			driver = new FirefoxDriver();
 			driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
 		}
 	}
