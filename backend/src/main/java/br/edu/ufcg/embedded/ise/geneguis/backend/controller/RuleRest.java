@@ -15,6 +15,20 @@ public class RuleRest {
 	private PropertyTypeType propertyTypeTypeLocator;
 	private String configuration;
 
+	
+	public RuleRest() {}
+
+	public RuleRest(String widgetName, String portName) {
+		this.widgetName = widgetName;
+		this.portName = portName;
+	}
+
+	public RuleRest(String widgetName, String portName, String type) {
+		this(widgetName, portName);
+		this.type = type;
+	}
+
+	
 	public Long getId() {
 		return id;
 	}

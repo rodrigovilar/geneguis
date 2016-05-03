@@ -6,8 +6,7 @@ import java.util.List;
 public class EntityType {
 
 	private String name;
-	private List<PropertyType> propertyTypes = new ArrayList<PropertyType>();
-	private List<RelationshipType> relationshipTypes = new ArrayList<RelationshipType>();
+	private List<FieldType> fieldTypes = new ArrayList<FieldType>();
 
 	
 	public EntityType() {}
@@ -24,22 +23,14 @@ public class EntityType {
 		this.name = name;
 	}
 	
-	public List<PropertyType> getPropertyTypes() {
-		return propertyTypes;
+
+	public List<FieldType> getFieldTypes() {
+		return fieldTypes;
 	}
 
-	public void setPropertyTypes(List<PropertyType> propertyTypes) {
-		this.propertyTypes = propertyTypes;
+	public void setFieldTypes(List<FieldType> fieldTypes) {
+		this.fieldTypes = fieldTypes;
 	}
-
-	public List<RelationshipType> getRelationshipTypes() {
-		return relationshipTypes;
-	}
-
-	public void setRelationshipTypes(List<RelationshipType> relationshipTypes) {
-		this.relationshipTypes = relationshipTypes;
-	}
-
 
 	@Override
 	public int hashCode() {

@@ -30,6 +30,7 @@ public class Rule {
 	private String propertyTypeLocator;
 	private PropertyTypeType propertyTypeTypeLocator;
 	private String configuration;
+	private WidgetType type;
 
 	public Long getId() {
 		return id;
@@ -95,69 +96,12 @@ public class Rule {
 		this.configuration = configuration;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((configuration == null) ? 0 : configuration.hashCode());
-		result = prime * result + ((entityTypeLocator == null) ? 0 : entityTypeLocator.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((port == null) ? 0 : port.hashCode());
-		result = prime * result + ((propertyTypeLocator == null) ? 0 : propertyTypeLocator.hashCode());
-		result = prime * result + ((propertyTypeTypeLocator == null) ? 0 : propertyTypeTypeLocator.hashCode());
-		result = prime * result + ((version == null) ? 0 : version.hashCode());
-		result = prime * result + ((widget == null) ? 0 : widget.hashCode());
-		return result;
+	public WidgetType getType() {
+		return type;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Rule other = (Rule) obj;
-		if (configuration == null) {
-			if (other.configuration != null)
-				return false;
-		} else if (!configuration.equals(other.configuration))
-			return false;
-		if (entityTypeLocator == null) {
-			if (other.entityTypeLocator != null)
-				return false;
-		} else if (!entityTypeLocator.equals(other.entityTypeLocator))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (port == null) {
-			if (other.port != null)
-				return false;
-		} else if (!port.equals(other.port))
-			return false;
-		if (propertyTypeLocator == null) {
-			if (other.propertyTypeLocator != null)
-				return false;
-		} else if (!propertyTypeLocator.equals(other.propertyTypeLocator))
-			return false;
-		if (propertyTypeTypeLocator != other.propertyTypeTypeLocator)
-			return false;
-		if (version == null) {
-			if (other.version != null)
-				return false;
-		} else if (!version.equals(other.version))
-			return false;
-		if (widget == null) {
-			if (other.widget != null)
-				return false;
-		} else if (!widget.equals(other.widget))
-			return false;
-		return true;
+	public void setType(WidgetType type) {
+		this.type = type;
 	}
-	
 	
 }

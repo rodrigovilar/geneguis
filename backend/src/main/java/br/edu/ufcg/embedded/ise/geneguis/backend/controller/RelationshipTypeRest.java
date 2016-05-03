@@ -1,22 +1,15 @@
 package br.edu.ufcg.embedded.ise.geneguis.backend.controller;
 
 import br.edu.ufcg.embedded.ise.geneguis.Cardinality;
+import br.edu.ufcg.embedded.ise.geneguis.FieldKind;
 
-public class RelationshipTypeRest {
+public class RelationshipTypeRest extends FieldTypeRest {
 
-	private String name;
 	private String targetType;
 	private Cardinality targetCardinality;
 	private Cardinality sourceCardinality;
+	private String reverse;
 	
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public String getTargetType() {
 		return targetType;
 	}
@@ -40,4 +33,19 @@ public class RelationshipTypeRest {
 	public void setSourceCardinality(Cardinality sourceCardinality) {
 		this.sourceCardinality = sourceCardinality;
 	}
+	
+	@Override
+	public FieldKind getKind() {
+		return FieldKind.Relationship;
+	}
+
+	public String getReverse() {
+		return reverse;
+	}
+
+	public void setReverse(String reverse) {
+		this.reverse = reverse;
+	}
+
+	
 }

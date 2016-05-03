@@ -15,7 +15,7 @@ import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerDetailsReposit
 public class T07_CompleteCRUD extends WebBrowserTestCase {
 
 	@Override
-	void deployEntityTypes() {
+	void deployEntityTypes() throws Exception {
 		deployEntityType(CustomerDetails.class, CustomerDetailsRepository.class);
 	}
 
@@ -38,16 +38,16 @@ public class T07_CompleteCRUD extends WebBrowserTestCase {
 
 	@Override
 	void addRules() {
-		rule("root", "EntityTypeList");
-		rule("entity_type_item", "EntityTypeItem");
-		rule("table_head", "TableHead");
-		rule("line_cell", "TableCell");
-		rule("creation_form", "CreateForm");
-		rule("form_line", "FormLine");
-		rule("entity_type_page", "ListingTableCrud");
-		rule("table_line", "TableLineCrud");
-		rule("edition_form", "EditForm");
-		rule("edit_form_line", "EditFormLine");
+		rule("root", "EntityTypeList", EntityTypeSet);
+		rule("entity_type_item", "EntityTypeItem", EntityType);
+		rule("table_head", "TableHead", PropertyType);
+		rule("line_cell", "TableCell", Property);
+		rule("creation_form", "CreateForm", EntityType);
+		rule("form_line", "FormLine", PropertyType);
+		rule("entity_type_page", "ListingTableCrud", EntityType);
+		rule("table_line", "TableLineCrud", Entity);
+		rule("edition_form", "EditForm", Entity);
+		rule("edit_form_line", "EditFormLine", Property);
 	}
 
 	@Override

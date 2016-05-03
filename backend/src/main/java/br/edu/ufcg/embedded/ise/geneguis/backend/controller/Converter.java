@@ -10,6 +10,8 @@ import javax.persistence.OneToOne;
 
 import br.edu.ufcg.embedded.ise.geneguis.Cardinality;
 import br.edu.ufcg.embedded.ise.geneguis.EntityType;
+import br.edu.ufcg.embedded.ise.geneguis.FieldKind;
+import br.edu.ufcg.embedded.ise.geneguis.FieldType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
 import br.edu.ufcg.embedded.ise.geneguis.RelationshipType;
@@ -27,13 +29,16 @@ public class Converter {
 		EntityTypeRest entityTypeRest = toRest(domain);
 		
 		if (withDetails) {
-			for (PropertyType propertyType : domain.getPropertyTypes()) {
-				PropertyTypeRest rest = toDomain(propertyType);
-				entityTypeRest.getPropertyTypes().add(rest);
-			}
-			for (RelationshipType relationType : domain.getRelationshipTypes()) {
-				RelationshipTypeRest rest = toDomain(relationType);
-				entityTypeRest.getRelationshipTypes().add(rest);
+			for (FieldType fieldType : domain.getFieldTypes()) {
+				FieldTypeRest rest = null;
+				
+				if (fieldType.getKind().equals(FieldKind.Property)) {
+					rest = toDomain((PropertyType) fieldType);
+				} else {
+					rest = toDomain((RelationshipType) fieldType);					
+				}
+				
+				entityTypeRest.getFieldTypes().add(rest);
 			}
 		}
 
@@ -128,7 +133,7 @@ public class Converter {
 		ruleRest.setWidgetName(rule.getWidget().getName());
 		ruleRest.setWidgetVersion(rule.getWidget().getVersion());
 		ruleRest.setPortName(rule.getPort().getName());
-		ruleRest.setType(rule.getPort().getType().name());
+		ruleRest.setType(rule.getType().name());
 		ruleRest.setEntityTypeLocator(rule.getEntityTypeLocator());
 		ruleRest.setPropertyTypeLocator(rule.getPropertyTypeLocator());
 		ruleRest.setPropertyTypeTypeLocator(rule.getPropertyTypeTypeLocator());
@@ -151,6 +156,7 @@ public class Converter {
 		Port port = new Port();
 		port.setName(ruleRest.getPortName());
 		rule.setPort(port);
+		rule.setType(WidgetType.valueOf(ruleRest.getType()));
 		return rule;
 	}
 

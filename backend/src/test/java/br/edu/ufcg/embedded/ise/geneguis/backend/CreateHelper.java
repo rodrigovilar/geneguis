@@ -45,6 +45,7 @@ public class CreateHelper {
 		entitySetRule.setEntityTypeLocator(entityTypeLocator);
 		entitySetRule.setPortName(portName);
 		entitySetRule.setWidgetName(widgetName);
+		entitySetRule.setType(WidgetType.EntityType.name());
 		return entitySetRule;
 	}
 
@@ -53,6 +54,7 @@ public class CreateHelper {
 		entityRule.setEntityTypeLocator(entityTypeLocator);
 		entityRule.setPortName(portName);
 		entityRule.setWidgetName(widgetName);
+		entityRule.setType(WidgetType.Entity.name());
 		return entityRule;
 	}
 
@@ -64,6 +66,7 @@ public class CreateHelper {
 		propertyTypeRule.setPropertyTypeLocator(propertyTypeLocator);
 		propertyTypeRule.setPortName(portName);
 		propertyTypeRule.setWidgetName(widgetName);
+		propertyTypeRule.setType(WidgetType.PropertyType.name());
 		return propertyTypeRule;
 	}
 }

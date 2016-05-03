@@ -13,7 +13,7 @@ public class CustomerDetails {
 
 	private String ssn;
 	private String name;
-	private double credit;
+	private Double credit;
 	
 	public CustomerDetails() {}
 
@@ -47,11 +47,11 @@ public class CustomerDetails {
 		this.ssn = ssn;
 	}
 
-	public double getCredit() {
+	public Double getCredit() {
 		return credit;
 	}
 
-	public void setCredit(double credit) {
+	public void setCredit(Double credit) {
 		this.credit = credit;
 	}
 }

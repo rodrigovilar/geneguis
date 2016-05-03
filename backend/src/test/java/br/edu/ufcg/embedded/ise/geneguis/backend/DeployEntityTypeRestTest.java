@@ -98,13 +98,13 @@ public class DeployEntityTypeRestTest {
 		get(mockMvc, "/entities/Client").andExpect(status().isOk()).andExpect(entityType("Client"))
 				.andExpect(propertyType(0, "id", PropertyTypeType.integer))
 				.andExpect(propertyType(1, "name", PropertyTypeType.string))
-				.andExpect(relationshipType(0, "dependents", "Dependent", One, Many));
+				.andExpect(relationshipType(2, "dependents", "Dependent", One, Many));
 
 		get(mockMvc, "/entities/Dependent").andExpect(status().isOk()).andExpect(entityType("Dependent"))
 				.andExpect(propertyType(0, "id", PropertyTypeType.integer))
 				.andExpect(propertyType(1, "name", PropertyTypeType.string))
 				.andExpect(propertyType(2, "age", PropertyTypeType.integer))
-				.andExpect(relationshipType(0, "client", "Client", Many, One));
+				.andExpect(relationshipType(3, "client", "Client", Many, One));
 
 		get(mockMvc, "/api/Client").andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
 
@@ -142,8 +142,8 @@ public class DeployEntityTypeRestTest {
 		deploy(applicationContext, CustomerDetails.class, CustomerDetailsRepository.class);
 
 		String name = "FooName";
-		String ssn = null;
-		CustomerDetails customer = createCustomerDetails(name, ssn, 0);
+		String ssn = "ssn 1";
+		CustomerDetails customer = createCustomerDetails(name, ssn, 0.0);
 
 		Map<String, Object> instanceMap = objectToMap(customer);
 		instanceMap.remove("id");
@@ -172,12 +172,40 @@ public class DeployEntityTypeRestTest {
 		get(mockMvc, "/api/" + "CustomerDetails/" + customer.getId()).andExpect(status().isNotFound());
 
 	}
+	
+	@DirtiesContext
+	@Test
+	public void testRelationshipCRUD() throws Exception {
+		deploy(applicationContext, Client.class, ClientRepository.class);
+		deploy(applicationContext, Dependent.class, DependentRepository.class);
 
-	private CustomerDetails createCustomerDetails(String name, String ssn, int credit) {
+		Client client = new Client("client1 ");
+
+		Map<String, Object> clientMap = objectToMap(client);
+		clientMap.remove("id");
+
+		MvcResult result = post(mockMvc, "/api/Client", client).andExpect(status().isCreated())
+				.andExpect(instance(clientMap)).andReturn();
+		client = getObjectFromResult(result, Client.class);
+
+		Dependent dependent = client.addDependent("dep 1", 10);
+
+		Map<String, Object> depMap = objectToMap(dependent);
+		depMap.remove("id");
+		depMap.remove("client");
+
+		result = post(mockMvc, "/api/Dependent", dependent).andExpect(status().isCreated())
+				.andExpect(instance(depMap)).andReturn();
+
+		get(mockMvc, "/api/Dependent");
+	}
+
+	private CustomerDetails createCustomerDetails(String name, String ssn, Double credit) {
 		CustomerDetails customer = new CustomerDetails();
 		customer.setName(name);
 		customer.setSsn(ssn);
 		customer.setCredit(credit);
 		return customer;
 	}
+	
 }
