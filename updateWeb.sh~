@@ -1,0 +1,10 @@
+cd frontend
+mvn coffeescript:compile
+cd ..
+
+rm -r e2e/src/main/webapp/*
+rm e2e/src/main/resources/widgets/*
+
+cp -r frontend/src/main/webapp/* e2e/src/main/webapp/
+cp -r widgets/src/main/resources/templates/* e2e/src/main/resources/widgets/
+

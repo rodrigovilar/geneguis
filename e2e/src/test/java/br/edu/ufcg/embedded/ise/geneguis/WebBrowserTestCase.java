@@ -2,6 +2,7 @@ package br.edu.ufcg.embedded.ise.geneguis;
 
 import java.util.concurrent.TimeUnit;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,6 +44,7 @@ public abstract class WebBrowserTestCase {
 		if (driver == null) {
 			System.setProperty("webdriver.chrome.driver", "/home/anderson/development/chromedriver");
 			driver = new ChromeDriver();
+			
 //			driver = new FirefoxDriver();
 			driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
 		}
