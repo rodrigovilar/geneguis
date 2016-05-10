@@ -1,0 +1,11 @@
+<div class="container" style="
+     max-width:600px;
+     max-height: 500px;
+     float: none;
+     margin-left: auto;
+     margin-right: auto;">
+    <form id='edit_{{entityType.name}}'>
+  		{{'edit_form_line' | forEachProperty}}
+  		<button type="submit" class="btn btn-raised btn-info" {{'backPage' | put}}>Edit</button>
+	</form>
+</div>
