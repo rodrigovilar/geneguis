@@ -1,12 +1,13 @@
+<h2 id='title_{{name}}'>
+  {{name}}
+</h2>
 <table id='table_{{name}}' border=1>
   <thead>
     <tr>
       {{'table_head' | forEachPropertyType}}
     </tr>
   </thead>
-
   <tbody>  
     {{'table_line' | forEachEntity}}
   </tbody>  
-  
 </table>

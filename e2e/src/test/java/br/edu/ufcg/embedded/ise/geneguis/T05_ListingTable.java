@@ -10,12 +10,15 @@ import static br.edu.ufcg.embedded.ise.geneguis.Helper.widget;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerDetails;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerDetailsRepository;
+import br.edu.ufcg.embedded.ise.geneguis.backend.examples.Product;
+import br.edu.ufcg.embedded.ise.geneguis.backend.examples.ProductRepository;
 
 public class T05_ListingTable extends WebBrowserTestCase {
 
 	@Override
 	void deployEntityTypes() throws Exception {
 		deployEntityType(CustomerDetails.class, CustomerDetailsRepository.class);
+		deployEntityType(Product.class, ProductRepository.class);
 	}
 
 	@Override
@@ -43,6 +46,9 @@ public class T05_ListingTable extends WebBrowserTestCase {
 	void steps() {
 		postEntity(new CustomerDetails("ssn1", "name1", 1.0));
 		postEntity(new CustomerDetails("ssn2", "name2", 2.0));
+		postEntity(new Product("00123451", "Product 1", "Description of product 1", 1.0));
+		postEntity(new Product("00123499", "Product 2", "Description of product 2", 2.0));
+		postEntity(new Product("00123777", "Product 3", "Description of product 3", 3.5));
 
 		openApp();
 		clickEntityType(CustomerDetails.class);
