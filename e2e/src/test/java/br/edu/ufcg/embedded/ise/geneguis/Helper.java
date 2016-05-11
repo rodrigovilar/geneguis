@@ -18,9 +18,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.edu.ufcg.embedded.ise.geneguis.backend.EntryPoint;
 import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
@@ -29,11 +28,19 @@ import br.edu.ufcg.embedded.ise.geneguis.backend.controller.JsonMetadata;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.RuleRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetRest;
+import br.edu.ufcg.embedded.ise.geneguis.consolereader.BrowserConsoleReader;
+import br.edu.ufcg.embedded.ise.geneguis.consolereader.BrowserReaders;
+import br.edu.ufcg.embedded.ise.geneguis.consolereader.ChromeConsoleReader;
+import br.edu.ufcg.embedded.ise.geneguis.consolereader.FirefoxConsoleReader;
 import br.edu.ufcg.embedded.ise.geneguis.jpadomain.MetadataUtil;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Helper {
 
 	static final String SERVER_URL = "http://localhost:8080/";
+	static final BrowserConsoleReader[] consoleReaders = {
+			new ChromeConsoleReader(), new FirefoxConsoleReader() };
 
 	static void openApp() {
 		WebBrowserTestCase.driver.get(SERVER_URL);
@@ -73,7 +80,8 @@ public class Helper {
 	}
 
 	static String readWidgetFile(String fileName) {
-		URL resource = EntryPoint.class.getResource("/widgets/" + fileName + ".hbs");
+		URL resource = EntryPoint.class.getResource("/widgets/" + fileName
+				+ ".hbs");
 		File file = new File(resource.getFile());
 		String filePath = file.getAbsolutePath();
 		try {
@@ -90,7 +98,8 @@ public class Helper {
 		postJSON(SERVER_URL + "rules", rule);
 	}
 
-	static <T> void deployEntityType(Class<T> entityType, Class<?> repository) throws Exception {
+	static <T> void deployEntityType(Class<T> entityType, Class<?> repository)
+			throws Exception {
 		EntityTypeDeployRest rest = new EntityTypeDeployRest();
 		rest.setEntity(entityType.getName());
 		rest.setRepository(repository.getName());
@@ -98,19 +107,22 @@ public class Helper {
 	}
 
 	static <T> T postEntity(T entity) {
-		return postEntity(SERVER_URL + "api/" + entity.getClass().getSimpleName(), entity);
+		return postEntity(SERVER_URL + "api/"
+				+ entity.getClass().getSimpleName(), entity);
 	}
 
 	@SuppressWarnings("unchecked")
 	static <T> T postJSON(String url, T data) {
 
-		try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+		try (CloseableHttpClient httpClient = HttpClientBuilder.create()
+				.build()) {
 
 			ObjectMapper mapper = new ObjectMapper();
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			mapper.setDateFormat(df);
 
-			StringEntity input = new StringEntity(mapper.writeValueAsString(data));
+			StringEntity input = new StringEntity(
+					mapper.writeValueAsString(data));
 			input.setContentType("application/json");
 			HttpPost request = new HttpPost(url);
 			request.setEntity(input);
@@ -127,15 +139,17 @@ public class Helper {
 			return null;
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	static <T> T postEntity(String url, T data) {
-		
+
 		EntityType entityType = MetadataUtil.extractMetadata(data.getClass());
 
-		try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+		try (CloseableHttpClient httpClient = HttpClientBuilder.create()
+				.build()) {
 
-			StringEntity input = new StringEntity(JsonMetadata.renderInstance(data, entityType).toString());
+			StringEntity input = new StringEntity(JsonMetadata.renderInstance(
+					data, entityType).toString());
 			input.setContentType("application/json");
 			HttpPost request = new HttpPost(url);
 			request.setEntity(input);
@@ -156,10 +170,10 @@ public class Helper {
 		}
 	}
 
-
 	static String post(String url, String data) {
 
-		try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+		try (CloseableHttpClient httpClient = HttpClientBuilder.create()
+				.build()) {
 
 			StringEntity input = new StringEntity(data);
 			input.setContentType("application/json");
@@ -174,7 +188,11 @@ public class Helper {
 		} catch (IOException e) {
 			Assert.fail(e.getMessage());
 		}
-
 		return null;
+	}
+
+	static void exception(WebDriver webDriver, String... msgs) {
+		BrowserReaders readers = new BrowserReaders();
+		readers.getReader(webDriver).readException(webDriver, SERVER_URL, msgs);
 	}
 }

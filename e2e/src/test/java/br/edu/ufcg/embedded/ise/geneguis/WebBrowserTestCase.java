@@ -35,7 +35,6 @@ public abstract class WebBrowserTestCase {
 	 */
 	
 	static WebDriver driver;
-//	static FirefoxDriver driver;
 
 	@BeforeClass
 	public static void openBrowser() {
