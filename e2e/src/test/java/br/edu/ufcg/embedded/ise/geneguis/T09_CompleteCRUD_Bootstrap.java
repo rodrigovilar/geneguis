@@ -23,31 +23,31 @@ public class T09_CompleteCRUD_Bootstrap extends WebBrowserTestCase {
 	void addWidgets() {
 		widget("EntityTypeList", EntityTypeSet, new PortRest("entity_type_item", EntityType.name()));
 		widget("EntityTypeItem", EntityType, new PortRest("entity_type_page", EntityType.name()));
-		widget("TableHead", PropertyType);
+		widget("TableHeadMaterial", PropertyType);
 		widget("TableCell", Property);
-		widget("CreateFormBootstrap", EntityType, new PortRest("form_line", PropertyType.name()));
-		widget("FormLineBootstrap", PropertyType);
-		widget("ListingTableCrud", EntityType, new PortRest("table_head", PropertyType.name()),
+		widget("CreateFormMaterial", EntityType, new PortRest("form_line", PropertyType.name()));
+		widget("FormLineMaterial", PropertyType);
+		widget("ListingTableCrudMaterial", EntityType, new PortRest("table_head", PropertyType.name()),
 				new PortRest("table_line", Entity.name()),
 				new PortRest("creation_form", EntityType.name()));
-		widget("TableLineCrud", Entity, new PortRest("line_cell", Property.name()),
+		widget("TableLineCrudMaterial", Entity, new PortRest("line_cell", Property.name()),
 				new PortRest("edition_form", Entity.name()));
-		widget("EditForm", Entity, new PortRest("edit_form_line", Property.name()));
-		widget("EditFormLine", Property);
+		widget("EditFormMaterial", Entity, new PortRest("edit_form_line", Property.name()));
+		widget("EditFormLineMaterial", Property);
 	}
 
 	@Override
 	void addRules() {
 		rule("root", "EntityTypeList", EntityTypeSet);
 		rule("entity_type_item", "EntityTypeItem", EntityType);
-		rule("table_head", "TableHead", PropertyType);
+		rule("table_head", "TableHeadMaterial", PropertyType);
 		rule("line_cell", "TableCell", Property);
-		rule("creation_form", "CreateFormBootstrap", EntityType);
-		rule("form_line", "FormLineBootstrap", PropertyType);
-		rule("entity_type_page", "ListingTableCrud", EntityType);
-		rule("table_line", "TableLineCrud", Entity);
-		rule("edition_form", "EditForm", Entity);
-		rule("edit_form_line", "EditFormLine", Property);
+		rule("creation_form", "CreateFormMaterial", EntityType);
+		rule("form_line", "FormLineMaterial", PropertyType);
+		rule("entity_type_page", "ListingTableCrudMaterial", EntityType);
+		rule("table_line", "TableLineCrudMaterial", Entity);
+		rule("edition_form", "EditFormMaterial", Entity);
+		rule("edit_form_line", "EditFormLineMaterial", Property);
 	}
 
 	@Override
