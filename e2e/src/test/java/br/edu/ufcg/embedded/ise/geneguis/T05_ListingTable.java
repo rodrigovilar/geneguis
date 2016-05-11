@@ -1,5 +1,6 @@
 package br.edu.ufcg.embedded.ise.geneguis;
 
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkTextByXpath;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.clickEntityType;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.deployEntityType;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.openApp;
@@ -51,7 +52,9 @@ public class T05_ListingTable extends WebBrowserTestCase {
 		postEntity(new Product("00123777", "Product 3", "Description of product 3", 3.5));
 
 		openApp();
-		clickEntityType(CustomerDetails.class);
+		clickEntityType(Product.class);
+		
+		checkTextByXpath(".//table[@id = 'table_Product']/tbody/tr[1]/td[4]", "Description of product 1");
 	}
 
 }

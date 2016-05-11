@@ -5,6 +5,6 @@ import org.openqa.selenium.WebDriver;
 
 public interface BrowserConsoleReader {
 
-	void readException(WebDriver webDriver, String url, String... msgs);
+	void readException(WebDriver webDriver, String msg);
 
 }

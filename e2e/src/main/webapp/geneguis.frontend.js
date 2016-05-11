@@ -257,6 +257,9 @@
     body.append(page);
     widget = WidgetStack[WidgetStack.length - 1].rootWidget;
     return widget.template.render(widget.context, function(err, html) {
+      if (err) {
+        throw err;
+      }
       return page.html(html);
     });
   };
@@ -358,6 +361,9 @@
         return API.getEntitiesTypes(function(entitiesTypes) {
           view.rootWidget.context = entitiesTypes;
           return view.rootWidget.template.render(entitiesTypes, function(err, html) {
+            if (err) {
+              throw err;
+            }
             return view.html(html);
           });
         });
@@ -376,7 +382,10 @@
       if (widget.type === "EntityTypeSet") {
         return API.getEntitiesTypes(function(entitiesTypes) {
           return widget.template.render(entitiesTypes, function(err, html) {
-            return callback(null, html);
+            if (err) {
+              throw err;
+            }
+            return callback(err, html);
           });
         });
       }
@@ -417,6 +426,9 @@
         entityType = _this.ctx[i];
         while (entityType) {
           widget.template.render(entityType, function(err, html) {
+            if (err) {
+              throw err;
+            }
             result += html;
             j++;
             if (i === j) {
@@ -442,6 +454,9 @@
       return API.getEntityType(entityTypeName, function(entityType) {
         view.rootWidget.context = entityType;
         return view.rootWidget.template.render(entityType, function(err, html) {
+          if (err) {
+            throw err;
+          }
           return view.html(html);
         });
       });
@@ -460,6 +475,9 @@
       } else {
         return API.getEntityType(_this.ctx.name, function(entityType) {
           return widget.template.render(entityType, function(err, html) {
+            if (err) {
+              throw err;
+            }
             return callback(err, html);
           });
         });
@@ -481,6 +499,9 @@
         return entities.forEach(function(entity) {
           entity.entityType = _this.ctx;
           return widget.template.render(entity, function(err, html) {
+            if (err) {
+              throw err;
+            }
             result += html;
             if (i === len) {
               callback(err, result);
@@ -504,6 +525,9 @@
         return GUI.getPropertyTypeWidget(port, entityType.name, fieldType, function(widget) {
           fieldType.entity = entityType;
           return widget.template.render(fieldType, function(err, html) {
+            if (err) {
+              throw err;
+            }
             result += html;
             if (i === len) {
               callback(null, result);
@@ -527,6 +551,9 @@
         return GUI.getRelationshipTypeWidget(port, entityType.name, fieldType, function(widget) {
           fieldType.entity = entityType;
           return widget.template.render(fieldType, function(err, html) {
+            if (err) {
+              throw err;
+            }
             result += html;
             if (i === len) {
               callback(null, result);
@@ -549,6 +576,9 @@
       return GUI.getFieldTypeWidget(port, entityType.name, fieldType, function(widget) {
         fieldType.entity = entityType;
         return widget.template.render(fieldType, function(err, html) {
+          if (err) {
+            throw err;
+          }
           result += html;
           if (i === len) {
             callback(null, result);
@@ -578,6 +608,9 @@
             type: fieldType
           };
           return widget.template.render(property, function(err, html) {
+            if (err) {
+              throw err;
+            }
             result += html;
             if (i === len) {
               callback(null, result);
@@ -611,6 +644,9 @@
               type: fieldType
             };
             return widget.template.render(relationship, function(err, html) {
+              if (err) {
+                throw err;
+              }
               result += html;
               if (i === len) {
                 callback(null, result);
@@ -644,6 +680,9 @@
             type: fieldType
           };
           return widget.template.render(field, function(err, html) {
+            if (err) {
+              throw err;
+            }
             result += html;
             if (i === len) {
               callback(null, result);
@@ -658,6 +697,9 @@
               type: fieldType
             };
             return widget.template.render(field, function(err, html) {
+              if (err) {
+                throw err;
+              }
               result += html;
               if (i === len) {
                 callback(null, result);
@@ -685,6 +727,9 @@
           entity.entityType = entityType;
           view.rootWidget.context = entity;
           return view.rootWidget.template.render(entity, function(err, html) {
+            if (err) {
+              throw err;
+            }
             return view.html(html);
           });
         });

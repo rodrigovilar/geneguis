@@ -8,6 +8,8 @@ import static br.edu.ufcg.embedded.ise.geneguis.Helper.postEntity;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.rule;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.widget;
 
+import org.openqa.selenium.By;
+
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerDetails;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerDetailsRepository;
@@ -63,7 +65,7 @@ public class T07_CompleteCRUD extends WebBrowserTestCase {
 
 		openApp();
 		clickEntityType(CustomerDetails.class);
-		click("button_new_" + CustomerDetails.class.getSimpleName());
+		click(By.id("button_new_" + CustomerDetails.class.getSimpleName()));
 	}
 
 }

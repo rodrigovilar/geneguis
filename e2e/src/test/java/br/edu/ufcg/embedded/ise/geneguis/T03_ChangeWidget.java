@@ -9,6 +9,8 @@ import static br.edu.ufcg.embedded.ise.geneguis.Helper.postEntity;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.rule;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.widget;
 
+import org.openqa.selenium.By;
+
 import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.Customer;
@@ -49,7 +51,7 @@ public class T03_ChangeWidget extends WebBrowserTestCase {
 
 		openApp();
 		clickEntityType(Customer.class);
-		checkId("olist_" + Customer.class.getSimpleName());
+		checkId(By.id("olist_" + Customer.class.getSimpleName()));
 		checkIds("li_" + c1.getId(), "li_" + c2.getId());		
 	}
 
