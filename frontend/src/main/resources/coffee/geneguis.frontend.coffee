@@ -163,6 +163,8 @@ GUI.refresh = () ->
 	body.append page
 	widget = WidgetStack[WidgetStack.length - 1].rootWidget
 	widget.template.render widget.context, (err, html) ->
+		if err
+			throw err
 		page.html html
 
 API.loadData = (url, callback) ->
@@ -235,6 +237,8 @@ GUI.newPageByPort = (portName, entityTypeName, entityId) ->
 			API.getEntitiesTypes (entitiesTypes) =>
 				view.rootWidget.context = entitiesTypes
 				view.rootWidget.template.render entitiesTypes, (err, html) ->
+					if err
+						throw err
 					view.html html
 	
 GUI.openApp = () ->
@@ -246,7 +250,9 @@ GUI.renderPortFilter = (port, callback) ->
 		if (widget.type == "EntityTypeSet")
 			API.getEntitiesTypes (entitiesTypes) =>
 				widget.template.render entitiesTypes, (err, html) ->
-					callback(null, html)
+					if err
+						throw err
+					callback(err, html)
 
 GUI.renderNewPageFilter = (port) ->
 	entityTypeName = if this.ctx.entityType then this.ctx.entityType.name else this.ctx.name
@@ -275,6 +281,8 @@ Filter.forEachEntityType = (port, callback) ->
 			entityType = this.ctx[i]
 			while (entityType)
 				widget.template.render entityType, (err, html) ->
+					if err
+						throw err
 					result += html
 					j++
 					if (i == j)
@@ -292,6 +300,8 @@ Filter.newPageForEntityType = (portName, entityTypeName) ->
 		API.getEntityType entityTypeName, (entityType) =>
 			view.rootWidget.context = entityType
 			view.rootWidget.template.render entityType, (err, html) ->
+				if err
+					throw err
 				view.html html
 				
 Filter.forEntityType = (port, callback) ->
@@ -304,6 +314,8 @@ Filter.forEntityType = (port, callback) ->
 		else
 			API.getEntityType this.ctx.name, (entityType) =>
 				widget.template.render entityType, (err, html) ->
+					if err
+						throw err
 					callback(err, html)
 					
 Filter.forEachEntity = (port, callback) ->
@@ -317,6 +329,8 @@ Filter.forEachEntity = (port, callback) ->
 			entities.forEach (entity) =>
 				entity.entityType = this.ctx
 				widget.template.render entity, (err, html) ->
+					if err
+						throw err
 					result += html
 					if (i == len)
 						callback(err, result)
@@ -333,6 +347,8 @@ Filter.forEachPropertyType = (port, callback) ->
 			GUI.getPropertyTypeWidget port, entityType.name, fieldType, (widget) ->
 				fieldType.entity = entityType
 				widget.template.render fieldType, (err, html) ->
+					if err
+						throw err
 					result += html
 					if (i == len)
 						callback(null, result)
@@ -349,6 +365,8 @@ Filter.forEachRelationshipType = (port, callback) ->
 			GUI.getRelationshipTypeWidget port, entityType.name, fieldType, (widget) ->
 				fieldType.entity = entityType
 				widget.template.render fieldType, (err, html) ->
+					if err
+						throw err
 					result += html
 					if (i == len)
 						callback(null, result)
@@ -364,6 +382,8 @@ Filter.forEachFieldType = (port, callback) ->
 		GUI.getFieldTypeWidget port, entityType.name, fieldType, (widget) ->
 			fieldType.entity = entityType
 			widget.template.render fieldType, (err, html) ->
+				if err
+					throw err
 				result += html
 				if (i == len)
 					callback(null, result)
@@ -383,6 +403,8 @@ Filter.forEachProperty = (port, callback) ->
 				propertyValue = entity[fieldType.name]
 				property = {value: propertyValue, type: fieldType}
 				widget.template.render property, (err, html) ->
+					if err
+						throw err
 					result += html
 					if (i == len)
 						callback(null, result)
@@ -403,6 +425,8 @@ Filter.forEachRelationship = (port, callback) ->
 				API.getEntity fieldType.targetType, relationshipId, (entity) =>
 					relationship = {target: entity, type: fieldType}
 					widget.template.render relationship, (err, html) ->
+						if err
+							throw err
 						result += html
 						if (i == len)
 							callback(null, result)
@@ -423,6 +447,8 @@ Filter.forEachField = (port, callback) ->
 				propertyValue = entity[fieldType.name]
 				field = {value: propertyValue, type: fieldType}		
 				widget.template.render field, (err, html) ->
+					if err
+						throw err
 					result += html
 					if (i == len)
 						callback(null, result)
@@ -432,6 +458,8 @@ Filter.forEachField = (port, callback) ->
 				API.getEntity fieldType.targetType, relationshipId, (entity) =>
 					field = {target: entity, type: fieldType}
 					widget.template.render field, (err, html) ->
+						if err
+							throw err
 						result += html
 						if (i == len)
 							callback(null, result)
@@ -450,6 +478,8 @@ Filter.newPageForEntity = (portName, entityTypeName, entityId) ->
 				entity.entityType = entityType
 				view.rootWidget.context = entity
 				view.rootWidget.template.render entity, (err, html) ->
+					if err
+						throw err
 					view.html html
 
 $ ->

@@ -47,25 +47,55 @@ public class Helper {
 	}
 
 	static void clickEntityType(Class<?> entityType) {
-		click("entityType_" + entityType.getSimpleName());
+		click(By.id("entityType_" + entityType.getSimpleName()));
 	}
 
-	static void click(String id) {
-		checkId(id).click();
+	static void click(By by) {
+		checkId(by).click();
 	}
 
 	static void checkTitle(Class<?> entityType) {
-		checkId("title_" + entityType.getSimpleName());
+		checkId(By.id("title_" + entityType.getSimpleName()));
 	}
 
-	static WebElement checkId(String id) {
-		return WebBrowserTestCase.driver.findElement(By.id(id));
+	static WebElement checkId(By by) {
+		return WebBrowserTestCase.driver.findElement(by);
 	}
 
 	static void checkIds(String... ids) {
 		for (String id : ids) {
 			WebBrowserTestCase.driver.findElement(By.id(id));
 		}
+	}
+	
+	static void checkTextInPageSource(String... texts) {
+		String pageSource = WebBrowserTestCase.driver.getPageSource();
+		
+		for (String text : texts) {
+			if (!pageSource.contains(text)) {
+				Assert.fail(text + " not found in current page."); 
+			}
+		}
+	}
+
+	static void checkTextById(String id, String text) {
+		String elementText = WebBrowserTestCase.driver.findElement(By.id(id)).getText();
+
+		if (!elementText.contains(text)) {
+			Assert.fail(text + " not found in element " + id); 
+		}
+	}
+
+	static void checkTextByXpath(String xpath, String text) {
+		String elementText = WebBrowserTestCase.driver.findElement(By.xpath(xpath)).getText();
+
+		if (!elementText.contains(text)) {
+			Assert.fail(text + " not found in element " + xpath); 
+		}
+	}
+
+	static void sendText(By by, String text) {
+		WebBrowserTestCase.driver.findElement(by).sendKeys(text);
 	}
 
 	static void widget(String name, WidgetType type, PortRest... ports) {
@@ -191,8 +221,8 @@ public class Helper {
 		return null;
 	}
 
-	static void exception(WebDriver webDriver, String... msgs) {
+	static void exception(WebDriver webDriver, String msg) {
 		BrowserReaders readers = new BrowserReaders();
-		readers.getReader(webDriver).readException(webDriver, SERVER_URL, msgs);
+		readers.getReader(webDriver).readException(webDriver, msg);
 	}
 }

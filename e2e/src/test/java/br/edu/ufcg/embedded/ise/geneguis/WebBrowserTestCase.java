@@ -1,16 +1,17 @@
 package br.edu.ufcg.embedded.ise.geneguis;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
 
 import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
+import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 
 public abstract class WebBrowserTestCase {
 	
@@ -36,15 +37,18 @@ public abstract class WebBrowserTestCase {
 	 * WebDriver driver = new ChromeDriver(); 
 	 */
 	
-	static WebDriver driver;
+	public static WebDriver driver;
 
 	@BeforeClass
-	public static void openBrowser() {
+	public static void openBrowser() throws IOException {
 		if (driver == null) {
-			System.setProperty("webdriver.chrome.driver", "/home/anderson/development/chromedriver");
-			driver = new ChromeDriver();
+//			System.setProperty("webdriver.chrome.driver", "/home/anderson/development/chromedriver");
+//			driver = new ChromeDriver();
 			
-//			driver = new FirefoxDriver();
+			FirefoxProfile ffProfile = new FirefoxProfile();
+			JavaScriptError.addExtension(ffProfile);
+			driver = new FirefoxDriver(ffProfile);
+
 			driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
 		}
 	}

@@ -1,12 +1,16 @@
 package br.edu.ufcg.embedded.ise.geneguis;
 
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkTextByXpath;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.click;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.clickEntityType;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.deployEntityType;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.openApp;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.postEntity;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.rule;
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.sendText;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.widget;
+
+import org.openqa.selenium.By;
 
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerDetails;
@@ -51,7 +55,16 @@ public class T06_ListingTableCreateButton extends WebBrowserTestCase {
 
 		openApp();
 		clickEntityType(CustomerDetails.class);
-		click("button_new_" + CustomerDetails.class.getSimpleName());
+		click(By.id("button_new_" + CustomerDetails.class.getSimpleName()));
+		
+		sendText(By.name("create_form_field_ssn"), "ssn3");
+		sendText(By.name("create_form_field_name"), "name3");
+		sendText(By.name("create_form_field_credit"), "3");	
+		
+		click(By.xpath(".//form/button"));
+		
+		checkTextByXpath(".//table[@id = 'table_CustomerDetails']/tbody/tr[3]/td[3]", "name3");
+
 	}
 
 }

@@ -1,13 +1,15 @@
 package br.edu.ufcg.embedded.ise.geneguis;
 
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkId;
-import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkIds;
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkTextById;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.clickEntityType;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.deployEntityType;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.openApp;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.postEntity;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.rule;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.widget;
+
+import org.openqa.selenium.By;
 
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerDetails;
@@ -47,8 +49,10 @@ public class T04_PropertyWidget extends WebBrowserTestCase {
 
 		openApp();
 		clickEntityType(CustomerDetails.class);
-		checkId("olist_" + CustomerDetails.class.getSimpleName());
-		checkIds("li_" + c1.getId(), "li_" + c2.getId());
+		checkId(By.id("olist_" + CustomerDetails.class.getSimpleName()));
+		
+		checkTextById("li_" + c1.getId(), "ssn1; name1; 1;");
+		checkTextById("li_" + c2.getId(), "ssn2; name2; 2;");		
 	}
 
 }

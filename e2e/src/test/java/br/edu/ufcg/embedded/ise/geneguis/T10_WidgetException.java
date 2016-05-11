@@ -20,26 +20,25 @@ public class T10_WidgetException extends WebBrowserTestCase {
 
 	@Override
 	void addWidgets() {
-//		widget("EntityTypeList", WidgetType.EntityTypeSet, new PortRest(
-//				"entity_type_item", EntityType.name()));
-//		widget("EntityTypeItem", EntityType, new PortRest("entity_type_page",
-//				EntityType.name()));
-//		widget("EntityTitle", EntityType);
+		widget("EntityTypeList", WidgetType.EntityTypeSet, new PortRest(
+				"entity_type_item", EntityType.name()));
+		widget("EntityTypeItem", EntityType, new PortRest("entity_type_page",
+				EntityType.name()));
+		widget("EntityTitleWithUnknownFilter", EntityType);
 	}
 
 	@Override
 	void addRules() {
-//		rule("root", "EntityTypeList", EntityTypeSet);
-//		rule("entity_type_item", "EntityTypeItem", EntityType);
-//		rule("entity_type_page", "EntityTitle", EntityType);
+		rule("root", "EntityTypeList", EntityTypeSet);
+		rule("entity_type_item", "EntityTypeItem", EntityType);
+		rule("entity_type_page", "EntityTitleWithUnknownFilter", EntityType);
 	}
 
 	@Override
 	void steps() {
 		openApp();
-//		clickEntityType(Customer.class);
-		exception(driver, "Expected exception message one",
-				"Expected exception message two");
+		clickEntityType(Customer.class);
+		exception(driver, "Error: filter not found: unknownFilter");
 	}
 
 }
