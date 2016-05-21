@@ -28,6 +28,10 @@ public class RuleRest {
 		this.type = type;
 	}
 
+	public RuleRest(String widgetName, String entityTypeLocator, String portName, String type) {
+		this(widgetName, portName, type);
+		this.entityTypeLocator = entityTypeLocator;
+	}
 	
 	public Long getId() {
 		return id;

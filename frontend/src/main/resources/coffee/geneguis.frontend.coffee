@@ -49,17 +49,16 @@ GUI.downloadAllWidgets = (callback) ->
 			WidgetCache[widgetSpec.name + widgetSpec.version] = widgetSpec
 		callback()
 
-GUI.newPage = (portName, entityTypeName, callback) ->
-	body  = $("body")
-	body.empty()  
-	page = $('<div>')
-	page.attr "id", "page_view"
-	body.append page
-	GUI.getWidget portName, entityTypeName, null, (widget) ->
-		page.rootWidget = widget
-		page.rootWidget.context = { name: entityTypeName }
-		WidgetStack.push page
-		callback(page)
+GUI.newPage = (widget, entityTypeName) ->
+  body  = $("body")
+  body.empty()  
+  page = $('<div>')
+  page.attr "id", "page_view"
+  body.append page
+  page.rootWidget = widget
+  page.rootWidget.context = { name: entityTypeName }
+  WidgetStack.push page
+  page
 		
 GUI.back = () ->
 	WidgetStack.pop()
@@ -140,16 +139,17 @@ GUI.putAndBack = (entityTypeName) ->
 GUI.remove = (entityTypeName, entityID) ->
 	API.deleteEntity(entityTypeName, entityID)
 
-GUI.newPageForEntityTypeSet = (portName, entityTypeName, entityId) ->
-	console.log 'newPageForEntityTypeSet: ' + portName
-	GUI.newPage portName, entityTypeName, (view) -> 
-		if (view.rootWidget.type == "EntityTypeSet")
-			API.getEntitiesTypes (entitiesTypes) =>
-				view.rootWidget.context = entitiesTypes
-				view.rootWidget.template.render entitiesTypes, (err, html) ->
-					if err
-						throw err
-					view.html html
+GUI.newPageForEntityTypeSet = (port, entityTypeName, entityId) ->
+  console.log 'newPageForEntityTypeSet: ' + port
+  GUI.getWidget port, entityTypeName, null, (widget) ->
+    view = GUI.newPage widget, entityTypeName 
+    if (view.rootWidget.type == "EntityTypeSet")
+      API.getEntitiesTypes (entitiesTypes) =>
+        view.rootWidget.context = entitiesTypes
+        view.rootWidget.template.render entitiesTypes, (err, html) ->
+          if err
+            throw err
+          view.html html
 	
 GUI.openApp = () ->
 	GUI.newPageForEntityTypeSet 'root'
@@ -201,19 +201,26 @@ class Filter.EntityTypeFilter extends Filter.AbstractFilter
 
   newPage: (port, entityType) ->
     console.log @name + '.newPage: ' + port
-    GUI.newPage port, entityType.name, (view) -> 
-      view.rootWidget.context = entityType
-      view.rootWidget.template.render entityType, (err, html) ->
-        if err
-          throw err
-        view.html html
+    widget = @getWidget port, {entityTypeName: entityType.name}
+    view = GUI.newPage widget, entityType.name 
+    view.rootWidget.context = entityType
+    view.rootWidget.template.render entityType, (err, html) ->
+      if err
+        throw err
+      view.html html
 
   getRule: (port, params) ->
-    found = null
+    defaultScope = null
+    sameName = null
     for rule in RulesCache
       if rule.portName == port
-        found = rule
-    return found
+        if rule.entityTypeLocator == "*"
+          defaultScope = rule
+        if rule.entityTypeLocator == params.entityTypeName
+          sameName = rule
+    if sameName
+      return sameName
+    return defaultScope
 
   forEachPort: (port, context, callback) ->
     console.log @name + '.forEachPort: ' + port
@@ -248,13 +255,14 @@ class Filter.EntityFilter extends Filter.AbstractFilter
 
   newPage: (port, entityType, entity) ->
     console.log @name + '.newPage: ' + port
-    GUI.newPage portName, entityTypeName, (view) -> 
-      entity.entityType = entityType
-      view.rootWidget.context = entity
-      view.rootWidget.template.render entity, (err, html) ->
-        if err
-          throw err
-        view.html html
+    widget = @getWidget port, {entityTypeName: entityType.name}
+    view = GUI.newPage widget, entityTypeName 
+    entity.entityType = entityType
+    view.rootWidget.context = entity
+    view.rootWidget.template.render entity, (err, html) ->
+      if err
+        throw err
+      view.html html
 
   getRule: (port, params) ->
     found = null
