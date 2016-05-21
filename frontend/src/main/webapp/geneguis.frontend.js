@@ -82,21 +82,19 @@
     });
   };
 
-  GUI.newPage = function(portName, entityTypeName, callback) {
+  GUI.newPage = function(widget, entityTypeName) {
     var body, page;
     body = $("body");
     body.empty();
     page = $('<div>');
     page.attr("id", "page_view");
     body.append(page);
-    return GUI.getWidget(portName, entityTypeName, null, function(widget) {
-      page.rootWidget = widget;
-      page.rootWidget.context = {
-        name: entityTypeName
-      };
-      WidgetStack.push(page);
-      return callback(page);
-    });
+    page.rootWidget = widget;
+    page.rootWidget.context = {
+      name: entityTypeName
+    };
+    WidgetStack.push(page);
+    return page;
   };
 
   GUI.back = function() {
@@ -209,10 +207,12 @@
     return API.deleteEntity(entityTypeName, entityID);
   };
 
-  GUI.newPageForEntityTypeSet = function(portName, entityTypeName, entityId) {
-    console.log('newPageForEntityTypeSet: ' + portName);
-    return GUI.newPage(portName, entityTypeName, function(view) {
-      var _this = this;
+  GUI.newPageForEntityTypeSet = function(port, entityTypeName, entityId) {
+    console.log('newPageForEntityTypeSet: ' + port);
+    return GUI.getWidget(port, entityTypeName, null, function(widget) {
+      var view,
+        _this = this;
+      view = GUI.newPage(widget, entityTypeName);
       if (view.rootWidget.type === "EntityTypeSet") {
         return API.getEntitiesTypes(function(entitiesTypes) {
           view.rootWidget.context = entitiesTypes;
@@ -300,28 +300,40 @@
     }
 
     EntityTypeFilter.prototype.newPage = function(port, entityType) {
+      var view, widget;
       console.log(this.name + '.newPage: ' + port);
-      return GUI.newPage(port, entityType.name, function(view) {
-        view.rootWidget.context = entityType;
-        return view.rootWidget.template.render(entityType, function(err, html) {
-          if (err) {
-            throw err;
-          }
-          return view.html(html);
-        });
+      widget = this.getWidget(port, {
+        entityTypeName: entityType.name
+      });
+      view = GUI.newPage(widget, entityType.name);
+      view.rootWidget.context = entityType;
+      return view.rootWidget.template.render(entityType, function(err, html) {
+        if (err) {
+          throw err;
+        }
+        return view.html(html);
       });
     };
 
     EntityTypeFilter.prototype.getRule = function(port, params) {
-      var found, rule, _i, _len;
-      found = null;
+      var defaultScope, rule, sameName, _i, _len;
+      defaultScope = null;
+      sameName = null;
       for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
         rule = RulesCache[_i];
         if (rule.portName === port) {
-          found = rule;
+          if (rule.entityTypeLocator === "*") {
+            defaultScope = rule;
+          }
+          if (rule.entityTypeLocator === params.entityTypeName) {
+            sameName = rule;
+          }
         }
       }
-      return found;
+      if (sameName) {
+        return sameName;
+      }
+      return defaultScope;
     };
 
     EntityTypeFilter.prototype.forEachPort = function(port, context, callback) {
@@ -381,16 +393,19 @@
     };
 
     EntityFilter.prototype.newPage = function(port, entityType, entity) {
+      var view, widget;
       console.log(this.name + '.newPage: ' + port);
-      return GUI.newPage(portName, entityTypeName, function(view) {
-        entity.entityType = entityType;
-        view.rootWidget.context = entity;
-        return view.rootWidget.template.render(entity, function(err, html) {
-          if (err) {
-            throw err;
-          }
-          return view.html(html);
-        });
+      widget = this.getWidget(port, {
+        entityTypeName: entityType.name
+      });
+      view = GUI.newPage(widget, entityTypeName);
+      entity.entityType = entityType;
+      view.rootWidget.context = entity;
+      return view.rootWidget.template.render(entity, function(err, html) {
+        if (err) {
+          throw err;
+        }
+        return view.html(html);
       });
     };
 
