@@ -9,10 +9,10 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 
 public class BrowserReaders {
 
-	private Map<Class, BrowserConsoleReader> readers;
+	private Map<Class<?>, BrowserConsoleReader> readers;
 
 	public BrowserReaders() {
-		this.readers = new HashMap<Class, BrowserConsoleReader>();
+		this.readers = new HashMap<Class<?>, BrowserConsoleReader>();
 		this.readers.put(ChromeDriver.class, new ChromeConsoleReader());
 		this.readers.put(FirefoxDriver.class, new FirefoxConsoleReader());
 	}

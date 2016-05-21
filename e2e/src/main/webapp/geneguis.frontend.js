@@ -1,5 +1,7 @@
 (function() {
-  var _this = this;
+  var _this = this,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   nunjucks.configure({
     autoescape: false
@@ -49,153 +51,7 @@
     widget = WidgetCache[rule.widgetName + rule.widgetVersion];
     widget.configuration = $.parseJSON(rule.configuration);
     console.log('getWidgetByRule: ' + rule.portName + '->' + widget.name);
-    return callback(widget);
-  };
-
-  GUI.getEntityTypeWidget = function(portName, entityTypeName, callback) {
-    var found,
-      _this = this;
-    found = null;
-    RulesCache.forEach(function(rule) {
-      if (rule.portName === portName) {
-        return found = rule;
-      }
-    });
-    if (found) {
-      return GUI.getWidgetByRule(found, callback);
-    } else {
-      return console.log('No rules found for port:' + portName);
-    }
-  };
-
-  GUI.getEntityWidget = function(portName, entityTypeName, callback) {
-    var found,
-      _this = this;
-    found = null;
-    RulesCache.forEach(function(rule) {
-      if (rule.portName === portName) {
-        return found = rule;
-      }
-    });
-    if (found) {
-      return GUI.getWidgetByRule(found, callback);
-    } else {
-      return console.log('No rules found for port:' + portName);
-    }
-  };
-
-  GUI.getPropertyTypeWidget = function(portName, entityTypeName, fieldType, callback) {
-    var found,
-      _this = this;
-    found = null;
-    RulesCache.forEach(function(rule) {
-      if (rule.portName === portName) {
-        if ((rule.type === "PropertyType" || rule.type === "Property" || rule.type === "FieldType" || rule.type === "Field") && fieldType.kind === "Property") {
-          return found = rule;
-        }
-      }
-    });
-    if (found) {
-      return GUI.getWidgetByRule(found, callback);
-    } else {
-      return console.log('No rules found for port:' + portName);
-    }
-  };
-
-  GUI.getRelationshipTypeWidget = function(portName, entityTypeName, fieldType, callback) {
-    var found,
-      _this = this;
-    found = null;
-    RulesCache.forEach(function(rule) {
-      if (rule.portName === portName) {
-        if ((rule.type === "RelationshipType" || rule.type === "Relationship" || rule.type === "FieldType" || rule.type === "Field") && fieldType.kind === "Relationship") {
-          return found = rule;
-        }
-      }
-    });
-    if (found) {
-      return GUI.getWidgetByRule(found, callback);
-    } else {
-      return console.log('No rules found for port:' + portName);
-    }
-  };
-
-  GUI.getFieldTypeWidget = function(portName, entityTypeName, fieldType, callback) {
-    var found,
-      _this = this;
-    found = null;
-    RulesCache.forEach(function(rule) {
-      if (rule.portName === portName) {
-        if ((rule.type === "PropertyType" || rule.type === "Property" || rule.type === "FieldType" || rule.type === "Field") && fieldType.kind === "Property") {
-          found = rule;
-        }
-        if ((rule.type === "RelationshipType" || rule.type === "Relationship" || rule.type === "FieldType" || rule.type === "Field") && fieldType.kind === "Relationship") {
-          return found = rule;
-        }
-      }
-    });
-    if (found) {
-      return GUI.getWidgetByRule(found, callback);
-    } else {
-      return console.log('No rules found for port:' + portName);
-    }
-  };
-
-  GUI.getFieldWidget = function(portName, entityTypeName, fieldType, callback) {
-    var found,
-      _this = this;
-    found = null;
-    RulesCache.forEach(function(rule) {
-      if (rule.portName === portName) {
-        if ((rule.type === "PropertyType" || rule.type === "Property") && fieldType.kind === "Property") {
-          found = rule;
-        }
-        if ((rule.type === "RelationshipType" || rule.type === "Relationship") && fieldType.kind === "Relationship") {
-          return found = rule;
-        }
-      }
-    });
-    if (found) {
-      return GUI.getWidgetByRule(found, callback);
-    } else {
-      return console.log('No rules found for port:' + portName);
-    }
-  };
-
-  GUI.getPropertyWidget = function(portName, entityTypeName, fieldType, callback) {
-    var found,
-      _this = this;
-    found = null;
-    RulesCache.forEach(function(rule) {
-      if (rule.portName === portName) {
-        if ((rule.type === "PropertyType" || rule.type === "Property") && fieldType.kind === "Property") {
-          return found = rule;
-        }
-      }
-    });
-    if (found) {
-      return GUI.getWidgetByRule(found, callback);
-    } else {
-      return console.log('No rules found for port:' + portName);
-    }
-  };
-
-  GUI.getRelationshipWidget = function(portName, entityTypeName, fieldType, callback) {
-    var found,
-      _this = this;
-    found = null;
-    RulesCache.forEach(function(rule) {
-      if (rule.portName === portName) {
-        if ((rule.type === "RelationshipType" || rule.type === "Relationship") && fieldType.kind === "Relationship") {
-          return found = rule;
-        }
-      }
-    });
-    if (found) {
-      return GUI.getWidgetByRule(found, callback);
-    } else {
-      return console.log('No rules found for port:' + portName);
-    }
+    return widget;
   };
 
   GUI.getWidget = function(portName, entityTypeName, propertyType, callback) {
@@ -353,8 +209,8 @@
     return API.deleteEntity(entityTypeName, entityID);
   };
 
-  GUI.newPageByPort = function(portName, entityTypeName, entityId) {
-    console.log('newPageByPort: ' + portName);
+  GUI.newPageForEntityTypeSet = function(portName, entityTypeName, entityId) {
+    console.log('newPageForEntityTypeSet: ' + portName);
     return GUI.newPage(portName, entityTypeName, function(view) {
       var _this = this;
       if (view.rootWidget.type === "EntityTypeSet") {
@@ -372,30 +228,7 @@
   };
 
   GUI.openApp = function() {
-    return GUI.newPageByPort('root');
-  };
-
-  GUI.renderPortFilter = function(port, callback) {
-    var _this = this;
-    console.log('renderPortFilter: ' + port);
-    return GUI.getWidget(port, this.ctx.name, null, function(widget) {
-      if (widget.type === "EntityTypeSet") {
-        return API.getEntitiesTypes(function(entitiesTypes) {
-          return widget.template.render(entitiesTypes, function(err, html) {
-            if (err) {
-              throw err;
-            }
-            return callback(err, html);
-          });
-        });
-      }
-    });
-  };
-
-  GUI.renderNewPageFilter = function(port) {
-    var entityTypeName;
-    entityTypeName = this.ctx.entityType ? this.ctx.entityType.name : this.ctx.name;
-    return "onClick=\"GUI.newPageByPort('" + port + "','" + entityTypeName + "'," + this.ctx.id + ")\"";
+    return GUI.newPageForEntityTypeSet('root');
   };
 
   GUI.renderPostFilter = function(port) {
@@ -410,48 +243,65 @@
     return "onClick=\"GUI." + action + "('" + this.ctx.entityType.name + "', " + this.ctx.id + ");GUI.refresh();\"";
   };
 
-  Filter.forEachEntityType = function(port, callback) {
-    var _this = this;
-    console.log('forEachEntityType: ' + port);
-    return GUI.getEntityTypeWidget(port, this.ctx.name, function(widget) {
-      var entityType, i, j, msg, result;
-      if (widget.type !== "EntityType") {
-        msg = 'forEachEntityType: ' + widget.name + ' is not EntityType';
-        console.error(msg);
-        return callback(msg, null);
-      } else {
-        i = 0;
-        j = 0;
-        result = "";
-        entityType = _this.ctx[i];
-        while (entityType) {
-          widget.template.render(entityType, function(err, html) {
-            if (err) {
-              throw err;
-            }
-            result += html;
-            j++;
-            if (i === j) {
-              return callback(null, result);
-            }
-          });
-          entityType = _this.ctx[++i];
+  Filter.AbstractFilter = (function() {
+
+    function AbstractFilter(name) {
+      this.name = name;
+    }
+
+    AbstractFilter.prototype.renderNewPage = function(port, context) {
+      var entityTypeName;
+      entityTypeName = context.name;
+      return "onClick=\"Filter.newPageFor" + this.name + "('" + port + "','" + entityTypeName + "')\"";
+    };
+
+    AbstractFilter.prototype.forEachPort = function(port, context, callback) {};
+
+    AbstractFilter.prototype.forPort = function(port, context, callback) {
+      var widget;
+      console.log(this.name + '.forPort: ' + port);
+      widget = this.getWidget(port, context);
+      return this.renderFor(widget, context, callback);
+    };
+
+    AbstractFilter.prototype.getWidget = function(port, params) {
+      var rule;
+      rule = this.getRule(port, params);
+      this.checkRule(rule);
+      return GUI.getWidgetByRule(rule);
+    };
+
+    AbstractFilter.prototype.getRule = function(port, params) {};
+
+    AbstractFilter.prototype.checkRule = function(rule) {
+      if (rule) {
+        if (rule.type === this.name) {
+
+        } else {
+          throw 'Problem on port #{port}: #{rule.name} is not #{@name}';
         }
+      } else {
+        throw 'No rules found for port: #{port}';
       }
-    });
-  };
+    };
 
-  Filter.renderNewPageForEntityType = function(portName) {
-    var entityTypeName;
-    entityTypeName = this.ctx.name;
-    return "onClick=\"Filter.newPageForEntityType('" + portName + "','" + entityTypeName + "')\"";
-  };
+    AbstractFilter.prototype.renderFor = function(widget, context, callback) {};
 
-  Filter.newPageForEntityType = function(portName, entityTypeName) {
-    console.log('newPageForEntityType: ' + portName);
-    return GUI.newPage(portName, entityTypeName, function(view) {
-      var _this = this;
-      return API.getEntityType(entityTypeName, function(entityType) {
+    return AbstractFilter;
+
+  })();
+
+  Filter.EntityTypeFilter = (function(_super) {
+
+    __extends(EntityTypeFilter, _super);
+
+    function EntityTypeFilter() {
+      EntityTypeFilter.__super__.constructor.call(this, "EntityType");
+    }
+
+    EntityTypeFilter.prototype.newPage = function(port, entityType) {
+      console.log(this.name + '.newPage: ' + port);
+      return GUI.newPage(port, entityType.name, function(view) {
         view.rootWidget.context = entityType;
         return view.rootWidget.template.render(entityType, function(err, html) {
           if (err) {
@@ -460,184 +310,434 @@
           return view.html(html);
         });
       });
-    });
-  };
+    };
 
-  Filter.forEntityType = function(port, callback) {
-    var _this = this;
-    console.log('forEntityType: ' + port);
-    return GUI.getEntityWidget(port, this.ctx.name, function(widget) {
-      var msg;
-      if (widget.type !== "EntityType") {
-        msg = 'forEntityType: ' + widget.name + ' is not EntityType';
-        console.error(msg);
-        return callback(msg, null);
-      } else {
-        return API.getEntityType(_this.ctx.name, function(entityType) {
-          return widget.template.render(entityType, function(err, html) {
-            if (err) {
-              throw err;
-            }
-            return callback(err, html);
-          });
-        });
+    EntityTypeFilter.prototype.getRule = function(port, params) {
+      var found, rule, _i, _len;
+      found = null;
+      for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
+        rule = RulesCache[_i];
+        if (rule.portName === port) {
+          found = rule;
+        }
       }
-    });
-  };
+      return found;
+    };
 
-  Filter.forEachEntity = function(port, callback) {
-    var entityTypeName,
-      _this = this;
-    console.log('forEachEntity: ' + port);
-    entityTypeName = this.ctx.name;
-    return GUI.getEntityWidget(port, entityTypeName, function(widget) {
-      return API.getEntities(entityTypeName, function(entities) {
-        var i, len, result;
-        result = "";
-        i = 1;
-        len = entities.length;
-        return entities.forEach(function(entity) {
-          entity.entityType = _this.ctx;
-          return widget.template.render(entity, function(err, html) {
-            if (err) {
-              throw err;
-            }
-            result += html;
-            if (i === len) {
-              callback(err, result);
-            }
-            return i++;
-          });
+    EntityTypeFilter.prototype.forEachPort = function(port, context, callback) {
+      var current, item, result, size, widget, _results;
+      console.log(this.name + '.forEachPort: ' + port);
+      size = 0;
+      result = "";
+      current = 0;
+      item = context[size];
+      _results = [];
+      while (item) {
+        widget = this.getWidget(port, {
+          entityTypeName: item.name
         });
-      });
-    });
-  };
-
-  Filter.forEachPropertyType = function(port, callback) {
-    var entityType, i, len, result;
-    console.log('forEachPropertyType: ' + port);
-    entityType = this.ctx;
-    result = "";
-    i = 1;
-    len = entityType.fieldTypes.length;
-    return entityType.fieldTypes.forEach(function(fieldType) {
-      if (fieldType.kind === "Property") {
-        return GUI.getPropertyTypeWidget(port, entityType.name, fieldType, function(widget) {
-          fieldType.entity = entityType;
-          return widget.template.render(fieldType, function(err, html) {
-            if (err) {
-              throw err;
-            }
-            result += html;
-            if (i === len) {
-              callback(null, result);
-            }
-            return i++;
-          });
-        });
-      }
-    });
-  };
-
-  Filter.forEachRelationshipType = function(port, callback) {
-    var entityType, i, len, result;
-    console.log('forEachRelationshipType: ' + port);
-    entityType = this.ctx;
-    result = "";
-    i = 1;
-    len = entityType.fieldTypes.length;
-    return entityType.fieldTypes.forEach(function(fieldType) {
-      if (fieldType.kind === "Relationship") {
-        return GUI.getRelationshipTypeWidget(port, entityType.name, fieldType, function(widget) {
-          fieldType.entity = entityType;
-          return widget.template.render(fieldType, function(err, html) {
-            if (err) {
-              throw err;
-            }
-            result += html;
-            if (i === len) {
-              callback(null, result);
-            }
-            return i++;
-          });
-        });
-      }
-    });
-  };
-
-  Filter.forEachFieldType = function(port, callback) {
-    var entityType, i, len, result;
-    console.log('forEachFieldType: ' + port);
-    entityType = this.ctx;
-    result = "";
-    i = 1;
-    len = entityType.fieldTypes.length;
-    return entityType.fieldTypes.forEach(function(fieldType) {
-      return GUI.getFieldTypeWidget(port, entityType.name, fieldType, function(widget) {
-        fieldType.entity = entityType;
-        return widget.template.render(fieldType, function(err, html) {
+        widget.template.render(item, function(err, html) {
           if (err) {
             throw err;
           }
           result += html;
-          if (i === len) {
-            callback(null, result);
+          if (++current === size) {
+            return callback(null, result);
           }
-          return i++;
+        });
+        _results.push(item = context[++size]);
+      }
+      return _results;
+    };
+
+    EntityTypeFilter.prototype.renderFor = function(widget, context, callback) {
+      var _this = this;
+      return API.getEntityType(context.name, function(entityType) {
+        return widget.template.render(entityType, function(err, html) {
+          if (err) {
+            throw err;
+          }
+          return callback(null, html);
         });
       });
-    });
-  };
+    };
 
-  Filter.forEachProperty = function(port, callback) {
-    var entity, entityType, i, len, result;
-    console.log('forEachProperty: ' + port);
-    entity = this.ctx;
-    entityType = this.ctx.entityType ? this.ctx.entityType : this.ctx.type;
-    result = "";
-    i = 1;
-    len = entityType.fieldTypes.length;
-    return entityType.fieldTypes.forEach(function(fieldType) {
-      if (fieldType.kind === "Property") {
-        return GUI.getPropertyWidget(port, entityType.name, fieldType, function(widget) {
-          var property, propertyValue;
+    return EntityTypeFilter;
+
+  })(Filter.AbstractFilter);
+
+  Filter.EntityFilter = (function(_super) {
+
+    __extends(EntityFilter, _super);
+
+    function EntityFilter() {
+      EntityFilter.__super__.constructor.call(this, "Entity");
+    }
+
+    EntityFilter.prototype.renderNewPage = function(port, context) {
+      var entityTypeName;
+      entityTypeName = context.name;
+      return "onClick=\"Filter.newPageFor" + this.name + "('" + port + "','" + entityTypeName + "'," + context.id + ")\"";
+    };
+
+    EntityFilter.prototype.newPage = function(port, entityType, entity) {
+      console.log(this.name + '.newPage: ' + port);
+      return GUI.newPage(portName, entityTypeName, function(view) {
+        entity.entityType = entityType;
+        view.rootWidget.context = entity;
+        return view.rootWidget.template.render(entity, function(err, html) {
+          if (err) {
+            throw err;
+          }
+          return view.html(html);
+        });
+      });
+    };
+
+    EntityFilter.prototype.getRule = function(port, params) {
+      var found, rule, _i, _len;
+      found = null;
+      for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
+        rule = RulesCache[_i];
+        if (rule.portName === port) {
+          found = rule;
+        }
+      }
+      return found;
+    };
+
+    EntityFilter.prototype.forEachPort = function(port, context, callback) {
+      var widget,
+        _this = this;
+      console.log(this.name + '.forEachPort: ' + port);
+      widget = this.getWidget(port, {
+        entityTypeName: context.name
+      });
+      return API.getEntities(context.name, function(entities) {
+        var current, entity, result, size, _i, _len, _results;
+        result = "";
+        size = entities.length;
+        current = 0;
+        _results = [];
+        for (_i = 0, _len = entities.length; _i < _len; _i++) {
+          entity = entities[_i];
+          entity.entityType = context;
+          _results.push(widget.template.render(entity, function(err, html) {
+            if (err) {
+              throw err;
+            }
+            result += html;
+            if (++current === size) {
+              return callback(null, result);
+            }
+          }));
+        }
+        return _results;
+      });
+    };
+
+    EntityFilter.prototype.renderFor = function(widget, context, callback) {
+      var _this = this;
+      return API.getEntityType(context.name, function(entityType) {
+        return widget.template.render(entityType, function(err, html) {
+          if (err) {
+            throw err;
+          }
+          return callback(null, html);
+        });
+      });
+    };
+
+    return EntityFilter;
+
+  })(Filter.AbstractFilter);
+
+  Filter.PropertyTypeFilter = (function(_super) {
+
+    __extends(PropertyTypeFilter, _super);
+
+    function PropertyTypeFilter() {
+      PropertyTypeFilter.__super__.constructor.call(this, "PropertyType");
+    }
+
+    PropertyTypeFilter.prototype.getRule = function(port, params) {
+      var fieldType, found, rule, _i, _len;
+      fieldType = params.fieldType;
+      found = null;
+      for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
+        rule = RulesCache[_i];
+        if (rule.portName === port) {
+          if ((rule.type === "PropertyType" || rule.type === "Property" || rule.type === "FieldType" || rule.type === "Field") && fieldType.kind === "Property") {
+            found = rule;
+          }
+        }
+      }
+      return found;
+    };
+
+    PropertyTypeFilter.prototype.forEachPort = function(port, entityType, callback) {
+      var current, fieldType, result, size, widget, _i, _len, _ref, _results;
+      console.log(this.name + '.forEachPort: ' + port);
+      result = "";
+      current = 0;
+      size = entityType.fieldTypes.length;
+      _ref = entityType.fieldTypes;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        fieldType = _ref[_i];
+        if (fieldType.kind === "Property") {
+          widget = this.getWidget(port, {
+            entityTypeName: entityType.name,
+            fieldType: fieldType
+          });
           fieldType.entity = entityType;
+          _results.push(widget.template.render(fieldType, function(err, html) {
+            if (err) {
+              throw err;
+            }
+            result += html;
+            if (++current === size) {
+              return callback(null, result);
+            }
+          }));
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+
+    return PropertyTypeFilter;
+
+  })(Filter.AbstractFilter);
+
+  Filter.RelationshipTypeFilter = (function(_super) {
+
+    __extends(RelationshipTypeFilter, _super);
+
+    function RelationshipTypeFilter() {
+      RelationshipTypeFilter.__super__.constructor.call(this, "RelationshipType");
+    }
+
+    RelationshipTypeFilter.prototype.getRule = function(port, params) {
+      var fieldType, found, rule, _i, _len;
+      fieldType = params.fieldType;
+      found = null;
+      for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
+        rule = RulesCache[_i];
+        if (rule.portName === port) {
+          if ((rule.type === "RelationshipType" || rule.type === "Relationship" || rule.type === "FieldType" || rule.type === "Field") && fieldType.kind === "Relationship") {
+            found = rule;
+          }
+        }
+      }
+      return found;
+    };
+
+    RelationshipTypeFilter.prototype.forEachPort = function(port, entityType, callback) {
+      var current, fieldType, result, size, widget, _i, _len, _ref, _results;
+      console.log(this.name + '.forEachPort: ' + port);
+      result = "";
+      current = 0;
+      size = entityType.fieldTypes.length;
+      _ref = entityType.fieldTypes;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        fieldType = _ref[_i];
+        if (fieldType.kind === "Relationship") {
+          widget = this.getWidget(port, {
+            entityTypeName: entityType.name,
+            fieldType: fieldType
+          });
+          fieldType.entity = entityType;
+          _results.push(widget.template.render(fieldType, function(err, html) {
+            if (err) {
+              throw err;
+            }
+            result += html;
+            if (++current === size) {
+              return callback(null, result);
+            }
+          }));
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+
+    return RelationshipTypeFilter;
+
+  })(Filter.AbstractFilter);
+
+  Filter.FieldTypeFilter = (function(_super) {
+
+    __extends(FieldTypeFilter, _super);
+
+    function FieldTypeFilter() {
+      FieldTypeFilter.__super__.constructor.call(this, "FieldType");
+    }
+
+    FieldTypeFilter.prototype.getRule = function(port, params) {
+      var fieldType, found, rule, _i, _len;
+      fieldType = params.fieldType;
+      found = null;
+      for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
+        rule = RulesCache[_i];
+        if (rule.portName === port) {
+          if ((rule.type === "PropertyType" || rule.type === "Property" || rule.type === "FieldType" || rule.type === "Field") && fieldType.kind === "Property") {
+            found = rule;
+          }
+          if ((rule.type === "RelationshipType" || rule.type === "Relationship" || rule.type === "FieldType" || rule.type === "Field") && fieldType.kind === "Relationship") {
+            found = rule;
+          }
+        }
+      }
+      return found;
+    };
+
+    FieldTypeFilter.prototype.forEachPort = function(port, entityType, callback) {
+      var current, fieldType, result, size, widget, _i, _len, _ref, _results;
+      console.log(this.name + '.forEachPort: ' + port);
+      result = "";
+      current = 0;
+      size = entityType.fieldTypes.length;
+      _ref = entityType.fieldTypes;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        fieldType = _ref[_i];
+        if (fieldType.kind === "Property") {
+          widget = this.getWidget(port, {
+            entityTypeName: entityType.name,
+            fieldType: fieldType
+          });
+          fieldType.entity = entityType;
+          _results.push(widget.template.render(fieldType, function(err, html) {
+            if (err) {
+              throw err;
+            }
+            result += html;
+            if (++current === size) {
+              return callback(null, result);
+            }
+          }));
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+
+    return FieldTypeFilter;
+
+  })(Filter.AbstractFilter);
+
+  Filter.PropertyFilter = (function(_super) {
+
+    __extends(PropertyFilter, _super);
+
+    function PropertyFilter() {
+      PropertyFilter.__super__.constructor.call(this, "Property");
+    }
+
+    PropertyFilter.prototype.getRule = function(port, params) {
+      var fieldType, found, rule, _i, _len;
+      fieldType = params.fieldType;
+      found = null;
+      for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
+        rule = RulesCache[_i];
+        if (rule.portName === port) {
+          if ((rule.type === "PropertyType" || rule.type === "Property") && fieldType.kind === "Property") {
+            found = rule;
+          }
+        }
+      }
+      return found;
+    };
+
+    PropertyFilter.prototype.forEachPort = function(port, entity, callback) {
+      var current, fieldType, property, propertyValue, result, size, widget, _i, _len, _ref, _results;
+      console.log(this.name + '.forEachPort: ' + port);
+      result = "";
+      current = 0;
+      size = entity.entityType.fieldTypes.length;
+      _ref = entity.entityType.fieldTypes;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        fieldType = _ref[_i];
+        if (fieldType.kind === "Property") {
+          widget = this.getWidget(port, {
+            entityTypeName: entity.entityType.name,
+            fieldType: fieldType
+          });
+          fieldType.entity = entity.entityType;
           propertyValue = entity[fieldType.name];
           property = {
             value: propertyValue,
             type: fieldType
           };
-          return widget.template.render(property, function(err, html) {
+          _results.push(widget.template.render(property, function(err, html) {
             if (err) {
               throw err;
             }
             result += html;
-            if (i === len) {
-              callback(null, result);
+            if (++current === size) {
+              return callback(null, result);
             }
-            return i++;
-          });
-        });
+          }));
+        } else {
+          _results.push(void 0);
+        }
       }
-    });
-  };
+      return _results;
+    };
 
-  Filter.forEachRelationship = function(port, callback) {
-    var entity, entityType, i, len, result;
-    console.log('forEachRelationship: ' + port);
-    entity = this.ctx;
-    entityType = this.ctx.entityType ? this.ctx.entityType : this.ctx.type;
-    result = "";
-    i = 1;
-    len = entityType.fieldTypes.length;
-    return entityType.fieldTypes.forEach(function(fieldType) {
-      if (fieldType.kind === "Relationship") {
-        return GUI.getRelationshipWidget(port, entityType.name, fieldType, function(widget) {
-          var relationshipId,
-            _this = this;
-          fieldType.entity = entityType;
+    return PropertyFilter;
+
+  })(Filter.AbstractFilter);
+
+  Filter.RelationshipFilter = (function(_super) {
+
+    __extends(RelationshipFilter, _super);
+
+    function RelationshipFilter() {
+      RelationshipFilter.__super__.constructor.call(this, "Relationship");
+    }
+
+    RelationshipFilter.prototype.getRule = function(port, params) {
+      var fieldType, found, rule, _i, _len;
+      fieldType = params.fieldType;
+      found = null;
+      for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
+        rule = RulesCache[_i];
+        if (rule.portName === port) {
+          if ((rule.type === "RelationshipType" || rule.type === "Relationship") && fieldType.kind === "Relationship") {
+            found = rule;
+          }
+        }
+      }
+      return found;
+    };
+
+    RelationshipFilter.prototype.forEachPort = function(port, entity, callback) {
+      var current, fieldType, relationshipId, result, size, widget, _i, _len, _ref, _results,
+        _this = this;
+      console.log(this.name + '.forEachPort: ' + port);
+      result = "";
+      current = 0;
+      size = entity.entityType.fieldTypes.length;
+      _ref = entity.entityType.fieldTypes;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        fieldType = _ref[_i];
+        if (fieldType.kind === "Relationship") {
+          widget = this.getWidget(port, {
+            entityTypeName: entity.entityType.name,
+            fieldType: fieldType
+          });
+          fieldType.entity = entity.entityType;
           relationshipId = entity[fieldType.name];
-          return API.getEntity(fieldType.targetType, relationshipId, function(entity) {
+          _results.push(API.getEntity(fieldType.targetType, relationshipId, function(entity) {
             var relationship;
             relationship = {
               target: entity,
@@ -648,93 +748,201 @@
                 throw err;
               }
               result += html;
-              if (i === len) {
-                callback(null, result);
+              if (++current === size) {
+                return callback(null, result);
               }
-              return i++;
             });
-          });
-        });
+          }));
+        } else {
+          _results.push(void 0);
+        }
       }
-    });
-  };
+      return _results;
+    };
 
-  Filter.forEachField = function(port, callback) {
-    var entity, entityType, i, len, result;
-    console.log('forEachField: ' + port);
-    entity = this.ctx;
-    entityType = this.ctx.entityType ? this.ctx.entityType : this.ctx.type;
-    result = "";
-    i = 1;
-    len = entityType.fieldTypes.length;
-    return entityType.fieldTypes.forEach(function(fieldType) {
-      return GUI.getFieldWidget(port, entityType.name, fieldType, function(widget) {
-        var field, propertyValue, relationshipId,
-          _this = this;
-        fieldType.entity = entityType;
-        field = null;
+    return RelationshipFilter;
+
+  })(Filter.AbstractFilter);
+
+  Filter.FieldFilter = (function(_super) {
+
+    __extends(FieldFilter, _super);
+
+    function FieldFilter() {
+      FieldFilter.__super__.constructor.call(this, "Field");
+    }
+
+    FieldFilter.prototype.getRule = function(port, params) {
+      var fieldType, found, rule, _i, _len;
+      fieldType = params.fieldType;
+      found = null;
+      for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
+        rule = RulesCache[_i];
+        if (rule.portName === port) {
+          if ((rule.type === "PropertyType" || rule.type === "Property") && fieldType.kind === "Property") {
+            found = rule;
+          }
+          if ((rule.type === "RelationshipType" || rule.type === "Relationship") && fieldType.kind === "Relationship") {
+            found = rule;
+          }
+        }
+      }
+      return found;
+    };
+
+    FieldFilter.prototype.forEachPort = function(port, entity, callback) {
+      var current, fieldType, property, propertyValue, relationshipId, result, size, widget, _i, _len, _ref, _results,
+        _this = this;
+      console.log(this.name + '.forEachPort: ' + port);
+      result = "";
+      current = 0;
+      size = entity.entityType.fieldTypes.length;
+      _ref = entity.entityType.fieldTypes;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        fieldType = _ref[_i];
+        widget = this.getWidget(port, {
+          entityTypeName: entity.entityType.name,
+          fieldType: fieldType
+        });
+        fieldType.entity = entity.entityType;
         if (fieldType.kind === "Property") {
           propertyValue = entity[fieldType.name];
-          field = {
+          property = {
             value: propertyValue,
             type: fieldType
           };
-          return widget.template.render(field, function(err, html) {
+          _results.push(widget.template.render(property, function(err, html) {
             if (err) {
               throw err;
             }
             result += html;
-            if (i === len) {
-              callback(null, result);
+            if (++current === size) {
+              return callback(null, result);
             }
-            return i++;
-          });
+          }));
         } else {
           relationshipId = entity[fieldType.name];
-          return API.getEntity(fieldType.targetType, relationshipId, function(entity) {
-            field = {
+          _results.push(API.getEntity(fieldType.targetType, relationshipId, function(entity) {
+            var relationship;
+            relationship = {
               target: entity,
               type: fieldType
             };
-            return widget.template.render(field, function(err, html) {
+            return widget.template.render(relationship, function(err, html) {
               if (err) {
                 throw err;
               }
               result += html;
-              if (i === len) {
-                callback(null, result);
+              if (++current === size) {
+                return callback(null, result);
               }
-              return i++;
             });
-          });
+          }));
         }
+      }
+      return _results;
+    };
+
+    return FieldFilter;
+
+  })(Filter.AbstractFilter);
+
+  Filter.renderNewPageForEntityType = function(port) {
+    var context, filter;
+    filter = new Filter.EntityTypeFilter;
+    context = this.ctx;
+    return filter.renderNewPage(port, context);
+  };
+
+  Filter.newPageForEntityType = function(port, entityTypeName) {
+    var filter,
+      _this = this;
+    filter = new Filter.EntityTypeFilter;
+    return API.getEntityType(entityTypeName, function(entityType) {
+      return filter.newPage(port, entityType);
+    });
+  };
+
+  Filter.forEachEntityType = function(port, callback) {
+    var context, filter;
+    filter = new Filter.EntityTypeFilter;
+    context = this.ctx;
+    return filter.forEachPort(port, context, callback);
+  };
+
+  Filter.forEntityType = function(port, callback) {
+    var context, filter;
+    filter = new Filter.EntityTypeFilter;
+    context = this.ctx;
+    return filter.forPort(port, context, callback);
+  };
+
+  Filter.renderNewPageForEntity = function(port) {
+    var context, filter;
+    filter = new Filter.EntityFilter;
+    context = this.ctx;
+    return filter.renderNewPage(port, context);
+  };
+
+  Filter.forEachEntity = function(port, callback) {
+    var context, filter;
+    filter = new Filter.EntityFilter;
+    context = this.ctx;
+    return filter.forEachPort(port, context, callback);
+  };
+
+  Filter.newPageForEntity = function(port, entityTypeName, entityId) {
+    var filter,
+      _this = this;
+    filter = new Filter.EntityFilter;
+    return API.getEntityType(entityTypeName, function(entityType) {
+      return API.getEntity(entityTypeName, entityId, function(entity) {
+        return filter.newPage(port, entityType, entity);
       });
     });
   };
 
-  Filter.renderNewPageForEntity = function(portName) {
-    var entityTypeName;
-    entityTypeName = this.ctx.entityType.name;
-    return "onClick=\"Filter.newPageForEntity('" + portName + "','" + entityTypeName + "'," + this.ctx.id + ")\"";
+  Filter.forEachPropertyType = function(port, callback) {
+    var context, filter;
+    filter = new Filter.PropertyTypeFilter;
+    context = this.ctx;
+    return filter.forEachPort(port, context, callback);
   };
 
-  Filter.newPageForEntity = function(portName, entityTypeName, entityId) {
-    console.log('newPageForEntity: ' + portName);
-    return GUI.newPage(portName, entityTypeName, function(view) {
-      var _this = this;
-      return API.getEntityType(entityTypeName, function(entityType) {
-        return API.getEntity(entityTypeName, entityId, function(entity) {
-          entity.entityType = entityType;
-          view.rootWidget.context = entity;
-          return view.rootWidget.template.render(entity, function(err, html) {
-            if (err) {
-              throw err;
-            }
-            return view.html(html);
-          });
-        });
-      });
-    });
+  Filter.forEachRelationshipType = function(port, callback) {
+    var context, filter;
+    filter = new Filter.RelationshipTypeFilter;
+    context = this.ctx;
+    return filter.forEachPort(port, context, callback);
+  };
+
+  Filter.forEachFieldType = function(port, callback) {
+    var context, filter;
+    filter = new Filter.FieldTypeFilter;
+    context = this.ctx;
+    return filter.forEachPort(port, context, callback);
+  };
+
+  Filter.forEachProperty = function(port, callback) {
+    var context, filter;
+    filter = new Filter.PropertyFilter;
+    context = this.ctx;
+    return filter.forEachPort(port, context, callback);
+  };
+
+  Filter.forEachRelationship = function(port, callback) {
+    var context, filter;
+    filter = new Filter.RelationshipFilter;
+    context = this.ctx;
+    return filter.forEachPort(port, context, callback);
+  };
+
+  Filter.forEachField = function(port, callback) {
+    var context, filter;
+    filter = new Filter.FieldFilter;
+    context = this.ctx;
+    return filter.forEachPort(port, context, callback);
   };
 
   $(function() {

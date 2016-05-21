@@ -29,98 +29,8 @@ GUI.getWidgetByRule = (rule, callback) ->
 	widget = WidgetCache[rule.widgetName + rule.widgetVersion]
 	widget.configuration = $.parseJSON(rule.configuration)
 	console.log 'getWidgetByRule: ' + rule.portName + '->' + widget.name
-	callback(widget)
+	widget
 
-GUI.getEntityTypeWidget = (portName, entityTypeName, callback) ->
-	found = null
-	RulesCache.forEach (rule) =>
-		if rule.portName == portName
-			found = rule
-	if found
-		GUI.getWidgetByRule found, callback
-	else
-		console.log 'No rules found for port:' + portName
-
-GUI.getEntityWidget = (portName, entityTypeName, callback) ->
-	found = null
-	RulesCache.forEach (rule) =>
-		if rule.portName == portName
-			found = rule
-	if found
-		GUI.getWidgetByRule found, callback
-	else
-		console.log 'No rules found for port:' + portName
-
-GUI.getPropertyTypeWidget = (portName, entityTypeName, fieldType, callback) ->
-	found = null
-	RulesCache.forEach (rule) =>
-		if rule.portName == portName
-			if (rule.type == "PropertyType" || rule.type == "Property" || rule.type == "FieldType" || rule.type == "Field") && fieldType.kind == "Property" 
-				found = rule
-	if found
-		GUI.getWidgetByRule found, callback
-	else
-		console.log 'No rules found for port:' + portName
-		
-GUI.getRelationshipTypeWidget = (portName, entityTypeName, fieldType, callback) ->
-	found = null
-	RulesCache.forEach (rule) =>
-		if rule.portName == portName
-			if (rule.type == "RelationshipType" || rule.type == "Relationship" || rule.type == "FieldType" || rule.type == "Field") && fieldType.kind == "Relationship" 
-				found = rule
-	if found
-		GUI.getWidgetByRule found, callback
-	else
-		console.log 'No rules found for port:' + portName
-
-GUI.getFieldTypeWidget = (portName, entityTypeName, fieldType, callback) ->
-	found = null
-	RulesCache.forEach (rule) =>
-		if rule.portName == portName
-			if (rule.type == "PropertyType" || rule.type == "Property" || rule.type == "FieldType" || rule.type == "Field") && fieldType.kind == "Property" 
-				found = rule
-			if (rule.type == "RelationshipType" || rule.type == "Relationship" || rule.type == "FieldType" || rule.type == "Field") && fieldType.kind == "Relationship" 
-				found = rule
-	if found
-		GUI.getWidgetByRule found, callback
-	else
-		console.log 'No rules found for port:' + portName
-
-GUI.getFieldWidget = (portName, entityTypeName, fieldType, callback) ->
-	found = null
-	RulesCache.forEach (rule) =>
-		if rule.portName == portName
-			if (rule.type == "PropertyType" || rule.type == "Property") && fieldType.kind == "Property" 
-				found = rule
-			if (rule.type == "RelationshipType" || rule.type == "Relationship") && fieldType.kind == "Relationship" 
-				found = rule
-	if found
-		GUI.getWidgetByRule found, callback
-	else
-		console.log 'No rules found for port:' + portName
-
-GUI.getPropertyWidget = (portName, entityTypeName, fieldType, callback) ->
-	found = null
-	RulesCache.forEach (rule) =>
-		if rule.portName == portName
-			if (rule.type == "PropertyType" || rule.type == "Property") && fieldType.kind == "Property" 
-				found = rule
-	if found
-		GUI.getWidgetByRule found, callback
-	else
-		console.log 'No rules found for port:' + portName
-
-GUI.getRelationshipWidget = (portName, entityTypeName, fieldType, callback) ->
-	found = null
-	RulesCache.forEach (rule) =>
-		if rule.portName == portName
-			if (rule.type == "RelationshipType" || rule.type == "Relationship") && fieldType.kind == "Relationship" 
-				found = rule
-	if found
-		GUI.getWidgetByRule found, callback
-	else
-		console.log 'No rules found for port:' + portName
-			
 GUI.getWidget = (portName, entityTypeName, propertyType, callback) ->
 	found = null
 	RulesCache.forEach (rule) =>
@@ -230,8 +140,8 @@ GUI.putAndBack = (entityTypeName) ->
 GUI.remove = (entityTypeName, entityID) ->
 	API.deleteEntity(entityTypeName, entityID)
 
-GUI.newPageByPort = (portName, entityTypeName, entityId) ->
-	console.log 'newPageByPort: ' + portName
+GUI.newPageForEntityTypeSet = (portName, entityTypeName, entityId) ->
+	console.log 'newPageForEntityTypeSet: ' + portName
 	GUI.newPage portName, entityTypeName, (view) -> 
 		if (view.rootWidget.type == "EntityTypeSet")
 			API.getEntitiesTypes (entitiesTypes) =>
@@ -242,21 +152,7 @@ GUI.newPageByPort = (portName, entityTypeName, entityId) ->
 					view.html html
 	
 GUI.openApp = () ->
-	GUI.newPageByPort 'root'
-
-GUI.renderPortFilter = (port, callback) ->
-	console.log 'renderPortFilter: ' + port
-	GUI.getWidget port, this.ctx.name, null, (widget) =>
-		if (widget.type == "EntityTypeSet")
-			API.getEntitiesTypes (entitiesTypes) =>
-				widget.template.render entitiesTypes, (err, html) ->
-					if err
-						throw err
-					callback(err, html)
-
-GUI.renderNewPageFilter = (port) ->
-	entityTypeName = if this.ctx.entityType then this.ctx.entityType.name else this.ctx.name
-	"onClick=\"GUI.newPageByPort('" + port + "','" + entityTypeName + "'," +  this.ctx.id + ")\""
+	GUI.newPageForEntityTypeSet 'root'
 
 GUI.renderPostFilter = (port) ->
 	"onClick=\"GUI.postAndBack('" + this.ctx.name + "');return false;\""
@@ -266,221 +162,391 @@ GUI.renderPutFilter = (port) ->
 
 GUI.renderActionFilter = (action) ->
 	"onClick=\"GUI." + action + "('" + this.ctx.entityType.name + "', " + this.ctx.id + ");GUI.refresh();\""
-	
-Filter.forEachEntityType = (port, callback) ->
-	console.log 'forEachEntityType: ' + port
-	GUI.getEntityTypeWidget port, this.ctx.name, (widget) =>
-		if (widget.type != "EntityType")
-			msg = 'forEachEntityType: ' + widget.name + ' is not EntityType'
-			console.error msg
-			callback(msg, null)
-		else
-			i = 0
-			j = 0
-			result = ""
-			entityType = this.ctx[i]
-			while (entityType)
-				widget.template.render entityType, (err, html) ->
-					if err
-						throw err
-					result += html
-					j++
-					if (i == j)
-						callback(null, result)
-				entityType = this.ctx[++i]
-			return
+						
+class Filter.AbstractFilter
+  constructor: (@name) ->
+  
+  renderNewPage: (port, context) ->
+    entityTypeName = context.name
+    "onClick=\"Filter.newPageFor#{@name}('#{port}','#{entityTypeName}')\""
 
-Filter.renderNewPageForEntityType = (portName) ->
-	entityTypeName = this.ctx.name
-	"onClick=\"Filter.newPageForEntityType('" + portName + "','" + entityTypeName + "')\""
+  forEachPort: (port, context, callback) ->
 
-Filter.newPageForEntityType = (portName, entityTypeName) ->
-	console.log 'newPageForEntityType: ' + portName
-	GUI.newPage portName, entityTypeName, (view) -> 
-		API.getEntityType entityTypeName, (entityType) =>
-			view.rootWidget.context = entityType
-			view.rootWidget.template.render entityType, (err, html) ->
-				if err
-					throw err
-				view.html html
-				
-Filter.forEntityType = (port, callback) ->
-	console.log 'forEntityType: ' + port
-	GUI.getEntityWidget port, this.ctx.name, (widget) =>
-		if (widget.type != "EntityType")
-			msg = 'forEntityType: ' + widget.name + ' is not EntityType'
-			console.error msg
-			callback(msg, null)
-		else
-			API.getEntityType this.ctx.name, (entityType) =>
-				widget.template.render entityType, (err, html) ->
-					if err
-						throw err
-					callback(err, html)
-					
+  forPort: (port, context, callback) ->
+    console.log @name + '.forPort: ' + port
+    widget = @getWidget port, context
+    @renderFor widget, context, callback
+
+  getWidget: (port, params) ->
+    rule = @getRule port, params
+    @checkRule rule
+    GUI.getWidgetByRule rule  
+  
+  getRule: (port, params) ->
+
+  checkRule: (rule) ->
+    if rule
+      if (rule.type == @name)
+        return
+      else
+        throw 'Problem on port #{port}: #{rule.name} is not #{@name}'
+    else
+      throw 'No rules found for port: #{port}'
+
+  renderFor: (widget, context, callback) ->
+
+class Filter.EntityTypeFilter extends Filter.AbstractFilter
+  constructor: () ->
+    super("EntityType")
+
+  newPage: (port, entityType) ->
+    console.log @name + '.newPage: ' + port
+    GUI.newPage port, entityType.name, (view) -> 
+      view.rootWidget.context = entityType
+      view.rootWidget.template.render entityType, (err, html) ->
+        if err
+          throw err
+        view.html html
+
+  getRule: (port, params) ->
+    found = null
+    for rule in RulesCache
+      if rule.portName == port
+        found = rule
+    return found
+
+  forEachPort: (port, context, callback) ->
+    console.log @name + '.forEachPort: ' + port
+    size = 0
+    result = ""
+    current = 0
+    item = context[size]
+    while item
+      widget = @getWidget port, {entityTypeName: item.name}
+      widget.template.render item, (err, html) ->
+        if err
+          throw err
+        result += html
+        if (++current == size)
+          callback(null, result)
+      item = context[++size]
+
+  renderFor: (widget, context, callback) ->
+    API.getEntityType context.name, (entityType) =>
+      widget.template.render entityType, (err, html) ->
+        if err
+          throw err
+        callback(null, html)
+
+class Filter.EntityFilter extends Filter.AbstractFilter
+  constructor: () ->
+    super("Entity")
+
+  renderNewPage: (port, context) ->
+    entityTypeName = context.name
+    "onClick=\"Filter.newPageFor#{@name}('#{port}','#{entityTypeName}',#{context.id})\""
+
+  newPage: (port, entityType, entity) ->
+    console.log @name + '.newPage: ' + port
+    GUI.newPage portName, entityTypeName, (view) -> 
+      entity.entityType = entityType
+      view.rootWidget.context = entity
+      view.rootWidget.template.render entity, (err, html) ->
+        if err
+          throw err
+        view.html html
+
+  getRule: (port, params) ->
+    found = null
+    for rule in RulesCache
+      if rule.portName == port
+        found = rule
+    return found
+
+  forEachPort: (port, context, callback) ->
+    console.log @name + '.forEachPort: ' + port
+    widget = @getWidget port, {entityTypeName: context.name}
+    API.getEntities context.name, (entities) =>
+      result = ""
+      size = entities.length
+      current = 0
+      for entity in entities
+        entity.entityType = context
+        widget.template.render entity, (err, html) ->
+          if err
+            throw err
+          result += html
+          if (++current == size)
+            callback(null, result)
+          
+  renderFor: (widget, context, callback) ->
+    API.getEntityType context.name, (entityType) =>
+      widget.template.render entityType, (err, html) ->
+        if err
+          throw err
+        callback(null, html)
+
+class Filter.PropertyTypeFilter extends Filter.AbstractFilter
+  constructor: () ->
+    super("PropertyType")
+
+  getRule: (port, params) ->
+    fieldType = params.fieldType
+    found = null
+    for rule in RulesCache
+      if rule.portName == port
+        if (rule.type == "PropertyType" || rule.type == "Property" || rule.type == "FieldType" || rule.type == "Field") && fieldType.kind == "Property" 
+          found = rule
+    return found
+
+  forEachPort: (port, entityType, callback) ->
+    console.log @name + '.forEachPort: ' + port
+    result = ""
+    current = 0
+    size = entityType.fieldTypes.length
+    for fieldType in entityType.fieldTypes
+      if fieldType.kind == "Property"
+        widget = @getWidget port, {entityTypeName: entityType.name, fieldType: fieldType}
+        fieldType.entity = entityType
+        widget.template.render fieldType, (err, html) ->
+          if err
+            throw err
+          result += html
+          if (++current == size)
+            callback(null, result)
+
+class Filter.RelationshipTypeFilter extends Filter.AbstractFilter
+  constructor: () ->
+    super("RelationshipType")
+
+  getRule: (port, params) ->
+    fieldType = params.fieldType
+    found = null
+    for rule in RulesCache
+      if rule.portName == port
+        if (rule.type == "RelationshipType" || rule.type == "Relationship" || rule.type == "FieldType" || rule.type == "Field") && fieldType.kind == "Relationship" 
+          found = rule
+    return found
+
+  forEachPort: (port, entityType, callback) ->
+    console.log @name + '.forEachPort: ' + port
+    result = ""
+    current = 0
+    size = entityType.fieldTypes.length
+    for fieldType in entityType.fieldTypes
+      if fieldType.kind == "Relationship"
+        widget = @getWidget port, {entityTypeName: entityType.name, fieldType: fieldType}
+        fieldType.entity = entityType
+        widget.template.render fieldType, (err, html) ->
+          if err
+            throw err
+          result += html
+          if (++current == size)
+            callback(null, result)
+
+class Filter.FieldTypeFilter extends Filter.AbstractFilter
+  constructor: () ->
+    super("FieldType")
+
+  getRule: (port, params) ->
+    fieldType = params.fieldType
+    found = null
+    for rule in RulesCache
+      if rule.portName == port
+        if (rule.type == "PropertyType" || rule.type == "Property" || rule.type == "FieldType" || rule.type == "Field") && fieldType.kind == "Property" 
+          found = rule
+        if (rule.type == "RelationshipType" || rule.type == "Relationship" || rule.type == "FieldType" || rule.type == "Field") && fieldType.kind == "Relationship" 
+          found = rule
+    return found
+
+  forEachPort: (port, entityType, callback) ->
+    console.log @name + '.forEachPort: ' + port
+    result = ""
+    current = 0
+    size = entityType.fieldTypes.length
+    for fieldType in entityType.fieldTypes
+      if fieldType.kind == "Property"
+        widget = @getWidget port, {entityTypeName: entityType.name, fieldType: fieldType}
+        fieldType.entity = entityType
+        widget.template.render fieldType, (err, html) ->
+          if err
+            throw err
+          result += html
+          if (++current == size)
+            callback(null, result)
+            
+class Filter.PropertyFilter extends Filter.AbstractFilter
+  constructor: () ->
+    super("Property")
+
+  getRule: (port, params) ->
+    fieldType = params.fieldType
+    found = null
+    for rule in RulesCache
+      if rule.portName == port
+        if (rule.type == "PropertyType" || rule.type == "Property") && fieldType.kind == "Property" 
+          found = rule
+    return found
+
+  forEachPort: (port, entity, callback) ->
+    console.log @name + '.forEachPort: ' + port
+    result = ""
+    current = 0
+    size = entity.entityType.fieldTypes.length
+    for fieldType in entity.entityType.fieldTypes
+      if fieldType.kind == "Property"
+        widget = @getWidget port, {entityTypeName: entity.entityType.name, fieldType: fieldType}
+        fieldType.entity = entity.entityType
+        propertyValue = entity[fieldType.name]
+        property = {value: propertyValue, type: fieldType}
+        widget.template.render property, (err, html) ->
+          if err
+            throw err
+          result += html
+          if (++current == size)
+            callback(null, result)
+
+class Filter.RelationshipFilter extends Filter.AbstractFilter
+  constructor: () ->
+    super("Relationship")
+
+  getRule: (port, params) ->
+    fieldType = params.fieldType
+    found = null
+    for rule in RulesCache
+      if rule.portName == port
+        if (rule.type == "RelationshipType" || rule.type == "Relationship") && fieldType.kind == "Relationship" 
+          found = rule
+    return found
+
+  forEachPort: (port, entity, callback) ->
+    console.log @name + '.forEachPort: ' + port
+    result = ""
+    current = 0
+    size = entity.entityType.fieldTypes.length
+    for fieldType in entity.entityType.fieldTypes
+      if fieldType.kind == "Relationship"
+        widget = @getWidget port, {entityTypeName: entity.entityType.name, fieldType: fieldType}
+        fieldType.entity = entity.entityType
+        relationshipId = entity[fieldType.name]
+        API.getEntity fieldType.targetType, relationshipId, (entity) =>
+          relationship = {target: entity, type: fieldType}
+          widget.template.render relationship, (err, html) ->
+            if err
+              throw err
+            result += html
+            if (++current == size)
+              callback(null, result)
+
+            
+class Filter.FieldFilter extends Filter.AbstractFilter
+  constructor: () ->
+    super("Field")
+
+  getRule: (port, params) ->
+    fieldType = params.fieldType
+    found = null
+    for rule in RulesCache
+      if rule.portName == port
+        if (rule.type == "PropertyType" || rule.type == "Property") && fieldType.kind == "Property" 
+          found = rule
+        if (rule.type == "RelationshipType" || rule.type == "Relationship") && fieldType.kind == "Relationship" 
+          found = rule
+    return found
+
+  forEachPort: (port, entity, callback) ->
+    console.log @name + '.forEachPort: ' + port
+    result = ""
+    current = 0
+    size = entity.entityType.fieldTypes.length
+    for fieldType in entity.entityType.fieldTypes
+      widget = @getWidget port, {entityTypeName: entity.entityType.name, fieldType: fieldType}
+      fieldType.entity = entity.entityType
+      if fieldType.kind == "Property"
+        propertyValue = entity[fieldType.name]
+        property = {value: propertyValue, type: fieldType}
+        widget.template.render property, (err, html) ->
+          if err
+            throw err
+          result += html
+          if (++current == size)
+            callback(null, result)
+      else
+        relationshipId = entity[fieldType.name]
+        API.getEntity fieldType.targetType, relationshipId, (entity) =>
+          relationship = {target: entity, type: fieldType}
+          widget.template.render relationship, (err, html) ->
+            if err
+              throw err
+            result += html
+            if (++current == size)
+              callback(null, result)
+
+Filter.renderNewPageForEntityType = (port) ->
+  filter = new Filter.EntityTypeFilter
+  context = `this.ctx`
+  filter.renderNewPage port, context
+  
+Filter.newPageForEntityType = (port, entityTypeName) ->
+  filter = new Filter.EntityTypeFilter
+  API.getEntityType entityTypeName, (entityType) =>
+    filter.newPage port, entityType
+
+Filter.forEachEntityType = (port, callback) =>
+  filter = new Filter.EntityTypeFilter
+  context = `this.ctx`
+  filter.forEachPort port, context, callback
+
+Filter.forEntityType = (port, callback) =>
+  filter = new Filter.EntityTypeFilter
+  context = `this.ctx`
+  filter.forPort port, context, callback
+
+Filter.renderNewPageForEntity = (port) ->
+  filter = new Filter.EntityFilter
+  context = `this.ctx`
+  filter.renderNewPage port, context
+	      
 Filter.forEachEntity = (port, callback) ->
-	console.log 'forEachEntity: ' + port
-	entityTypeName = this.ctx.name
-	GUI.getEntityWidget port, entityTypeName, (widget) =>
-		API.getEntities entityTypeName, (entities) =>
-			result = ""
-			i = 1
-			len = entities.length
-			entities.forEach (entity) =>
-				entity.entityType = this.ctx
-				widget.template.render entity, (err, html) ->
-					if err
-						throw err
-					result += html
-					if (i == len)
-						callback(err, result)
-					i++;
-	
+  filter = new Filter.EntityFilter
+  context = `this.ctx`
+  filter.forEachPort port, context, callback
+
+Filter.newPageForEntity = (port, entityTypeName, entityId) ->
+  filter = new Filter.EntityFilter
+  API.getEntityType entityTypeName, (entityType) =>
+    API.getEntity entityTypeName, entityId, (entity) =>
+      filter.newPage port, entityType, entity
+
 Filter.forEachPropertyType = (port, callback) ->
-	console.log 'forEachPropertyType: ' + port
-	entityType = this.ctx
-	result = ""
-	i = 1
-	len = entityType.fieldTypes.length
-	entityType.fieldTypes.forEach (fieldType) ->
-		if fieldType.kind == "Property"
-			GUI.getPropertyTypeWidget port, entityType.name, fieldType, (widget) ->
-				fieldType.entity = entityType
-				widget.template.render fieldType, (err, html) ->
-					if err
-						throw err
-					result += html
-					if (i == len)
-						callback(null, result)
-					i++;
-					
+  filter = new Filter.PropertyTypeFilter
+  context = `this.ctx`
+  filter.forEachPort port, context, callback
+		
 Filter.forEachRelationshipType = (port, callback) ->
-	console.log 'forEachRelationshipType: ' + port
-	entityType = this.ctx
-	result = ""
-	i = 1
-	len = entityType.fieldTypes.length
-	entityType.fieldTypes.forEach (fieldType) ->
-		if fieldType.kind == "Relationship"
-			GUI.getRelationshipTypeWidget port, entityType.name, fieldType, (widget) ->
-				fieldType.entity = entityType
-				widget.template.render fieldType, (err, html) ->
-					if err
-						throw err
-					result += html
-					if (i == len)
-						callback(null, result)
-					i++;
-				
+  filter = new Filter.RelationshipTypeFilter
+  context = `this.ctx`
+  filter.forEachPort port, context, callback
+
 Filter.forEachFieldType = (port, callback) ->
-	console.log 'forEachFieldType: ' + port
-	entityType = this.ctx
-	result = ""
-	i = 1
-	len = entityType.fieldTypes.length
-	entityType.fieldTypes.forEach (fieldType) ->
-		GUI.getFieldTypeWidget port, entityType.name, fieldType, (widget) ->
-			fieldType.entity = entityType
-			widget.template.render fieldType, (err, html) ->
-				if err
-					throw err
-				result += html
-				if (i == len)
-					callback(null, result)
-				i++;
+  filter = new Filter.FieldTypeFilter
+  context = `this.ctx`
+  filter.forEachPort port, context, callback
 
 Filter.forEachProperty = (port, callback) ->
-	console.log 'forEachProperty: ' + port
-	entity = this.ctx
-	entityType = if this.ctx.entityType then this.ctx.entityType else this.ctx.type
-	result = ""
-	i = 1
-	len = entityType.fieldTypes.length
-	entityType.fieldTypes.forEach (fieldType) ->
-		if fieldType.kind == "Property"
-			GUI.getPropertyWidget port, entityType.name, fieldType, (widget) ->
-				fieldType.entity = entityType
-				propertyValue = entity[fieldType.name]
-				property = {value: propertyValue, type: fieldType}
-				widget.template.render property, (err, html) ->
-					if err
-						throw err
-					result += html
-					if (i == len)
-						callback(null, result)
-					i++;
+  filter = new Filter.PropertyFilter
+  context = `this.ctx`
+  filter.forEachPort port, context, callback
 
 Filter.forEachRelationship = (port, callback) ->
-	console.log 'forEachRelationship: ' + port
-	entity = this.ctx
-	entityType = if this.ctx.entityType then this.ctx.entityType else this.ctx.type
-	result = ""
-	i = 1
-	len = entityType.fieldTypes.length
-	entityType.fieldTypes.forEach (fieldType) ->
-		if fieldType.kind == "Relationship"
-			GUI.getRelationshipWidget port, entityType.name, fieldType, (widget) ->
-				fieldType.entity = entityType
-				relationshipId = entity[fieldType.name]
-				API.getEntity fieldType.targetType, relationshipId, (entity) =>
-					relationship = {target: entity, type: fieldType}
-					widget.template.render relationship, (err, html) ->
-						if err
-							throw err
-						result += html
-						if (i == len)
-							callback(null, result)
-						i++;
-									
+  filter = new Filter.RelationshipFilter
+  context = `this.ctx`
+  filter.forEachPort port, context, callback
+
 Filter.forEachField = (port, callback) ->
-	console.log 'forEachField: ' + port
-	entity = this.ctx
-	entityType = if this.ctx.entityType then this.ctx.entityType else this.ctx.type
-	result = ""
-	i = 1
-	len = entityType.fieldTypes.length
-	entityType.fieldTypes.forEach (fieldType) ->
-		GUI.getFieldWidget port, entityType.name, fieldType, (widget) ->
-			fieldType.entity = entityType
-			field = null
-			if fieldType.kind == "Property"
-				propertyValue = entity[fieldType.name]
-				field = {value: propertyValue, type: fieldType}		
-				widget.template.render field, (err, html) ->
-					if err
-						throw err
-					result += html
-					if (i == len)
-						callback(null, result)
-					i++;
-			else
-				relationshipId = entity[fieldType.name]
-				API.getEntity fieldType.targetType, relationshipId, (entity) =>
-					field = {target: entity, type: fieldType}
-					widget.template.render field, (err, html) ->
-						if err
-							throw err
-						result += html
-						if (i == len)
-							callback(null, result)
-						i++;
-
-
-Filter.renderNewPageForEntity = (portName) ->
-	entityTypeName = this.ctx.entityType.name
-	"onClick=\"Filter.newPageForEntity('" + portName + "','" + entityTypeName + "'," +  this.ctx.id + ")\""
-
-Filter.newPageForEntity = (portName, entityTypeName, entityId) ->
-	console.log 'newPageForEntity: ' + portName
-	GUI.newPage portName, entityTypeName, (view) -> 
-		API.getEntityType entityTypeName, (entityType) =>
-			API.getEntity entityTypeName, entityId, (entity) =>
-				entity.entityType = entityType
-				view.rootWidget.context = entity
-				view.rootWidget.template.render entity, (err, html) ->
-					if err
-						throw err
-					view.html html
+  filter = new Filter.FieldFilter
+  context = `this.ctx`
+  filter.forEachPort port, context, callback
 
 $ ->
 	env.addFilter('forEachEntityType', Filter.forEachEntityType, true)
