@@ -194,6 +194,9 @@ class Filter.AbstractFilter
       throw 'No rules found for port: #{port}'
 
   renderFor: (widget, context, callback) ->
+  
+  matchExpression: (text, expression) -> 
+    new RegExp("^" + expression.split("*").join(".*") + "$").test(text);
 
 class Filter.EntityTypeFilter extends Filter.AbstractFilter
   constructor: () ->
@@ -211,15 +214,15 @@ class Filter.EntityTypeFilter extends Filter.AbstractFilter
 
   getRule: (port, params) ->
     defaultScope = null
-    sameName = null
+    matchName = null
     for rule in RulesCache
       if rule.portName == port
         if rule.entityTypeLocator == "*"
           defaultScope = rule
-        if rule.entityTypeLocator == params.entityTypeName
-          sameName = rule
-    if sameName
-      return sameName
+        else if @matchExpression(params.entityTypeName, rule.entityTypeLocator)
+          matchName = rule
+    if matchName
+      return matchName
     return defaultScope
 
   forEachPort: (port, context, callback) ->
@@ -265,11 +268,17 @@ class Filter.EntityFilter extends Filter.AbstractFilter
       view.html html
 
   getRule: (port, params) ->
-    found = null
+    defaultScope = null
+    matchName = null
     for rule in RulesCache
       if rule.portName == port
-        found = rule
-    return found
+        if rule.entityTypeLocator == "*"
+          defaultScope = rule
+        else if @matchExpression(params.entityTypeName, rule.entityTypeLocator)
+          matchName = rule
+    if matchName
+      return matchName
+    return defaultScope
 
   forEachPort: (port, context, callback) ->
     console.log @name + '.forEachPort: ' + port
