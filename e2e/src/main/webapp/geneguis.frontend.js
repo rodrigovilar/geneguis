@@ -287,6 +287,10 @@
 
     AbstractFilter.prototype.renderFor = function(widget, context, callback) {};
 
+    AbstractFilter.prototype.matchExpression = function(text, expression) {
+      return new RegExp("^" + expression.split("*").join(".*") + "$").test(text);
+    };
+
     return AbstractFilter;
 
   })();
@@ -316,22 +320,21 @@
     };
 
     EntityTypeFilter.prototype.getRule = function(port, params) {
-      var defaultScope, rule, sameName, _i, _len;
+      var defaultScope, matchName, rule, _i, _len;
       defaultScope = null;
-      sameName = null;
+      matchName = null;
       for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
         rule = RulesCache[_i];
         if (rule.portName === port) {
           if (rule.entityTypeLocator === "*") {
             defaultScope = rule;
-          }
-          if (rule.entityTypeLocator === params.entityTypeName) {
-            sameName = rule;
+          } else if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator)) {
+            matchName = rule;
           }
         }
       }
-      if (sameName) {
-        return sameName;
+      if (matchName) {
+        return matchName;
       }
       return defaultScope;
     };
@@ -410,15 +413,23 @@
     };
 
     EntityFilter.prototype.getRule = function(port, params) {
-      var found, rule, _i, _len;
-      found = null;
+      var defaultScope, matchName, rule, _i, _len;
+      defaultScope = null;
+      matchName = null;
       for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
         rule = RulesCache[_i];
         if (rule.portName === port) {
-          found = rule;
+          if (rule.entityTypeLocator === "*") {
+            defaultScope = rule;
+          } else if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator)) {
+            matchName = rule;
+          }
         }
       }
-      return found;
+      if (matchName) {
+        return matchName;
+      }
+      return defaultScope;
     };
 
     EntityFilter.prototype.forEachPort = function(port, context, callback) {
