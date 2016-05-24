@@ -679,11 +679,11 @@
             if (rule.propertyTypeTypeLocator === "*") {
               if (rule.entityTypeLocator === "*" & rule.propertyTypeLocator === "*") {
                 defaultScope = rule;
-              } else if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator) && this.matchExpression(params.propertyTypeName, rule.propertyTypeLocator)) {
+              } else if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator) && this.matchExpression(fieldType.name, rule.propertyTypeLocator)) {
                 matchScope = rule;
               }
             } else {
-              if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator) && this.matchExpression(params.propertyTypeName, rule.propertyTypeLocator)) {
+              if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator) && this.matchExpression(fieldType.name, rule.propertyTypeLocator)) {
                 matchType = rule;
               }
             }

@@ -407,10 +407,10 @@ class Filter.PropertyFilter extends Filter.AbstractFilter
           if rule.propertyTypeTypeLocator == "*"
             if rule.entityTypeLocator == "*" & rule.propertyTypeLocator == "*"
               defaultScope = rule
-            else if @matchExpression(params.entityTypeName, rule.entityTypeLocator) && @matchExpression(params.propertyTypeName, rule.propertyTypeLocator)
+            else if @matchExpression(params.entityTypeName, rule.entityTypeLocator) && @matchExpression(fieldType.name, rule.propertyTypeLocator)
               matchScope = rule
           else 
-            if @matchExpression(params.entityTypeName, rule.entityTypeLocator) && @matchExpression(params.propertyTypeName, rule.propertyTypeLocator)
+            if @matchExpression(params.entityTypeName, rule.entityTypeLocator) && @matchExpression(fieldType.name, rule.propertyTypeLocator)
               matchType = rule
     if matchType
       return matchType
