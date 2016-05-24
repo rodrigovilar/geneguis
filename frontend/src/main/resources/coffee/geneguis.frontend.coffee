@@ -398,12 +398,26 @@ class Filter.PropertyFilter extends Filter.AbstractFilter
 
   getRule: (port, params) ->
     fieldType = params.fieldType
-    found = null
+    defaultScope = null
+    matchScope = null
+    matchType = null
     for rule in RulesCache
       if rule.portName == port
         if (rule.type == "PropertyType" || rule.type == "Property") && fieldType.kind == "Property" 
-          found = rule
-    return found
+          if rule.propertyTypeTypeLocator == "*"
+            if rule.entityTypeLocator == "*" & rule.propertyTypeLocator == "*"
+              defaultScope = rule
+            else if @matchExpression(params.entityTypeName, rule.entityTypeLocator) && @matchExpression(params.propertyTypeName, rule.propertyTypeLocator)
+              matchScope = rule
+          else 
+            if @matchExpression(params.entityTypeName, rule.entityTypeLocator) && @matchExpression(params.propertyTypeName, rule.propertyTypeLocator)
+              matchType = rule
+    if matchType
+      return matchType
+    if matchScope
+      return matchScope
+    return defaultScope
+
 
   forEachPort: (port, entity, callback) ->
     console.log @name + '.forEachPort: ' + port
