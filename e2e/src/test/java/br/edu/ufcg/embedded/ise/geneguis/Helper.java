@@ -123,18 +123,23 @@ public class Helper {
 		}
 	}
 
+	static void rule(String port, String entityScope, String propertyScope, PropertyTypeType pttype, String widget, WidgetType type) {
+		RuleRest rule = new RuleRest(widget, entityScope, propertyScope, pttype, port, type.name());
+		postJSON(SERVER_URL + "rules", rule);
+	}
+	
 	static void rule(String port, String entityScope, String propertyScope, String widget, WidgetType type) {
-		RuleRest rule = new RuleRest(widget, entityScope, propertyScope, port, type.name());
+		RuleRest rule = new RuleRest(widget, entityScope, propertyScope, null, port, type.name());
 		postJSON(SERVER_URL + "rules", rule);
 	}
 	
 	static void rule(String port, String entityScope, String widget, WidgetType type) {
-		RuleRest rule = new RuleRest(widget, entityScope, "*", port, type.name());
+		RuleRest rule = new RuleRest(widget, entityScope, "*", null, port, type.name());
 		postJSON(SERVER_URL + "rules", rule);
 	}
 	
 	static void rule(String port, String widget, WidgetType type) {
-		RuleRest rule = new RuleRest(widget, "*", "*", port, type.name());
+		RuleRest rule = new RuleRest(widget, "*", "*", null, port, type.name());
 		postJSON(SERVER_URL + "rules", rule);
 	}
 
