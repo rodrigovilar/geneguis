@@ -15,8 +15,8 @@ public class RuleRest {
 	private PropertyTypeType propertyTypeTypeLocator;
 	private String configuration;
 
-	
-	public RuleRest() {}
+	public RuleRest() {
+	}
 
 	public RuleRest(String widgetName, String portName) {
 		this.widgetName = widgetName;
@@ -28,11 +28,14 @@ public class RuleRest {
 		this.type = type;
 	}
 
-	public RuleRest(String widgetName, String entityTypeLocator, String portName, String type) {
+	public RuleRest(String widgetName, String entityTypeLocator, String propertyTypeLocator,
+			PropertyTypeType propertyTypeTypeLocator, String portName, String type) {
 		this(widgetName, portName, type);
 		this.entityTypeLocator = entityTypeLocator;
+		this.propertyTypeLocator = propertyTypeLocator;
+		this.propertyTypeTypeLocator = propertyTypeTypeLocator;
 	}
-	
+
 	public Long getId() {
 		return id;
 	}

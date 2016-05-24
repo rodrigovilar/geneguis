@@ -487,18 +487,36 @@
     }
 
     PropertyTypeFilter.prototype.getRule = function(port, params) {
-      var fieldType, found, rule, _i, _len;
+      var defaultScope, fieldType, matchScope, matchType, rule, _i, _len;
       fieldType = params.fieldType;
-      found = null;
+      defaultScope = null;
+      matchScope = null;
+      matchType = null;
       for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
         rule = RulesCache[_i];
         if (rule.portName === port) {
-          if ((rule.type === "PropertyType" || rule.type === "Property" || rule.type === "FieldType" || rule.type === "Field") && fieldType.kind === "Property") {
-            found = rule;
+          if ((rule.type === "PropertyType" || rule.type === "Property") && fieldType.kind === "Property") {
+            if (rule.propertyTypeTypeLocator) {
+              if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator) && this.matchExpression(fieldType.name, rule.propertyTypeLocator) && rule.propertyTypeTypeLocator === fieldType.type) {
+                matchType = rule;
+              }
+            } else {
+              if (rule.entityTypeLocator === "*" & rule.propertyTypeLocator === "*") {
+                defaultScope = rule;
+              } else if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator) && this.matchExpression(fieldType.name, rule.propertyTypeLocator)) {
+                matchScope = rule;
+              }
+            }
           }
         }
       }
-      return found;
+      if (matchType) {
+        return matchType;
+      }
+      if (matchScope) {
+        return matchScope;
+      }
+      return defaultScope;
     };
 
     PropertyTypeFilter.prototype.forEachPort = function(port, entityType, callback) {
@@ -667,18 +685,36 @@
     }
 
     PropertyFilter.prototype.getRule = function(port, params) {
-      var fieldType, found, rule, _i, _len;
+      var defaultScope, fieldType, matchScope, matchType, rule, _i, _len;
       fieldType = params.fieldType;
-      found = null;
+      defaultScope = null;
+      matchScope = null;
+      matchType = null;
       for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
         rule = RulesCache[_i];
         if (rule.portName === port) {
           if ((rule.type === "PropertyType" || rule.type === "Property") && fieldType.kind === "Property") {
-            found = rule;
+            if (rule.propertyTypeTypeLocator) {
+              if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator) && this.matchExpression(fieldType.name, rule.propertyTypeLocator) && rule.propertyTypeTypeLocator === fieldType.type) {
+                matchType = rule;
+              }
+            } else {
+              if (rule.entityTypeLocator === "*" & rule.propertyTypeLocator === "*") {
+                defaultScope = rule;
+              } else if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator) && this.matchExpression(fieldType.name, rule.propertyTypeLocator)) {
+                matchScope = rule;
+              }
+            }
           }
         }
       }
-      return found;
+      if (matchType) {
+        return matchType;
+      }
+      if (matchScope) {
+        return matchScope;
+      }
+      return defaultScope;
     };
 
     PropertyFilter.prototype.forEachPort = function(port, entity, callback) {
