@@ -39,8 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Helper {
 
 	static final String SERVER_URL = "http://localhost:8080/";
-	static final BrowserConsoleReader[] consoleReaders = {
-			new ChromeConsoleReader(), new FirefoxConsoleReader() };
+	static final BrowserConsoleReader[] consoleReaders = { new ChromeConsoleReader(), new FirefoxConsoleReader() };
 
 	static void openApp() {
 		WebBrowserTestCase.driver.get(SERVER_URL);
@@ -67,13 +66,13 @@ public class Helper {
 			WebBrowserTestCase.driver.findElement(By.id(id));
 		}
 	}
-	
+
 	static void checkTextInPageSource(String... texts) {
 		String pageSource = WebBrowserTestCase.driver.getPageSource();
-		
+
 		for (String text : texts) {
 			if (!pageSource.contains(text)) {
-				Assert.fail(text + " not found in current page."); 
+				Assert.fail(text + " not found in current page.");
 			}
 		}
 	}
@@ -82,7 +81,7 @@ public class Helper {
 		String elementText = WebBrowserTestCase.driver.findElement(By.id(id)).getText();
 
 		if (!elementText.contains(text)) {
-			Assert.fail(text + " not found in element " + id); 
+			Assert.fail(text + " not found in element " + id);
 		}
 	}
 
@@ -90,7 +89,7 @@ public class Helper {
 		String elementText = WebBrowserTestCase.driver.findElement(By.xpath(xpath)).getText();
 
 		if (!elementText.contains(text)) {
-			Assert.fail(text + " not found in element " + xpath); 
+			Assert.fail(text + " not found in element " + xpath);
 		}
 	}
 
@@ -110,8 +109,7 @@ public class Helper {
 	}
 
 	static String readWidgetFile(String fileName) {
-		URL resource = EntryPoint.class.getResource("/widgets/" + fileName
-				+ ".hbs");
+		URL resource = EntryPoint.class.getResource("/widgets/" + fileName + ".hbs");
 		File file = new File(resource.getFile());
 		String filePath = file.getAbsolutePath();
 		try {
@@ -123,28 +121,28 @@ public class Helper {
 		}
 	}
 
-	static void rule(String port, String entityScope, String propertyScope, PropertyTypeType pttype, String widget, WidgetType type) {
+	static void rule(String port, String entityScope, String propertyScope, PropertyTypeType pttype, String widget,
+			WidgetType type) {
 		RuleRest rule = new RuleRest(widget, entityScope, propertyScope, pttype, port, type.name());
 		postJSON(SERVER_URL + "rules", rule);
 	}
-	
+
 	static void rule(String port, String entityScope, String propertyScope, String widget, WidgetType type) {
 		RuleRest rule = new RuleRest(widget, entityScope, propertyScope, null, port, type.name());
 		postJSON(SERVER_URL + "rules", rule);
 	}
-	
+
 	static void rule(String port, String entityScope, String widget, WidgetType type) {
 		RuleRest rule = new RuleRest(widget, entityScope, "*", null, port, type.name());
 		postJSON(SERVER_URL + "rules", rule);
 	}
-	
+
 	static void rule(String port, String widget, WidgetType type) {
 		RuleRest rule = new RuleRest(widget, "*", "*", null, port, type.name());
 		postJSON(SERVER_URL + "rules", rule);
 	}
 
-	static <T> void deployEntityType(Class<T> entityType, Class<?> repository)
-			throws Exception {
+	static <T> void deployEntityType(Class<T> entityType, Class<?> repository) throws Exception {
 		EntityTypeDeployRest rest = new EntityTypeDeployRest();
 		rest.setEntity(entityType.getName());
 		rest.setRepository(repository.getName());
@@ -152,22 +150,19 @@ public class Helper {
 	}
 
 	static <T> T postEntity(T entity) {
-		return postEntity(SERVER_URL + "api/"
-				+ entity.getClass().getSimpleName(), entity);
+		return postEntity(SERVER_URL + "api/" + entity.getClass().getSimpleName(), entity);
 	}
 
 	@SuppressWarnings("unchecked")
 	static <T> T postJSON(String url, T data) {
 
-		try (CloseableHttpClient httpClient = HttpClientBuilder.create()
-				.build()) {
+		try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 
 			ObjectMapper mapper = new ObjectMapper();
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			mapper.setDateFormat(df);
 
-			StringEntity input = new StringEntity(
-					mapper.writeValueAsString(data));
+			StringEntity input = new StringEntity(mapper.writeValueAsString(data));
 			input.setContentType("application/json");
 			HttpPost request = new HttpPost(url);
 			request.setEntity(input);
@@ -190,11 +185,9 @@ public class Helper {
 
 		EntityType entityType = MetadataUtil.extractMetadata(data.getClass());
 
-		try (CloseableHttpClient httpClient = HttpClientBuilder.create()
-				.build()) {
+		try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 
-			StringEntity input = new StringEntity(JsonMetadata.renderInstance(
-					data, entityType).toString());
+			StringEntity input = new StringEntity(JsonMetadata.renderInstance(data, entityType).toString());
 			input.setContentType("application/json");
 			HttpPost request = new HttpPost(url);
 			request.setEntity(input);
@@ -217,8 +210,7 @@ public class Helper {
 
 	static String post(String url, String data) {
 
-		try (CloseableHttpClient httpClient = HttpClientBuilder.create()
-				.build()) {
+		try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 
 			StringEntity input = new StringEntity(data);
 			input.setContentType("application/json");

@@ -10,9 +10,15 @@
   <name>jpadomain</name>
   <url>http://maven.apache.org</url>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+ 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<start-class>br.edu.ufcg.embedded.ise.geneguis.backend.EntryPoint</start-class>
+		<java.version>1.6</java.version>
+		<tomcat.version>7.0.56</tomcat.version>
+		<servlet-api.version>3.0.1</servlet-api.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
 
   <dependencies>
     <dependency>

@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import br.edu.ufcg.embedded.ise.geneguis.Cardinality;
 import br.edu.ufcg.embedded.ise.geneguis.EntityType;
+import br.edu.ufcg.embedded.ise.geneguis.EnumPropertyType;
 import br.edu.ufcg.embedded.ise.geneguis.FieldType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyType;
 import br.edu.ufcg.embedded.ise.geneguis.RelationshipType;
@@ -28,38 +29,37 @@ public class JsonMetadata {
 
 	public static ArrayNode renderInstances(Object[] instances, EntityType entityType) {
 		ArrayNode an = JsonNodeFactory.instance.arrayNode();
-	
+
 		for (Object object : instances) {
 			ObjectNode on = renderInstance(object, entityType);
 			an.add(on);
 		}
-	
 		return an;
 	}
 
 	public static void parseInstance(EntityType entityType, String input, Object newInstance) throws Exception {
-	
+
 		JsonNode on = mapper.readTree(input);
-	
+
 		for (FieldType fieldType : entityType.getFieldTypes()) {
-	
+
 			JsonNode fv = on.get(fieldType.getName());
-			
+
 			if (fv != null) {
-				
+
 				switch (fieldType.getKind()) {
 				case Property:
 					parseProperty(fv, newInstance, fieldType);
-					
+
 					break;
-					
+
 				case Relationship:
 					parseRelationship(newInstance, fieldType, fv);
-					
+
 					break;
 				}
 			}
-	
+
 		}
 	}
 
@@ -68,14 +68,14 @@ public class JsonMetadata {
 		BeanWrapper instanceWrapper = new BeanWrapperImpl(newInstance);
 		RelationshipType rt = (RelationshipType) fieldType;
 		Object value = null;
-	
+
 		if (rt.getTargetCardinality() == Cardinality.One) {
 			value = createWithId(fv, rt);
 			setReverse(newInstance, rt, value);
-	
+
 		} else {
 			value = new ArrayList();
-	
+
 			Iterator<JsonNode> elements = fv.elements();
 			while (elements.hasNext()) {
 				Object item = createWithId(elements.next(), rt);
@@ -83,7 +83,7 @@ public class JsonMetadata {
 				setReverse(newInstance, rt, item);
 			}
 		}
-	
+
 		instanceWrapper.setPropertyValue(rt.getName(), value);
 	}
 
@@ -92,12 +92,12 @@ public class JsonMetadata {
 		if (item == null) {
 			return;
 		}
-		
+
 		BeanWrapper itemWrapper = new BeanWrapperImpl(item);
-		
+
 		if (rt.getSourceCardinality() == Cardinality.One) {
 			itemWrapper.setPropertyValue(rt.getReverse(), newInstance);
-	
+
 		} else {
 			Collection reverseValue = (Collection) itemWrapper.getPropertyValue(rt.getReverse());
 			reverseValue.add(newInstance);
@@ -115,39 +115,59 @@ public class JsonMetadata {
 		BeanWrapper instanceWrapper = new BeanWrapperImpl(newInstance);
 		Object value = null;
 		PropertyType pt = (PropertyType) fieldType;
-	
+
 		switch (pt.getType()) {
-	
+
 		case bool:
 			value = fv.asBoolean();
 			break;
-	
+
 		case date:
 			value = fv.asText();
 			break;
-	
+
 		case integer:
 			value = fv.asLong();
 			break;
-	
+
 		case real:
 			value = fv.asDouble();
 			break;
-	
+
 		case string:
 			value = fv.asText();
 			break;
+
+		case enumeration:
+			value = deserializeEnumJson(fv, (EnumPropertyType) fieldType);
+			break;
 		}
-	
 		instanceWrapper.setPropertyValue(pt.getName(), value);
+	}
+
+	private static Object deserializeEnumJson(JsonNode fv, EnumPropertyType enumPropertyType) {
+		Object value = null;
+		try {
+			Class<?> clz = Class.forName(enumPropertyType.getSource());
+			String jsonValue = fv.textValue();
+			for (int i = 0; i < clz.getEnumConstants().length; i++) {
+				if (jsonValue.equals(clz.getEnumConstants()[i].toString())) {
+					value = clz.getEnumConstants()[i];
+					break;
+				}
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return value;
 	}
 
 	public static ObjectNode renderInstance(Object instance, EntityType entityType) {
 		ObjectNode on = JsonNodeFactory.instance.objectNode();
 		BeanWrapper instanceWrapper = new BeanWrapperImpl(instance);
-	
+
 		for (FieldType fieldType : entityType.getFieldTypes()) {
-	
+
 			switch (fieldType.getKind()) {
 			case Property:
 				PropertyType propertyType = (PropertyType) fieldType;
@@ -159,12 +179,12 @@ public class JsonMetadata {
 				break;
 			}
 		}
-	
 		return on;
 	}
 
 	public static void renderPropertyType(ObjectNode on, BeanWrapper instanceWrapper, PropertyType propertyType) {
 		Object propertyValue = instanceWrapper.getPropertyValue(propertyType.getName());
+
 		if (propertyValue != null) {
 			if (propertyValue instanceof Long) {
 				on.put(propertyType.getName(), (Long) propertyValue);
@@ -172,14 +192,15 @@ public class JsonMetadata {
 				on.put(propertyType.getName(), (Integer) propertyValue);
 			} else if (propertyValue instanceof Double) {
 				on.put(propertyType.getName(), (Double) propertyValue);
-			} else {
-				on.put(propertyType.getName(), (String) propertyValue);
+			} else if (propertyValue instanceof String || propertyValue.getClass().isEnum()) {
+				on.put(propertyType.getName(), (String) propertyValue.toString());
 			}
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static void renderRelationshipType(ObjectNode on, BeanWrapper instanceWrapper, RelationshipType relationshipType) {
+	public static void renderRelationshipType(ObjectNode on, BeanWrapper instanceWrapper,
+			RelationshipType relationshipType) {
 		switch (relationshipType.getTargetCardinality()) {
 		case One:
 			Object targetInstance = instanceWrapper.getPropertyValue(relationshipType.getName());
@@ -199,6 +220,4 @@ public class JsonMetadata {
 			break;
 		}
 	}
-
-
 }
