@@ -13,7 +13,7 @@ import javax.persistence.OneToOne;
 import br.edu.ufcg.embedded.ise.geneguis.Cardinality;
 import br.edu.ufcg.embedded.ise.geneguis.ContainerException;
 import br.edu.ufcg.embedded.ise.geneguis.EntityType;
-import br.edu.ufcg.embedded.ise.geneguis.EnumPropertyType;
+import br.edu.ufcg.embedded.ise.geneguis.EnumType;
 import br.edu.ufcg.embedded.ise.geneguis.FieldType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
@@ -62,16 +62,16 @@ public class MetadataUtil {
 		}
 
 		else {
-			EnumPropertyType enumPropertyTypeRest = new EnumPropertyType();
+			EnumType enumPropertyTypeRest = new EnumType();
 			enumPropertyTypeRest.setName(field.getName());
-			
+
 			Class<?> c;
 			try {
 				c = Class.forName(field.getType().getName());
 				enumPropertyTypeRest.setSource(field.getType().getName());
-				
-				for(Field f : c.getDeclaredFields()){
-					enumPropertyTypeRest.getEnumValues().add(f);
+
+				for (Field f : c.getDeclaredFields()) {
+					enumPropertyTypeRest.getEnumValues().add(f.toString());
 				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();

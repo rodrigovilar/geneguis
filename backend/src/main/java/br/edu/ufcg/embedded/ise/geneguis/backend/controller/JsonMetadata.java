@@ -17,8 +17,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import br.edu.ufcg.embedded.ise.geneguis.Cardinality;
+import br.edu.ufcg.embedded.ise.geneguis.ContainerException;
 import br.edu.ufcg.embedded.ise.geneguis.EntityType;
-import br.edu.ufcg.embedded.ise.geneguis.EnumPropertyType;
+import br.edu.ufcg.embedded.ise.geneguis.EnumType;
 import br.edu.ufcg.embedded.ise.geneguis.FieldType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyType;
 import br.edu.ufcg.embedded.ise.geneguis.RelationshipType;
@@ -111,7 +112,7 @@ public class JsonMetadata {
 		return getDomainModel().getEntity(rt.getTargetType().getName(), jn.asLong());
 	}
 
-	public static void parseProperty(JsonNode fv, Object newInstance, FieldType fieldType) {
+	public static void parseProperty(JsonNode fv, Object newInstance, FieldType fieldType) throws ContainerException {
 		BeanWrapper instanceWrapper = new BeanWrapperImpl(newInstance);
 		Object value = null;
 		PropertyType pt = (PropertyType) fieldType;
@@ -139,16 +140,18 @@ public class JsonMetadata {
 			break;
 
 		case enumeration:
-			value = deserializeEnumJson(fv, (EnumPropertyType) fieldType);
+			value = deserializeEnumJson(fv, (EnumType) fieldType);
 			break;
 		}
 		instanceWrapper.setPropertyValue(pt.getName(), value);
 	}
 
-	private static Object deserializeEnumJson(JsonNode fv, EnumPropertyType enumPropertyType) {
+	private static Object deserializeEnumJson(JsonNode fv, EnumType enumPropertyType)
+			throws ContainerException {
 		Object value = null;
+		Class<?> clz;
 		try {
-			Class<?> clz = Class.forName(enumPropertyType.getSource());
+			clz = Class.forName(enumPropertyType.getSource());
 			String jsonValue = fv.textValue();
 			for (int i = 0; i < clz.getEnumConstants().length; i++) {
 				if (jsonValue.equals(clz.getEnumConstants()[i].toString())) {
@@ -157,8 +160,9 @@ public class JsonMetadata {
 				}
 			}
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			throw new ContainerException("Enum source not found");
 		}
+
 		return value;
 	}
 
