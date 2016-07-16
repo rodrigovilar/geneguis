@@ -1,7 +1,5 @@
 package br.edu.ufcg.embedded.ise.geneguis;
 
-import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkId;
-import static br.edu.ufcg.embedded.ise.geneguis.Helper.checkTextById;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.clickEntityType;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.deployEntityType;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.openApp;
@@ -9,15 +7,12 @@ import static br.edu.ufcg.embedded.ise.geneguis.Helper.postEntity;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.rule;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.widget;
 
-import org.openqa.selenium.By;
-
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.ProfileEnum;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.User;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.UserRepository;
 
 public class T04e_PropertyMultipleValuesWidget extends WebBrowserTestCase {
-
 	@Override
 	void deployEntityTypes() throws Exception {
 		deployEntityType(User.class, UserRepository.class);
@@ -27,33 +22,52 @@ public class T04e_PropertyMultipleValuesWidget extends WebBrowserTestCase {
 	void addWidgets() {
 		widget("EntityTypeList", EntityTypeSet, new PortRest("entity_type_item", EntityType.name()));
 		widget("EntityTypeItem", EntityType, new PortRest("entity_type_page", EntityType.name()));
-		widget("EntityTitle2", EntityType, new PortRest("entity_list", EntityType.name()));
-		widget("EntityOrderedList", EntityType, new PortRest("entity_item", Entity.name()));
-		widget("EntityItem2", Entity, new PortRest("property_value", Property.name()));
-		widget("SimpleValue", Property);
-		widget("SimpleValue2", Property);
-		widget("SimpleValue3", Property);
-		widget("SimpleValue4", Property);
+		widget("TableHead", PropertyType);
+		widget("TableCell", Property);
+		
+		widget("CreateForm", EntityType, new PortRest("form_line", PropertyType.name()));
+		widget("FormLine", PropertyType);
+		
+		// O 'ComboBox' abre uma porta chamada 'combo_options'
+		widget("ComboBox", PropertyType, new PortRest("combo_options", PropertyType.name()));
+		// O 'ComboBoxOption' não abre porta
+		widget("ComboBoxOption", Property);
+		
+		widget("ListingTableCrud", EntityType, new PortRest("table_head", PropertyType.name()), new PortRest("table_line", Entity.name()), new PortRest("creation_form", EntityType.name()));
+		widget("TableLineCrud", Entity, new PortRest("line_cell", Property.name()), new PortRest("edition_form", Entity.name()));
+		widget("EditForm", Entity, new PortRest("edit_form_line", Property.name()));
+		widget("EditFormLine", Property);
 	}
 
 	@Override
 	void addRules() {
 		rule("root", "EntityTypeList", EntityTypeSet);
 		rule("entity_type_item", "EntityTypeItem", EntityType);
-		rule("entity_type_page", "EntityTitle2", EntityType);
-		rule("entity_list", "EntityOrderedList", EntityType);
-		rule("entity_item", "EntityItem2", Entity);
-		rule("property_value", "SimpleValue", Property);
+		rule("table_head", "TableHead", PropertyType);
+		rule("line_cell", "TableCell", Property);
+		rule("creation_form", "CreateForm", EntityType);
+		
+		rule("form_line", "FormLine", PropertyType);
+		
+		// Na porta form_line é cadastrado um ComboBox
+		rule("form_line", "ComboBox", PropertyType);
+		// Na porta combo_options é cadastrado um ComboBoxOption
+		rule("combo_options", "ComboBoxOption", Property);
+		
+		rule("entity_type_page", "ListingTableCrud", EntityType);
+		rule("table_line", "TableLineCrud", Entity);
+		rule("edition_form", "EditForm", Entity);
+		rule("edit_form_line", "EditFormLine", Property);
 	}
 
 	@Override
 	void steps() {
-		User u1 = postEntity(new User("user1", "login1", "psw1", ProfileEnum.MANAGER));
-		System.out.println(u1);
+		postEntity(new User("name1", "login1", "pws1", ProfileEnum.MANAGER));
+		postEntity(new User("name2", "login2", "pws2", ProfileEnum.TECHNICAL_SUPPORT));
+		postEntity(new User("name3", "login3", "pws3", ProfileEnum.SIMPLE_USER));
+
 		openApp();
 		clickEntityType(User.class);
-		checkId(By.id("olist_User"));
-
-		checkTextById("li_" + u1.getId(), "user1; login1; psw1; " + ProfileEnum.MANAGER + ";");
 	}
+
 }

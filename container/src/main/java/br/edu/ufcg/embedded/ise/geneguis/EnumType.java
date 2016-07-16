@@ -9,9 +9,8 @@ public class EnumType extends PropertyType {
 	private List<String> enumValues;
 
 	public EnumType() {
-		super();
 		this.enumValues = new ArrayList<String>();
-		this.setType(PropertyTypeType.enumeration);
+		setType(PropertyTypeType.enumeration);
 	}
 
 	public List<String> getEnumValues() {

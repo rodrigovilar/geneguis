@@ -405,6 +405,50 @@ class Filter.FieldTypeFilter extends Filter.AbstractFilter
           if (++current == size)
             callback(null, result)
             
+class Filter.EnumTypeFilter extends Filter.AbstractFilter
+  constructor: () ->
+    super("EnumType")
+
+  getRule: (port, params) ->
+    fieldType = params.fieldType
+    defaultScope = null
+    matchScope = null
+    matchType = null
+    for rule in RulesCache
+      if rule.portName == port
+        if (rule.type == "EnumType") && fieldType.kind == "Property" 
+          if rule.propertyTypeTypeLocator 
+            if @matchExpression(params.entityTypeName, rule.entityTypeLocator) && @matchExpression(fieldType.name, rule.propertyTypeLocator) && rule.propertyTypeTypeLocator == "enumeration" 
+              matchType = rule
+          else 
+            if rule.entityTypeLocator == "*" & rule.propertyTypeLocator == "*"
+              defaultScope = rule
+            else if @matchExpression(params.entityTypeName, rule.entityTypeLocator) && @matchExpression(fieldType.name, rule.propertyTypeLocator)
+              matchScope = rule
+    if matchType
+      return matchType
+    if matchScope
+      return matchScope
+    return defaultScope
+
+  forEachPort: (port, enumType, callback) ->
+    console.log @name + '.forEachPort: ' + port
+    result = ""
+    current = 0
+    
+    console.log '>>> Nome do enum is: ' + enumType.class
+    
+    size = enumType.options.length
+    for option in enumType.options
+      widget = @getWidget port, {entityTypeName: enumType.entity.name, fieldType: enumType}
+      option.enum = enumType
+      widget.template.render option, (err, html) ->
+        if err
+          throw err
+        result += html
+        if (++current == size)
+          callback(null, result)
+
 class Filter.PropertyFilter extends Filter.AbstractFilter
   constructor: () ->
     super("Property")
@@ -592,6 +636,11 @@ Filter.forEachField = (port, callback) ->
   context = `this.ctx`
   filter.forEachPort port, context, callback
 
+Filter.forEachEnumValue = (port, callback) ->
+  filter = new Filter.EnumTypeFilter
+  context = `this.ctx`
+  filter.forEachPort port, context, callback
+
 $ ->
 	env.addFilter('forEachEntityType', Filter.forEachEntityType, true)
 	env.addFilter('newPageForEntityType', Filter.renderNewPageForEntityType, false)
@@ -602,6 +651,7 @@ $ ->
 	env.addFilter('forEachProperty', Filter.forEachProperty, true)
 	env.addFilter('forEachFieldType', Filter.forEachFieldType, true)
 	env.addFilter('forEachField', Filter.forEachField, true)
+	env.addFilter('forEachEnumValue', Filter.forEachEnumValue, true)
 	env.addFilter('post', GUI.renderPostFilter, false)
 	env.addFilter('put', GUI.renderPutFilter, false)
 	env.addFilter('action', GUI.renderActionFilter, false)
