@@ -13,6 +13,7 @@ import javax.persistence.OneToOne;
 import br.edu.ufcg.embedded.ise.geneguis.Cardinality;
 import br.edu.ufcg.embedded.ise.geneguis.ContainerException;
 import br.edu.ufcg.embedded.ise.geneguis.EntityType;
+import br.edu.ufcg.embedded.ise.geneguis.EnumType;
 import br.edu.ufcg.embedded.ise.geneguis.FieldType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
@@ -21,7 +22,7 @@ import br.edu.ufcg.embedded.ise.geneguis.RelationshipType;
 public class MetadataUtil {
 
 	public static EntityType extractMetadata(Class<?> clazz) {
-//		MetadataUtil.checkJpaEntity(clazz);
+		// MetadataUtil.checkJpaEntity(clazz);
 
 		EntityType entityType = new EntityType();
 		entityType.setName(clazz.getSimpleName());
@@ -52,14 +53,43 @@ public class MetadataUtil {
 	}
 
 	public static PropertyType propertyTypeFromField(Field field) {
-		PropertyType propertyTypeRest = new PropertyType();
-		propertyTypeRest.setName(field.getName());
-		String fieldName = field.getType().getSimpleName();
-		propertyTypeRest.setType(propertyTypeTypeFromString(fieldName));
-		return propertyTypeRest;
+
+		if (!field.getType().isEnum()) {
+			PropertyType propertyTypeRest = new PropertyType();
+			propertyTypeRest.setName(field.getName());
+			propertyTypeRest.setType(propertyTypeTypeFromString(field.getType()));
+			return propertyTypeRest;
+		}
+
+		else {
+			EnumType enumPropertyTypeRest = new EnumType();
+			enumPropertyTypeRest.setName(field.getName());
+
+			Class<?> c;
+			try {
+				c = Class.forName(field.getType().getName());
+				enumPropertyTypeRest.setSource(field.getType().getName());
+
+				for (Object enumConstant : c.getEnumConstants()) {
+					enumPropertyTypeRest.getEnumValues().add(enumConstant.toString());
+				}
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			return enumPropertyTypeRest;
+		}
 	}
 
-	public static PropertyTypeType propertyTypeTypeFromString(String typeName) {
+	public static PropertyTypeType propertyTypeTypeFromString(Class<?> type) {
+		if (!type.isEnum()) {
+			return propertyTypeTypeFromString(type.getSimpleName());
+		} else {
+			return PropertyTypeType.enumeration;
+		}
+
+	}
+
+	private static PropertyTypeType propertyTypeTypeFromString(String typeName) {
 		if (typeName.equals("String")) {
 			return PropertyTypeType.string;
 		}

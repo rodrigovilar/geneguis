@@ -24,6 +24,7 @@ public abstract class WebBrowserTestCase {
 	static WidgetType Relationship = WidgetType.Relationship;
 	static WidgetType FieldType = WidgetType.FieldType;
 	static WidgetType Field = WidgetType.Field;
+	static WidgetType EnumerationValue = WidgetType.EnumerationValue;
 	
 	
 	/**

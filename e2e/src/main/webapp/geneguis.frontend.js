@@ -676,6 +676,80 @@
 
   })(Filter.AbstractFilter);
 
+  Filter.EnumTypeFilter = (function(_super) {
+
+    __extends(EnumTypeFilter, _super);
+
+    function EnumTypeFilter() {
+      EnumTypeFilter.__super__.constructor.call(this, "EnumerationValue");
+    }
+
+    EnumTypeFilter.prototype.getRule = function(port, params) {
+      var defaultScope, fieldType, matchScope, matchType, rule, _i, _len;
+      fieldType = params.fieldType;
+      defaultScope = null;
+      matchScope = null;
+      matchType = null;
+      for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
+        rule = RulesCache[_i];
+        if (rule.portName === port) {
+          if ((rule.type === "EnumerationValue") && fieldType.kind === "Property") {
+            if (rule.propertyTypeTypeLocator) {
+              if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator) && this.matchExpression(fieldType.name, rule.propertyTypeLocator) && rule.propertyTypeTypeLocator === "enumeration") {
+                matchType = rule;
+              }
+            } else {
+              if (rule.entityTypeLocator === "*" & rule.propertyTypeLocator === "*") {
+                defaultScope = rule;
+              } else if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator) && this.matchExpression(fieldType.name, rule.propertyTypeLocator)) {
+                matchScope = rule;
+              }
+            }
+          }
+        }
+      }
+      if (matchType) {
+        return matchType;
+      }
+      if (matchScope) {
+        return matchScope;
+      }
+      return defaultScope;
+    };
+
+    EnumTypeFilter.prototype.forEachPort = function(port, enumType, callback) {
+      var current, option, result, size, widget, _i, _len, _ref, _results;
+      console.log(this.name + '.forEachPort: ' + port);
+      result = "";
+      current = 0;
+      console.log('>>> Nome do enum is: ' + enumType["class"]);
+      size = enumType.options.length;
+      _ref = enumType.options;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        option = _ref[_i];
+        widget = this.getWidget(port, {
+          entityTypeName: enumType.entity.name,
+          fieldType: enumType
+        });
+        option["enum"] = enumType;
+        _results.push(widget.template.render(option, function(err, html) {
+          if (err) {
+            throw err;
+          }
+          result += html;
+          if (++current === size) {
+            return callback(null, result);
+          }
+        }));
+      }
+      return _results;
+    };
+
+    return EnumTypeFilter;
+
+  })(Filter.AbstractFilter);
+
   Filter.PropertyFilter = (function(_super) {
 
     __extends(PropertyFilter, _super);
@@ -1007,6 +1081,13 @@
     return filter.forEachPort(port, context, callback);
   };
 
+  Filter.forEachEnumValue = function(port, callback) {
+    var context, filter;
+    filter = new Filter.EnumTypeFilter;
+    context = this.ctx;
+    return filter.forEachPort(port, context, callback);
+  };
+
   $(function() {
     env.addFilter('forEachEntityType', Filter.forEachEntityType, true);
     env.addFilter('newPageForEntityType', Filter.renderNewPageForEntityType, false);
@@ -1017,6 +1098,7 @@
     env.addFilter('forEachProperty', Filter.forEachProperty, true);
     env.addFilter('forEachFieldType', Filter.forEachFieldType, true);
     env.addFilter('forEachField', Filter.forEachField, true);
+    env.addFilter('forEachEnumValue', Filter.forEachEnumValue, true);
     env.addFilter('post', GUI.renderPostFilter, false);
     env.addFilter('put', GUI.renderPutFilter, false);
     env.addFilter('action', GUI.renderActionFilter, false);

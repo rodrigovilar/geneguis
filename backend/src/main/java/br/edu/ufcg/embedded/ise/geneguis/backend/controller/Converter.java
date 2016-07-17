@@ -10,6 +10,7 @@ import javax.persistence.OneToOne;
 
 import br.edu.ufcg.embedded.ise.geneguis.Cardinality;
 import br.edu.ufcg.embedded.ise.geneguis.EntityType;
+import br.edu.ufcg.embedded.ise.geneguis.EnumType;
 import br.edu.ufcg.embedded.ise.geneguis.FieldKind;
 import br.edu.ufcg.embedded.ise.geneguis.FieldType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyType;
@@ -33,7 +34,15 @@ public class Converter {
 				FieldTypeRest rest = null;
 				
 				if (fieldType.getKind().equals(FieldKind.Property)) {
-					rest = toDomain((PropertyType) fieldType);
+					
+					PropertyType propertyType = (PropertyType) fieldType;
+					
+					if (PropertyTypeType.enumeration.equals(propertyType.getType())) {
+						rest = toRest((EnumType) propertyType);
+					} else {
+						rest = toRest(propertyType);
+					}
+					
 				} else {
 					rest = toDomain((RelationshipType) fieldType);					
 				}
@@ -54,10 +63,24 @@ public class Converter {
 		return rest;
 	}
 
-	private static PropertyTypeRest toDomain(PropertyType propertyType) {
+	private static PropertyTypeRest toRest(PropertyType propertyType) {
 		PropertyTypeRest rest = new PropertyTypeRest();
 		rest.setName(propertyType.getName());
 		rest.setType(propertyType.getType());
+		return rest;
+	}
+
+	private static PropertyTypeRest toRest(EnumType enumType) {
+		EnumTypeRest rest = new EnumTypeRest();
+		rest.setName(enumType.getName());
+		rest.setType(PropertyTypeType.enumeration);
+
+		for (String opt : enumType.getEnumValues()) {
+			OptionRest optionRest = new OptionRest();
+			optionRest.setValue(opt);
+			rest.getOptions().add(optionRest);
+		}
+
 		return rest;
 	}
 
