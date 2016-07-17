@@ -407,7 +407,7 @@ class Filter.FieldTypeFilter extends Filter.AbstractFilter
             
 class Filter.EnumTypeFilter extends Filter.AbstractFilter
   constructor: () ->
-    super("EnumType")
+    super("EnumerationValue")
 
   getRule: (port, params) ->
     fieldType = params.fieldType
@@ -416,7 +416,7 @@ class Filter.EnumTypeFilter extends Filter.AbstractFilter
     matchType = null
     for rule in RulesCache
       if rule.portName == port
-        if (rule.type == "EnumType") && fieldType.kind == "Property" 
+        if (rule.type == "EnumerationValue") && fieldType.kind == "Property" 
           if rule.propertyTypeTypeLocator 
             if @matchExpression(params.entityTypeName, rule.entityTypeLocator) && @matchExpression(fieldType.name, rule.propertyTypeLocator) && rule.propertyTypeTypeLocator == "enumeration" 
               matchType = rule

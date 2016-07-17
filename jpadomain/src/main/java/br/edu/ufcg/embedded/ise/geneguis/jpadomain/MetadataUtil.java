@@ -70,8 +70,8 @@ public class MetadataUtil {
 				c = Class.forName(field.getType().getName());
 				enumPropertyTypeRest.setSource(field.getType().getName());
 
-				for (Field f : c.getDeclaredFields()) {
-					enumPropertyTypeRest.getEnumValues().add(f.toString());
+				for (Object enumConstant : c.getEnumConstants()) {
+					enumPropertyTypeRest.getEnumValues().add(enumConstant.toString());
 				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();

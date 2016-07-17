@@ -681,7 +681,7 @@
     __extends(EnumTypeFilter, _super);
 
     function EnumTypeFilter() {
-      EnumTypeFilter.__super__.constructor.call(this, "EnumType");
+      EnumTypeFilter.__super__.constructor.call(this, "EnumerationValue");
     }
 
     EnumTypeFilter.prototype.getRule = function(port, params) {
@@ -693,7 +693,7 @@
       for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
         rule = RulesCache[_i];
         if (rule.portName === port) {
-          if ((rule.type === "EnumType") && fieldType.kind === "Property") {
+          if ((rule.type === "EnumerationValue") && fieldType.kind === "Property") {
             if (rule.propertyTypeTypeLocator) {
               if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator) && this.matchExpression(fieldType.name, rule.propertyTypeLocator) && rule.propertyTypeTypeLocator === "enumeration") {
                 matchType = rule;

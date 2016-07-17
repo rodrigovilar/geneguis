@@ -38,9 +38,9 @@ public class Converter {
 					PropertyType propertyType = (PropertyType) fieldType;
 					
 					if (PropertyTypeType.enumeration.equals(propertyType.getType())) {
-						rest = toDomain((EnumType) propertyType);
+						rest = toRest((EnumType) propertyType);
 					} else {
-						rest = toDomain(propertyType);
+						rest = toRest(propertyType);
 					}
 					
 				} else {
@@ -63,14 +63,14 @@ public class Converter {
 		return rest;
 	}
 
-	private static PropertyTypeRest toDomain(PropertyType propertyType) {
+	private static PropertyTypeRest toRest(PropertyType propertyType) {
 		PropertyTypeRest rest = new PropertyTypeRest();
 		rest.setName(propertyType.getName());
 		rest.setType(propertyType.getType());
 		return rest;
 	}
 
-	private static PropertyTypeRest toDomain(EnumType enumType) {
+	private static PropertyTypeRest toRest(EnumType enumType) {
 		EnumTypeRest rest = new EnumTypeRest();
 		rest.setName(enumType.getName());
 		rest.setType(PropertyTypeType.enumeration);

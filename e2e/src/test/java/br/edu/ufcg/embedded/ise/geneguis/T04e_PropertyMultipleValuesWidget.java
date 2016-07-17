@@ -24,17 +24,19 @@ public class T04e_PropertyMultipleValuesWidget extends WebBrowserTestCase {
 		widget("EntityTypeItem", EntityType, new PortRest("entity_type_page", EntityType.name()));
 		widget("TableHead", PropertyType);
 		widget("TableCell", Property);
-		
+
 		widget("CreateForm", EntityType, new PortRest("form_line", PropertyType.name()));
 		widget("FormLine", PropertyType);
-		
+
 		// O 'ComboBox' abre uma porta chamada 'combo_options'
-		widget("ComboBox", PropertyType, new PortRest("combo_options", PropertyType.name()));
+		widget("ComboBox", PropertyType, new PortRest("combo_options", EnumerationValue.name()));
 		// O 'ComboBoxOption' não abre porta
-		widget("ComboBoxOption", Property);
-		
-		widget("ListingTableCrud", EntityType, new PortRest("table_head", PropertyType.name()), new PortRest("table_line", Entity.name()), new PortRest("creation_form", EntityType.name()));
-		widget("TableLineCrud", Entity, new PortRest("line_cell", Property.name()), new PortRest("edition_form", Entity.name()));
+		widget("ComboBoxOption", EnumerationValue);
+
+		widget("ListingTableCrud", EntityType, new PortRest("table_head", PropertyType.name()),
+				new PortRest("table_line", Entity.name()), new PortRest("creation_form", EntityType.name()));
+		widget("TableLineCrud", Entity, new PortRest("line_cell", Property.name()),
+				new PortRest("edition_form", Entity.name()));
 		widget("EditForm", Entity, new PortRest("edit_form_line", Property.name()));
 		widget("EditFormLine", Property);
 	}
@@ -46,14 +48,13 @@ public class T04e_PropertyMultipleValuesWidget extends WebBrowserTestCase {
 		rule("table_head", "TableHead", PropertyType);
 		rule("line_cell", "TableCell", Property);
 		rule("creation_form", "CreateForm", EntityType);
-		
+
 		rule("form_line", "FormLine", PropertyType);
-		
 		// Na porta form_line é cadastrado um ComboBox
-		rule("form_line", "ComboBox", PropertyType);
+		rule("form_line", "User", "profile", "ComboBox", PropertyType);
 		// Na porta combo_options é cadastrado um ComboBoxOption
-		rule("combo_options", "ComboBoxOption", Property);
-		
+		rule("combo_options", "ComboBoxOption", EnumerationValue);
+
 		rule("entity_type_page", "ListingTableCrud", EntityType);
 		rule("table_line", "TableLineCrud", Entity);
 		rule("edition_form", "EditForm", Entity);
