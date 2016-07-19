@@ -43,8 +43,8 @@ public class T02_EntityTitleWithThreeWidgets extends WebBrowserTestCase {
 
 	@Override
 	void steps() {
-		Customer c1 = postEntity(new Customer());
-		Customer c2 = postEntity(new Customer());
+		Entity c1 = postEntity(new Customer());
+		Entity c2 = postEntity(new Customer());
 
 		openApp();
 		clickEntityType(Customer.class);

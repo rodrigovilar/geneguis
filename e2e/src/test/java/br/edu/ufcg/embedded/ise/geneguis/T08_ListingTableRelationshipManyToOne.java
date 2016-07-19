@@ -46,8 +46,10 @@ public class T08_ListingTableRelationshipManyToOne extends WebBrowserTestCase {
 
 	@Override
 	void steps() {
-		Client c1 = postEntity(new Client("client 1"));
-		Client c2 = postEntity(new Client("client 2"));
+		Client c1 = new Client("client 1");
+		postEntity(c1);
+		Client c2 = new Client("client 2");
+		postEntity(c2);
 		postEntity(c1.addDependent("dependent 1", 10));
 		postEntity(c1.addDependent("dependent 2", 11));
 		postEntity(c2.addDependent("dependent 3", 12));

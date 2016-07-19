@@ -53,10 +53,10 @@ public class T04d_PropertyWidgetScope extends WebBrowserTestCase {
 
 	@Override
 	void steps() {
-		CustomerDetails c1 = postEntity(new CustomerDetails("ssn1", "name1", 1.0));
-		CustomerDetails c2 = postEntity(new CustomerDetails("ssn2", "name2", 2.0));
-		Product p1 = postEntity(new Product("111", "name 1", "desc 1", 1.0));
-		Product p2 = postEntity(new Product("222", "name 2", "desc 2", 2.0));
+		Entity c1 = postEntity(new CustomerDetails("ssn1", "name1", 1.0));
+		Entity c2 = postEntity(new CustomerDetails("ssn2", "name2", 2.0));
+		Entity p1 = postEntity(new Product("111", "name 1", "desc 1", 1.0));
+		Entity p2 = postEntity(new Product("222", "name 2", "desc 2", 2.0));
 
 		openApp();
 		clickEntityType(CustomerDetails.class);
