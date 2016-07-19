@@ -1,7 +1,6 @@
 package br.edu.ufcg.embedded.ise.geneguis.backend.controller;
 
 import static br.edu.ufcg.embedded.ise.geneguis.backend.EntryPoint.getContainer;
-import static br.edu.ufcg.embedded.ise.geneguis.backend.EntryPoint.getDomainModel;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import br.edu.ufcg.embedded.ise.geneguis.Entity;
 import br.edu.ufcg.embedded.ise.geneguis.EntityType;
 
 @Controller
@@ -21,7 +21,7 @@ public class OperationalController {
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<String> getAll(@PathVariable String entityType) {
-		Object[] instances = (Object[]) getContainer().getEntities(entityType).toArray();
+		Object[] instances = getContainer().getEntities(entityType).toArray();
 		EntityType entityTypeObj = getContainer().getEntityType(entityType);
 		return new ResponseEntity<String>(JsonMetadata.renderInstances(instances, entityTypeObj).toString(), HttpStatus.OK);
 	}
@@ -31,42 +31,42 @@ public class OperationalController {
 	public ResponseEntity<String> create(@PathVariable String entityType, @RequestBody String input) throws Exception {
 		EntityType entityTypeObj = getContainer().getEntityType(entityType);
 
-		Object newInstance = getDomainModel().getClass(entityTypeObj.getName()).newInstance();
-		JsonMetadata.parseInstance(entityTypeObj, input, newInstance);
+		Entity entity = new Entity();
+		entity.setType(entityTypeObj);
+		JsonMetadata.parseInstance(input, entity);
 
-		newInstance = getContainer().saveEntity(entityType, newInstance);
-		return new ResponseEntity<String>(JsonMetadata.renderInstance(newInstance, entityTypeObj).toString(), HttpStatus.CREATED);
+		entity = getContainer().saveEntity(entityType, entity);
+		return new ResponseEntity<String>(JsonMetadata.renderInstance(entity, entityTypeObj).toString(), HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "{instanceId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<String> get(@PathVariable String entityType, @PathVariable Long instanceId) {
-		Object instance = getContainer().getEntity(entityType, instanceId);
+		Entity entity = getContainer().getEntity(entityType, instanceId);
 
-		if (instance == null) {
+		if (entity == null) {
 			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 		}
 
 		EntityType entityTypeObj = getContainer().getEntityType(entityType);
-		return new ResponseEntity<String>(JsonMetadata.renderInstance(instance, entityTypeObj).toString(), HttpStatus.OK);
+		return new ResponseEntity<String>(JsonMetadata.renderInstance(entity, entityTypeObj).toString(), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "{instanceId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<String> update(@PathVariable String entityType, @PathVariable Long instanceId,
 			@RequestBody String input) throws Exception {
-		Object instance = getContainer().getEntity(entityType, instanceId);
+		Entity entity = getContainer().getEntity(entityType, instanceId);
 
-		if (instance == null) {
+		if (entity == null) {
 			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 		}
 		
 		EntityType entityTypeObj = getContainer().getEntityType(entityType);
-		Object newInstance = getDomainModel().getClass(entityTypeObj.getName()).newInstance();
-		JsonMetadata.parseInstance(entityTypeObj, input, newInstance);
+		JsonMetadata.parseInstance(input, entity);
 
-		instance = getContainer().saveEntity(instanceId, entityType, newInstance);
-		return new ResponseEntity<String>(JsonMetadata.renderInstance(instance, entityTypeObj).toString(), HttpStatus.CREATED);
+		entity = getContainer().saveEntity(instanceId, entityType, entity);
+		return new ResponseEntity<String>(JsonMetadata.renderInstance(entity, entityTypeObj).toString(), HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "{instanceId}", method = RequestMethod.DELETE)

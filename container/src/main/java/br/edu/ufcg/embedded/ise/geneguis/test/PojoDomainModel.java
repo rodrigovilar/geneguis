@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.edu.ufcg.embedded.ise.geneguis.DomainModel;
+import br.edu.ufcg.embedded.ise.geneguis.Entity;
 import br.edu.ufcg.embedded.ise.geneguis.EntityType;
 
 public class PojoDomainModel implements DomainModel {
@@ -18,19 +19,19 @@ public class PojoDomainModel implements DomainModel {
 		return pojoEntityTypes;
 	}
 
-	public <T> List<T> getEntities(String resource) {
+	public List<Entity> getEntities(String resource) {
 		return null;
 	}
 
-	public <T> T saveEntity(String name, T instance) {
+	public Entity saveEntity(String name, Entity instance) {
 		return null;
 	}
 
-	public <T> T getEntity(String name, Long entityId) {
+	public Entity getEntity(String name, Long entityId) {
 		return null;
 	}
 
-	public <T> T saveEntity(Long entityId, String name, T newEntity) {
+	public Entity saveEntity(Long entityId, String name, Entity newEntity) {
 		// TODO Auto-generated method stub
 		return null;
 	}

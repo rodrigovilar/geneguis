@@ -6,7 +6,7 @@ import java.util.List;
 public class EnumTypeRest extends PropertyTypeRest {
 
 	private String source;
-	private List<OptionRest> options = new ArrayList<>();
+	private List<OptionRest> options = new ArrayList<OptionRest>();
 
 	public String getSource() {
 		return source;

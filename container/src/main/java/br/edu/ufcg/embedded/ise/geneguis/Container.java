@@ -28,20 +28,28 @@ public class Container {
 		return null;
 	}
 
-	public <T> List<T> getEntities(String resource) {
+	public List<Entity> getEntities(String resource) {
 		return model.getEntities(resource);
 	}
 
-	public <T> T saveEntity(String name, T instance) {
-		return model.saveEntity(name, instance);
+	public Entity saveEntity(String name, Entity instance) {
+		try {
+			return model.saveEntity(name, instance);
+		} catch (Exception e) {
+			throw new ContainerException(e);
+		}
 	}
 
-	public <T> T getEntity(String name, Long entityId) {
+	public Entity getEntity(String name, Long entityId) {
 		return model.getEntity(name, entityId);
 	}
 
-	public <T> T saveEntity(Long entityId, String name, T newEntity) {
-		return model.saveEntity(entityId, name, newEntity);
+	public Entity saveEntity(Long entityId, String name, Entity newEntity) {
+		try {
+			return model.saveEntity(entityId, name, newEntity);
+		} catch (Exception e) {
+			throw new ContainerException(e);
+		}
 	}
 
 	public boolean deleteEntity(String name, Long entityId) {

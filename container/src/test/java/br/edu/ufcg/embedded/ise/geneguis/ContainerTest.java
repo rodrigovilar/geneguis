@@ -55,19 +55,19 @@ class DomainWithoutEntityTypes implements DomainModel {
 		return new ArrayList<EntityType>();
 	}
 
-	public <T> List<T> getEntities(String resource) {
+	public List<Entity> getEntities(String resource) {
 		return null;
 	}
 
-	public <T> T saveEntity(String name, T instance) {
+	public Entity saveEntity(String name, Entity instance) {
 		return null;
 	}
 
-	public <T> T getEntity(String name, Long entityId) {
+	public Entity getEntity(String name, Long entityId) {
 		return null;
 	}
 
-	public <T> T saveEntity(Long entityId, String name, T newEntity) {
+	public Entity saveEntity(Long entityId, String name, Entity newEntity) {
 		return null;
 	}
 

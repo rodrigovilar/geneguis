@@ -32,6 +32,7 @@ import br.edu.ufcg.embedded.ise.geneguis.consolereader.BrowserConsoleReader;
 import br.edu.ufcg.embedded.ise.geneguis.consolereader.BrowserReaders;
 import br.edu.ufcg.embedded.ise.geneguis.consolereader.ChromeConsoleReader;
 import br.edu.ufcg.embedded.ise.geneguis.consolereader.FirefoxConsoleReader;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.DomainMetadata;
 import br.edu.ufcg.embedded.ise.geneguis.jpadomain.MetadataUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -149,7 +150,7 @@ public class Helper {
 		postJSON(SERVER_URL + "entities", rest);
 	}
 
-	static <T> T postEntity(T entity) {
+	static <T> Entity postEntity(T entity) {
 		return postEntity(SERVER_URL + "api/" + entity.getClass().getSimpleName(), entity);
 	}
 
@@ -180,14 +181,13 @@ public class Helper {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	static <T> T postEntity(String url, T data) {
+	static <T> Entity postEntity(String url, T data) {
 
 		EntityType entityType = MetadataUtil.extractMetadata(data.getClass());
 
 		try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
-
-			StringEntity input = new StringEntity(JsonMetadata.renderInstance(data, entityType).toString());
+			Entity entity = DomainMetadata.fromDomain(data, entityType);
+			StringEntity input = new StringEntity(JsonMetadata.renderInstance(entity, entityType).toString());
 			input.setContentType("application/json");
 			HttpPost request = new HttpPost(url);
 			request.setEntity(input);
@@ -196,10 +196,11 @@ public class Helper {
 			Assert.assertEquals(201, response.getStatusLine().getStatusCode());
 
 			String json = EntityUtils.toString(response.getEntity(), "UTF-8");
-
-			Object newInstance = data.getClass().newInstance();
-			JsonMetadata.parseInstance(entityType, json, newInstance);
-			return (T) newInstance;
+			
+			entity = new Entity();
+			entity.setType(entityType);
+			JsonMetadata.parseInstance(json, entity);
+			return entity;
 
 		} catch (Exception e) {
 			e.printStackTrace();

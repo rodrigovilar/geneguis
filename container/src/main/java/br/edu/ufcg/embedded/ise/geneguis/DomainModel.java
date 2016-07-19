@@ -6,13 +6,13 @@ public interface DomainModel {
 
 	Iterable<EntityType> getEntityTypes();
 
-	<T> List<T> getEntities(String resource);
+	<T> List<Entity> getEntities(String resource);
 
-	<T> T saveEntity(String name, T instance);
+	<T> Entity saveEntity(String name, Entity instance) throws Exception;
 
-	<T> T getEntity(String name, Long entityId);
+	<T> Entity getEntity(String name, Long entityId);
 
-	<T> T saveEntity(Long entityId, String name, T newEntity);
+	<T> Entity saveEntity(Long entityId, String name, Entity newEntity) throws Exception;
 
 	boolean deleteEntity(String name, Long entityId);
 

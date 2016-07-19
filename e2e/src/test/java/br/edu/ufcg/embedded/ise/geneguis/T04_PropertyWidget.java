@@ -44,8 +44,8 @@ public class T04_PropertyWidget extends WebBrowserTestCase {
 
 	@Override
 	void steps() {
-		CustomerDetails c1 = postEntity(new CustomerDetails("ssn1", "name1", 1.0));
-		CustomerDetails c2 = postEntity(new CustomerDetails("ssn2", "name2", 2.0));
+		Entity c1 = postEntity(new CustomerDetails("ssn1", "name1", 1.0));
+		Entity c2 = postEntity(new CustomerDetails("ssn2", "name2", 2.0));
 
 		openApp();
 		clickEntityType(CustomerDetails.class);

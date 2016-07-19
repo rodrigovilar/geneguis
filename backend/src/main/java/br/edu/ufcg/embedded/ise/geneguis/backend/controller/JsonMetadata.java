@@ -1,14 +1,8 @@
 package br.edu.ufcg.embedded.ise.geneguis.backend.controller;
 
-import static br.edu.ufcg.embedded.ise.geneguis.backend.EntryPoint.getDomainModel;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,8 +12,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import br.edu.ufcg.embedded.ise.geneguis.Cardinality;
 import br.edu.ufcg.embedded.ise.geneguis.ContainerException;
+import br.edu.ufcg.embedded.ise.geneguis.Entity;
 import br.edu.ufcg.embedded.ise.geneguis.EntityType;
-import br.edu.ufcg.embedded.ise.geneguis.EnumType;
+import br.edu.ufcg.embedded.ise.geneguis.Field;
 import br.edu.ufcg.embedded.ise.geneguis.FieldType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyType;
 import br.edu.ufcg.embedded.ise.geneguis.RelationshipType;
@@ -31,18 +26,17 @@ public class JsonMetadata {
 	public static ArrayNode renderInstances(Object[] instances, EntityType entityType) {
 		ArrayNode an = JsonNodeFactory.instance.arrayNode();
 
-		for (Object object : instances) {
-			ObjectNode on = renderInstance(object, entityType);
+		for (Object entity : instances) {
+			ObjectNode on = renderInstance((Entity) entity, entityType);
 			an.add(on);
 		}
 		return an;
 	}
 
-	public static void parseInstance(EntityType entityType, String input, Object newInstance) throws Exception {
-
+	public static void parseInstance(String input, Entity entity) throws Exception {
 		JsonNode on = mapper.readTree(input);
 
-		for (FieldType fieldType : entityType.getFieldTypes()) {
+		for (FieldType fieldType : entity.getType().getFieldTypes()) {
 
 			JsonNode fv = on.get(fieldType.getName());
 
@@ -50,12 +44,12 @@ public class JsonMetadata {
 
 				switch (fieldType.getKind()) {
 				case Property:
-					parseProperty(fv, newInstance, fieldType);
+					parseProperty(fv, entity, fieldType);
 
 					break;
 
 				case Relationship:
-					parseRelationship(newInstance, fieldType, fv);
+					parseRelationship(entity, fieldType, fv);
 
 					break;
 				}
@@ -64,58 +58,13 @@ public class JsonMetadata {
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void parseRelationship(Object newInstance, FieldType fieldType, JsonNode fv) throws Exception {
-		BeanWrapper instanceWrapper = new BeanWrapperImpl(newInstance);
-		RelationshipType rt = (RelationshipType) fieldType;
-		Object value = null;
-
-		if (rt.getTargetCardinality() == Cardinality.One) {
-			value = createWithId(fv, rt);
-			setReverse(newInstance, rt, value);
-
-		} else {
-			value = new ArrayList();
-
-			Iterator<JsonNode> elements = fv.elements();
-			while (elements.hasNext()) {
-				Object item = createWithId(elements.next(), rt);
-				((ArrayList) value).add(item);
-				setReverse(newInstance, rt, item);
-			}
-		}
-
-		instanceWrapper.setPropertyValue(rt.getName(), value);
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void setReverse(Object newInstance, RelationshipType rt, Object item) {
-		if (item == null) {
-			return;
-		}
-
-		BeanWrapper itemWrapper = new BeanWrapperImpl(item);
-
-		if (rt.getSourceCardinality() == Cardinality.One) {
-			itemWrapper.setPropertyValue(rt.getReverse(), newInstance);
-
-		} else {
-			Collection reverseValue = (Collection) itemWrapper.getPropertyValue(rt.getReverse());
-			reverseValue.add(newInstance);
-		}
-	}
-
-	public static Object createWithId(JsonNode jn, RelationshipType rt) throws Exception {
-		if (getDomainModel() == null) {
-			return null;
-		}
-		return getDomainModel().getEntity(rt.getTargetType().getName(), jn.asLong());
-	}
-
-	public static void parseProperty(JsonNode fv, Object newInstance, FieldType fieldType) throws ContainerException {
-		BeanWrapper instanceWrapper = new BeanWrapperImpl(newInstance);
+	public static void parseProperty(JsonNode fv, Entity entity, FieldType fieldType) throws ContainerException {
 		Object value = null;
 		PropertyType pt = (PropertyType) fieldType;
+		Field property = new Field();
+		property.setType(pt);
+		property.setEntity(entity);
+		entity.getFields().add(property);
 
 		switch (pt.getType()) {
 
@@ -140,54 +89,60 @@ public class JsonMetadata {
 			break;
 
 		case enumeration:
-			value = deserializeEnumJson(fv, (EnumType) fieldType);
+			value = fv.asText();
 			break;
 		}
-		instanceWrapper.setPropertyValue(pt.getName(), value);
+		property.setValue(value);
 	}
 
-	private static Object deserializeEnumJson(JsonNode fv, EnumType enumPropertyType)
-			throws ContainerException {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void parseRelationship(Entity entity, FieldType fieldType, JsonNode fv) throws Exception {
+		RelationshipType rt = (RelationshipType) fieldType;
 		Object value = null;
-		Class<?> clz;
-		try {
-			clz = Class.forName(enumPropertyType.getSource());
-			String jsonValue = fv.textValue();
-			for (int i = 0; i < clz.getEnumConstants().length; i++) {
-				if (jsonValue.equals(clz.getEnumConstants()[i].toString())) {
-					value = clz.getEnumConstants()[i];
-					break;
-				}
+
+		if (rt.getTargetCardinality() == Cardinality.One) {
+			value = fv.asLong();
+
+		} else {
+			value = new ArrayList();
+
+			Iterator<JsonNode> elements = fv.elements();
+			while (elements.hasNext()) {
+				Object item = elements.next().asLong();
+				((ArrayList) value).add(item);
 			}
-		} catch (ClassNotFoundException e) {
-			throw new ContainerException("Enum source not found");
 		}
 
-		return value;
+		Field field = new Field();
+		field.setType(rt);
+		field.setValue(value);
+		field.setEntity(entity);
+		entity.getFields().add(field);
 	}
 
-	public static ObjectNode renderInstance(Object instance, EntityType entityType) {
+	public static ObjectNode renderInstance(Entity entity, EntityType entityType) {
 		ObjectNode on = JsonNodeFactory.instance.objectNode();
-		BeanWrapper instanceWrapper = new BeanWrapperImpl(instance);
-
-		for (FieldType fieldType : entityType.getFieldTypes()) {
-
+		
+		for (Field field : entity.getFields()) {
+			FieldType fieldType = field.getType();
 			switch (fieldType.getKind()) {
 			case Property:
 				PropertyType propertyType = (PropertyType) fieldType;
-				renderPropertyType(on, instanceWrapper, propertyType);
+				renderPropertyType(on, field, propertyType);
 				break;
 			case Relationship:
 				RelationshipType relationshipType = (RelationshipType) fieldType;
-				renderRelationshipType(on, instanceWrapper, relationshipType);
+				renderRelationshipType(on, field, relationshipType);
 				break;
 			}
+			
 		}
-		return on;
-	}
 
-	public static void renderPropertyType(ObjectNode on, BeanWrapper instanceWrapper, PropertyType propertyType) {
-		Object propertyValue = instanceWrapper.getPropertyValue(propertyType.getName());
+		return on;
+	}	
+	
+	public static void renderPropertyType(ObjectNode on, Field field, PropertyType propertyType) {
+		Object propertyValue = field.getValue();
 
 		if (propertyValue != null) {
 			if (propertyValue instanceof Long) {
@@ -203,25 +158,22 @@ public class JsonMetadata {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static void renderRelationshipType(ObjectNode on, BeanWrapper instanceWrapper,
+	public static void renderRelationshipType(ObjectNode on, Field field,
 			RelationshipType relationshipType) {
-		switch (relationshipType.getTargetCardinality()) {
-		case One:
-			Object targetInstance = instanceWrapper.getPropertyValue(relationshipType.getName());
-			if (targetInstance != null) {
-				BeanWrapper targetInstanceWrapper = new BeanWrapperImpl(targetInstance);
-				on.put(relationshipType.getName(), (Long) targetInstanceWrapper.getPropertyValue("id"));
-			}
-			break;
-		case Many:
+		
+		if (field.getValue() == null) {
+			return;
+		}
+
+		if (Cardinality.One == relationshipType.getTargetCardinality()) {
+			on.put(relationshipType.getName(), (Long) field.getValue());
+		} else { //Many
 			ArrayNode an = JsonNodeFactory.instance.arrayNode();
-			List targetInstances = (List) instanceWrapper.getPropertyValue(relationshipType.getName());
-			for (Object targetInstance2 : targetInstances) {
-				BeanWrapper targetInstanceWrapper2 = new BeanWrapperImpl(targetInstance2);
-				an.add((Long) targetInstanceWrapper2.getPropertyValue("id"));
+			List targetInstances = (List) field.getValue();
+			for (Object targetInstance : targetInstances) {
+				an.add((Long) targetInstance);
 			}
 			on.set(relationshipType.getName(), an);
-			break;
 		}
 	}
 }
