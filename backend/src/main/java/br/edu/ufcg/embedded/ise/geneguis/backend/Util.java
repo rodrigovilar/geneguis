@@ -8,9 +8,13 @@ import java.util.Arrays;
 import org.springframework.context.ApplicationContext;
 
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
-import br.edu.ufcg.embedded.ise.geneguis.backend.service.PortService;
-import br.edu.ufcg.embedded.ise.geneguis.backend.service.RuleService;
-import br.edu.ufcg.embedded.ise.geneguis.backend.service.WidgetService;
+import br.edu.ufcg.embedded.ise.geneguis.WidgetType;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.Port;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.Rule;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.Widget;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.service.PortService;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.service.RuleService;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.service.WidgetService;
 
 public class Util {
 

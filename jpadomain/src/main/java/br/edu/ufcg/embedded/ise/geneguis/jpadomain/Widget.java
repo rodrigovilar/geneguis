@@ -1,4 +1,4 @@
-package br.edu.ufcg.embedded.ise.geneguis.backend;
+package br.edu.ufcg.embedded.ise.geneguis.jpadomain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,8 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotNull;
+
+import br.edu.ufcg.embedded.ise.geneguis.WidgetType;
 
 @Entity
 //@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "name", "version" }) )

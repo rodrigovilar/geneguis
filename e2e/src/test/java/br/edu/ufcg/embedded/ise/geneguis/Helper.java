@@ -22,7 +22,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import br.edu.ufcg.embedded.ise.geneguis.backend.EntryPoint;
-import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.EntityTypeDeployRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.JsonMetadata;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;

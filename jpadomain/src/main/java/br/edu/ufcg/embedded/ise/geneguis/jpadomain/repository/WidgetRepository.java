@@ -1,10 +1,10 @@
-package br.edu.ufcg.embedded.ise.geneguis.backend.repository;
+package br.edu.ufcg.embedded.ise.geneguis.jpadomain.repository;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import br.edu.ufcg.embedded.ise.geneguis.backend.Widget;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.Widget;
 
 public interface WidgetRepository extends JpaRepository<Widget, String>{
 

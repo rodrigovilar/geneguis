@@ -13,12 +13,17 @@ public class ContainerTest {
 
 	@Test(expected = ContainerException.class)
 	public void withoutDomainModel() {
-		new Container(null);
+		new Container(null, new DummyRenderingService());
+	}
+
+	@Test(expected = ContainerException.class)
+	public void withoutRenderingService() {
+		new Container(new DomainWithoutEntityTypes(), null);
 	}
 
 	@Test
 	public void withoutEntityTypes() {
-		Container container = new Container(new DomainWithoutEntityTypes());
+		Container container = new Container(new DomainWithoutEntityTypes(), new DummyRenderingService());
 
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
 		Helper.assertNoMoreEntityTypes(entityTypes);
@@ -28,7 +33,7 @@ public class ContainerTest {
 	public void withOneEntityType() {
 		PojoDomainModel domainModel = new PojoDomainModel();
 		Helper.addEntityType(domainModel, "Product");
-		Container container = new Container(domainModel);
+		Container container = new Container(domainModel, new DummyRenderingService());
 
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
 		Helper.assertNextEntityType(entityTypes, "Product");
@@ -40,7 +45,7 @@ public class ContainerTest {
 		PojoDomainModel domainModel = new PojoDomainModel();
 		Helper.addEntityType(domainModel, "Product");
 		Helper.addEntityType(domainModel, "Customer");
-		Container container = new Container(domainModel);
+		Container container = new Container(domainModel, new DummyRenderingService());
 
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
 		Helper.assertNextEntityType(entityTypes, "Product");
@@ -77,4 +82,32 @@ class DomainWithoutEntityTypes implements DomainModel {
 
 	public void clear() {
 	}
+}
+
+class DummyRenderingService implements RenderingService {
+
+	public Widget saveWidget(Widget widget) {
+		return null;
+	}
+
+	public List<Widget> getAll() {
+		return null;
+	}
+
+	public Widget getWidget(String widgetName) {
+		return null;
+	}
+
+	public List<Rule> getAllRulesByVersionGreaterThan(Long version) {
+		return null;
+	}
+
+	public List<Rule> getAllRules() {
+		return null;
+	}
+
+	public Rule saveRule(Rule rule) {
+		return null;
+	}
+	
 }

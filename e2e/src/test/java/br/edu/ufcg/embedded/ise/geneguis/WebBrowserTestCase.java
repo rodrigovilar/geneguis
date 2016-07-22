@@ -10,7 +10,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 
-import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 
 public abstract class WebBrowserTestCase {

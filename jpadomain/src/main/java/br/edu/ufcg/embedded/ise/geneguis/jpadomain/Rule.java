@@ -1,4 +1,4 @@
-package br.edu.ufcg.embedded.ise.geneguis.backend;
+package br.edu.ufcg.embedded.ise.geneguis.jpadomain;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -8,6 +8,7 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
+import br.edu.ufcg.embedded.ise.geneguis.WidgetType;
 
 @Entity
 public class Rule {

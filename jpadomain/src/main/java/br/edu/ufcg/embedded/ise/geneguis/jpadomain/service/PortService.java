@@ -1,10 +1,10 @@
-package br.edu.ufcg.embedded.ise.geneguis.backend.service;
+package br.edu.ufcg.embedded.ise.geneguis.jpadomain.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.edu.ufcg.embedded.ise.geneguis.backend.Port;
-import br.edu.ufcg.embedded.ise.geneguis.backend.repository.PortRepository;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.Port;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.repository.PortRepository;
 
 @Service
 public class PortService {

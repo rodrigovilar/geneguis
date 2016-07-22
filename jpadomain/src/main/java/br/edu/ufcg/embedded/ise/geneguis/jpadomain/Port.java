@@ -1,4 +1,4 @@
-package br.edu.ufcg.embedded.ise.geneguis.backend;
+package br.edu.ufcg.embedded.ise.geneguis.jpadomain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,8 @@ import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import br.edu.ufcg.embedded.ise.geneguis.WidgetType;
 
 @Entity
 public class Port {

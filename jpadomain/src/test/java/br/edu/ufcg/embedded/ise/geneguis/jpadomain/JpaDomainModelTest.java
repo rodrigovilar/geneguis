@@ -17,7 +17,8 @@ public class JpaDomainModelTest {
 	@Test
 	public void withoutEntitites() {
 		JpaDomainModel domainModel = new JpaDomainModel();
-		Container container = new Container(domainModel);
+		JpaRenderingService renderingService = new JpaRenderingService();
+		Container container = new Container(domainModel, renderingService);
 		
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
 		Helper.assertNoMoreEntityTypes(entityTypes);
@@ -33,7 +34,8 @@ public class JpaDomainModelTest {
 	public void withOneEntityType() {
 		JpaDomainModel domainModel = new JpaDomainModel();
 		domainModel.deployEntityType(Item.class, new RepositoryAdapter<Item,Long>());
-		Container container = new Container(domainModel);
+		JpaRenderingService renderingService = new JpaRenderingService();
+		Container container = new Container(domainModel, renderingService);
 
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
 		Helper.assertNextEntityType(entityTypes, "Item");
@@ -45,7 +47,8 @@ public class JpaDomainModelTest {
 		JpaDomainModel domainModel = new JpaDomainModel();
 		domainModel.deployEntityType(Item.class, new RepositoryAdapter<Item,Long>());
 		domainModel.deployEntityType(Product.class, new RepositoryAdapter<Product,Long>());
-		Container container = new Container(domainModel);
+		JpaRenderingService renderingService = new JpaRenderingService();
+		Container container = new Container(domainModel, renderingService);
 
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
 		Helper.assertNextEntityType(entityTypes, "Item");

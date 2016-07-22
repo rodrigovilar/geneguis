@@ -16,10 +16,10 @@ import br.edu.ufcg.embedded.ise.geneguis.FieldType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
 import br.edu.ufcg.embedded.ise.geneguis.RelationshipType;
-import br.edu.ufcg.embedded.ise.geneguis.backend.Port;
-import br.edu.ufcg.embedded.ise.geneguis.backend.Rule;
-import br.edu.ufcg.embedded.ise.geneguis.backend.Widget;
-import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
+import br.edu.ufcg.embedded.ise.geneguis.WidgetType;
+import br.edu.ufcg.embedded.ise.geneguis.Port;
+import br.edu.ufcg.embedded.ise.geneguis.Rule;
+import br.edu.ufcg.embedded.ise.geneguis.Widget;
 
 public class Converter {
 

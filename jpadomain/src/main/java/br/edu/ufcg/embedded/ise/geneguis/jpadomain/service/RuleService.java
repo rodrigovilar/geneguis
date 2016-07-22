@@ -1,4 +1,4 @@
-package br.edu.ufcg.embedded.ise.geneguis.backend.service;
+package br.edu.ufcg.embedded.ise.geneguis.jpadomain.service;
 
 import java.util.List;
 
@@ -9,11 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import br.edu.ufcg.embedded.ise.geneguis.backend.Port;
-import br.edu.ufcg.embedded.ise.geneguis.backend.Rule;
-import br.edu.ufcg.embedded.ise.geneguis.backend.Widget;
-import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
-import br.edu.ufcg.embedded.ise.geneguis.backend.repository.RuleRepository;
+import br.edu.ufcg.embedded.ise.geneguis.WidgetType;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.Port;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.Rule;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.Widget;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.repository.RuleRepository;
 
 @Service
 public class RuleService {

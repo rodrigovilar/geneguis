@@ -48,6 +48,7 @@ import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerRepository;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.Dependent;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.DependentRepository;
 import br.edu.ufcg.embedded.ise.geneguis.jpadomain.JpaDomainModel;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.JpaRenderingService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = EntryPoint.class)
@@ -71,7 +72,8 @@ public class DeployEntityTypeRestTest {
 		this.mockMvc = standaloneSetup(metadataController, operationalController).build();
 
 		EntryPoint.setDomainModel(new JpaDomainModel());
-		EntryPoint.setContainer(new Container(EntryPoint.getDomainModel()));
+		EntryPoint.setRenderingService(new JpaRenderingService());
+		EntryPoint.setContainer(new Container(EntryPoint.getDomainModel(), EntryPoint.getRenderingService()));
 	}
 
 

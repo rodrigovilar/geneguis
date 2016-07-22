@@ -11,7 +11,6 @@ import static br.edu.ufcg.embedded.ise.geneguis.Helper.widget;
 
 import org.openqa.selenium.By;
 
-import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.Customer;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerRepository;
