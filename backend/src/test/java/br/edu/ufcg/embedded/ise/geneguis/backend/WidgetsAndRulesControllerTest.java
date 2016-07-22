@@ -15,11 +15,11 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 import java.util.Map;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -36,13 +36,9 @@ import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetCodeRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetController;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetRest;
 import br.edu.ufcg.embedded.ise.geneguis.jpadomain.JpaDomainModel;
-import br.edu.ufcg.embedded.ise.geneguis.jpadomain.JpaRenderingService;
-import br.edu.ufcg.embedded.ise.geneguis.jpadomain.service.RuleService;
-import br.edu.ufcg.embedded.ise.geneguis.jpadomain.service.WidgetService;
 
-@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {EntryPoint.class, WidgetService.class, RuleService.class, JpaRenderingService.class})
+@SpringApplicationConfiguration(classes = EntryPoint.class)
 public class WidgetsAndRulesControllerTest {
 
 	MockMvc mockMvc;
@@ -51,14 +47,17 @@ public class WidgetsAndRulesControllerTest {
 	RulesController rulesController;
 	@InjectMocks
 	WidgetController widgetController;
+	@Autowired
+	JpaRenderingService renderingService;
+
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		this.mockMvc = standaloneSetup(rulesController, widgetController).build();
 		DomainModel model = new JpaDomainModel();
-		JpaRenderingService renderingService = new JpaRenderingService();
-		EntryPoint.setContainer(new Container(model, renderingService));
+		EntryPoint.setRenderingService(renderingService);
+		EntryPoint.setContainer(new Container(model, EntryPoint.getRenderingService()));
 	}
 
 	@DirtiesContext

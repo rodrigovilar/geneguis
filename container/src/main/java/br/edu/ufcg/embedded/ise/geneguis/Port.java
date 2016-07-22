@@ -9,7 +9,7 @@ public class Port {
 	
 	private WidgetType type;
 	
-	private List<Rule> rules;
+	private List<Rule> rules = new ArrayList<Rule>();
 	
 	private List<Widget> widgets = new ArrayList<Widget>();
 

@@ -67,27 +67,15 @@ public class Container {
 	}
 
 	public Widget saveWidget(Widget widget) {
-		try {
 			return renderingService.saveWidget(widget);
-		} catch (Exception e) {
-			throw new ContainerException(e);
-		}
 	}
 
 	public List<Widget> getAll() {
-		try {
 			return renderingService.getAll();
-		} catch (Exception e) {
-			throw new ContainerException(e);
-		}
 	}
 
 	public Widget getWidget(String widgetName) {
-		try {
 			return renderingService.getWidget(widgetName);
-		} catch (Exception e) {
-			throw new ContainerException(e);
-		}
 	}
 
 	public List<Rule> getAllRulesByVersionGreaterThan(Long version) {

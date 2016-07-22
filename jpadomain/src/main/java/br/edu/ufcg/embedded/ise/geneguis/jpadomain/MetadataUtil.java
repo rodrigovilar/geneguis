@@ -3,15 +3,12 @@ package br.edu.ufcg.embedded.ise.geneguis.jpadomain;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-
-import org.springframework.beans.BeanUtils;
 
 import br.edu.ufcg.embedded.ise.geneguis.Cardinality;
 import br.edu.ufcg.embedded.ise.geneguis.ContainerException;
@@ -164,17 +161,6 @@ public class MetadataUtil {
 		Entity entity = clazz.getAnnotation(Entity.class);
 		if (entity == null) {
 			throw new ContainerException("Deployed classes must be annotated with JPA @Entity");
-		}
-	}
-
-	public static <T> void copyCollection(List<?> sources,
-			List<T> targets, Class<T> targetClass) throws Exception {
-	
-		targets.clear();
-		for (Object source : sources) {
-			T target = targetClass.newInstance();
-			BeanUtils.copyProperties(source, target);
-			targets.add(target);
 		}
 	}
 

@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import br.edu.ufcg.embedded.ise.geneguis.backend.EntryPoint;
-import br.edu.ufcg.embedded.ise.geneguis.jpadomain.service.PortService;
-import br.edu.ufcg.embedded.ise.geneguis.jpadomain.service.RuleService;
-import br.edu.ufcg.embedded.ise.geneguis.jpadomain.service.WidgetService;
+import br.edu.ufcg.embedded.ise.geneguis.backend.service.PortService;
+import br.edu.ufcg.embedded.ise.geneguis.backend.service.RuleService;
+import br.edu.ufcg.embedded.ise.geneguis.backend.service.WidgetService;
 
 @Controller
 @RequestMapping(value = "/test")

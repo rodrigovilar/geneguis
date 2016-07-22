@@ -1,4 +1,4 @@
-package br.edu.ufcg.embedded.ise.geneguis.jpadomain;
+package br.edu.ufcg.embedded.ise.geneguis.backend;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;

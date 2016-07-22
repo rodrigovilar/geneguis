@@ -1,12 +1,16 @@
 package br.edu.ufcg.embedded.ise.geneguis.jpadomain;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.Test;
 
 import br.edu.ufcg.embedded.ise.geneguis.Container;
 import br.edu.ufcg.embedded.ise.geneguis.ContainerException;
 import br.edu.ufcg.embedded.ise.geneguis.EntityType;
+import br.edu.ufcg.embedded.ise.geneguis.RenderingService;
+import br.edu.ufcg.embedded.ise.geneguis.Rule;
+import br.edu.ufcg.embedded.ise.geneguis.Widget;
 import br.edu.ufcg.embedded.ise.geneguis.jpadomain.examples.Item;
 import br.edu.ufcg.embedded.ise.geneguis.jpadomain.examples.Product;
 import br.edu.ufcg.embedded.ise.geneguis.jpadomain.examples.Supplier;
@@ -17,7 +21,7 @@ public class JpaDomainModelTest {
 	@Test
 	public void withoutEntitites() {
 		JpaDomainModel domainModel = new JpaDomainModel();
-		JpaRenderingService renderingService = new JpaRenderingService();
+		RenderingService renderingService = new DummyRenderingService();
 		Container container = new Container(domainModel, renderingService);
 		
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
@@ -34,7 +38,7 @@ public class JpaDomainModelTest {
 	public void withOneEntityType() {
 		JpaDomainModel domainModel = new JpaDomainModel();
 		domainModel.deployEntityType(Item.class, new RepositoryAdapter<Item,Long>());
-		JpaRenderingService renderingService = new JpaRenderingService();
+		RenderingService renderingService = new DummyRenderingService();
 		Container container = new Container(domainModel, renderingService);
 
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
@@ -47,7 +51,7 @@ public class JpaDomainModelTest {
 		JpaDomainModel domainModel = new JpaDomainModel();
 		domainModel.deployEntityType(Item.class, new RepositoryAdapter<Item,Long>());
 		domainModel.deployEntityType(Product.class, new RepositoryAdapter<Product,Long>());
-		JpaRenderingService renderingService = new JpaRenderingService();
+		RenderingService renderingService = new DummyRenderingService();
 		Container container = new Container(domainModel, renderingService);
 
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
@@ -56,4 +60,32 @@ public class JpaDomainModelTest {
 		Helper.assertNoMoreEntityTypes(entityTypes);
 	}
 
+}
+
+class DummyRenderingService implements RenderingService {
+
+	public Widget saveWidget(Widget widget) {
+		return null;
+	}
+
+	public List<Widget> getAll() {
+		return null;
+	}
+
+	public Widget getWidget(String widgetName) {
+		return null;
+	}
+
+	public List<Rule> getAllRulesByVersionGreaterThan(Long version) {
+		return null;
+	}
+
+	public List<Rule> getAllRules() {
+		return null;
+	}
+
+	public Rule saveRule(Rule rule) {
+		return null;
+	}
+	
 }

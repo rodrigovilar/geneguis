@@ -4,11 +4,11 @@ import java.util.List;
 
 public interface RenderingService {
 
-	Widget saveWidget(Widget widget) throws Exception;
+	Widget saveWidget(Widget widget);
 
-	List<Widget> getAll() throws Exception;
+	List<Widget> getAll();
 
-	Widget getWidget(String widgetName) throws Exception;
+	Widget getWidget(String widgetName);
 
 	List<Rule> getAllRulesByVersionGreaterThan(Long version);
 

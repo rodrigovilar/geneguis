@@ -6,7 +6,6 @@ import org.springframework.context.ApplicationContext;
 
 import br.edu.ufcg.embedded.ise.geneguis.Container;
 import br.edu.ufcg.embedded.ise.geneguis.jpadomain.JpaDomainModel;
-import br.edu.ufcg.embedded.ise.geneguis.jpadomain.JpaRenderingService;
 
 @SpringBootApplication
 public class EntryPoint {
@@ -49,15 +48,11 @@ public class EntryPoint {
 	}
 
 	public static void main(String[] args) {
-		JpaRenderingService renderingService = new JpaRenderingService();
-		run(null, new JpaDomainModel(), renderingService, args);
+		run(null, new JpaDomainModel(), args);
 	}
 
-	public static void run(Class<?> app, JpaDomainModel domainModel, JpaRenderingService renderingService,
+	public static void run(Class<?> app, JpaDomainModel domainModel,
 			String[] args) {
-		container = new Container(domainModel, renderingService);
-		EntryPoint.domainModel = domainModel;
-		EntryPoint.renderingService = renderingService;
 
 		if (app == null) {
 			application = SpringApplication.run(EntryPoint.class);
@@ -66,5 +61,10 @@ public class EntryPoint {
 			Object[] apps = new Object[] { EntryPoint.class, app };
 			application = SpringApplication.run(apps, args);
 		}
+		
+		JpaRenderingService renderingService = application.getBean(JpaRenderingService.class);
+		container = new Container(domainModel, renderingService);
+		EntryPoint.domainModel = domainModel;
+		EntryPoint.renderingService = renderingService;
 	}
 }

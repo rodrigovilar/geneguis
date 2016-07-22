@@ -1,4 +1,4 @@
-package br.edu.ufcg.embedded.ise.geneguis.jpadomain;
+package br.edu.ufcg.embedded.ise.geneguis.backend;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class Port {
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "port")
-	private List<Rule> rules;
+	private List<Rule> rules = new ArrayList<Rule>();
 	
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.LAZY)
