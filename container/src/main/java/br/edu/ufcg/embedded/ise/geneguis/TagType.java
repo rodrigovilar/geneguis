@@ -1,6 +1,5 @@
 package br.edu.ufcg.embedded.ise.geneguis;
 
 public enum TagType {
-
-	Id
+	EntityType, PropertyType, RelationshipType, FieldType
 }

@@ -26,7 +26,7 @@ public class JpaDomainModel implements DomainModel {
 	private List<JpaRepository<?, ?>> repositories = new ArrayList<JpaRepository<?, ?>>();
 	private List<Class<?>> classes = new ArrayList<Class<?>>();
 
-	public Iterable<EntityType> getEntityTypes() {
+	public List<EntityType> getEntityTypes() {
 		return entityTypes;
 	}
 

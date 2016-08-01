@@ -15,7 +15,7 @@ public class PojoDomainModel implements DomainModel {
 		return pojoEntityTypes;
 	}
 
-	public Iterable<EntityType> getEntityTypes() {
+	public List<EntityType> getEntityTypes() {
 		return pojoEntityTypes;
 	}
 

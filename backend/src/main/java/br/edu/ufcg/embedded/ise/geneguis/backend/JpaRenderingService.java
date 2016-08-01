@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import br.edu.ufcg.embedded.ise.geneguis.Port;
 import br.edu.ufcg.embedded.ise.geneguis.RenderingService;
 import br.edu.ufcg.embedded.ise.geneguis.Rule;
+import br.edu.ufcg.embedded.ise.geneguis.TagRule;
 import br.edu.ufcg.embedded.ise.geneguis.Widget;
 import br.edu.ufcg.embedded.ise.geneguis.backend.service.RuleService;
+import br.edu.ufcg.embedded.ise.geneguis.backend.service.TagService;
 import br.edu.ufcg.embedded.ise.geneguis.backend.service.WidgetService;
 
 @Service
@@ -21,6 +23,9 @@ public class JpaRenderingService implements RenderingService {
 
 	@Autowired
 	private RuleService ruleService;
+
+	@Autowired
+	private TagService tagService;
 
 	public void setRuleService(RuleService service) {
 		this.ruleService = service;
@@ -88,7 +93,7 @@ public class JpaRenderingService implements RenderingService {
 		return jpaport;
 	}
 
-	public List<Widget> getAll(){
+	public List<Widget> getAllWidgets(){
 		List<Widget> widgets = new ArrayList<Widget>();
 
 		for (br.edu.ufcg.embedded.ise.geneguis.backend.Widget jpawidget : widgetService.getAll()) {
@@ -154,5 +159,43 @@ public class JpaRenderingService implements RenderingService {
 		jparule.setVersion(rule.getVersion());
 		jparule.setWidget(toJPA(rule.getWidget()));
 		return jparule;
+	}
+
+	@Override
+	public List<TagRule> getAllTagRules() {
+		List<TagRule> tags = new ArrayList<TagRule>();
+
+		for (br.edu.ufcg.embedded.ise.geneguis.backend.TagRule jpatag : tagService.getAllTags()) {
+			tags.add(fromJPA(jpatag));
+		}
+
+		return tags;
+	}
+
+	private TagRule fromJPA(br.edu.ufcg.embedded.ise.geneguis.backend.TagRule jpatag) {
+		TagRule tag = new TagRule();
+		tag.setEntityLocator(jpatag.getEntityLocator());
+		tag.setFieldLocator(jpatag.getFieldLocator());
+		tag.setId(jpatag.getId());
+		tag.setType(jpatag.getType());
+		tag.setValue(jpatag.getValue());
+		tag.setName(jpatag.getName());
+		return tag;
+	}
+
+	@Override
+	public TagRule saveTagRule(TagRule tag) {
+		return fromJPA(tagService.saveTagRule(toJPA(tag)));
+	}
+
+	private br.edu.ufcg.embedded.ise.geneguis.backend.TagRule toJPA(TagRule tag) {
+		br.edu.ufcg.embedded.ise.geneguis.backend.TagRule jpatag = new br.edu.ufcg.embedded.ise.geneguis.backend.TagRule();
+		jpatag.setEntityLocator(tag.getEntityLocator());
+		jpatag.setFieldLocator(tag.getFieldLocator());
+		jpatag.setId(tag.getId());
+		jpatag.setType(tag.getType());
+		jpatag.setValue(tag.getValue());
+		jpatag.setName(tag.getName());
+		return jpatag;
 	}
 }

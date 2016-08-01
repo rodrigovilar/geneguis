@@ -6,7 +6,7 @@ public interface RenderingService {
 
 	Widget saveWidget(Widget widget);
 
-	List<Widget> getAll();
+	List<Widget> getAllWidgets();
 
 	Widget getWidget(String widgetName);
 
@@ -15,5 +15,9 @@ public interface RenderingService {
 	List<Rule> getAllRules();
 
 	Rule saveRule(Rule rule);
+
+	List<TagRule> getAllTagRules();
+
+	TagRule saveTagRule(TagRule tag);
 
 }

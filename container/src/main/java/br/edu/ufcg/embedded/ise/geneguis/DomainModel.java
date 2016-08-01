@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface DomainModel {
 
-	Iterable<EntityType> getEntityTypes();
+	List<EntityType> getEntityTypes();
 
 	<T> List<Entity> getEntities(String resource);
 

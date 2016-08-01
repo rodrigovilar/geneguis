@@ -1,6 +1,6 @@
-package br.edu.ufcg.embedded.ise.geneguis;
+package br.edu.ufcg.embedded.ise.geneguis.backend.controller;
 
-public class Tag {
+public class TagRest {
 
 	private String name;
 	private String value;

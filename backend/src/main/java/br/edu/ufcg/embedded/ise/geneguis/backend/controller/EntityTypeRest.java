@@ -7,6 +7,7 @@ public class EntityTypeRest {
 
 	private String name;
 	private List<FieldTypeRest> fieldTypes = new ArrayList<FieldTypeRest>();
+	private List<TagRest> tags = new ArrayList<TagRest>();
 
 	public String getName() {
 		return name;
@@ -22,6 +23,14 @@ public class EntityTypeRest {
 
 	public void setFieldTypes(List<FieldTypeRest> fieldTypes) {
 		this.fieldTypes = fieldTypes;
+	}
+
+	public List<TagRest> getTags() {
+		return tags;
+	}
+
+	public void setTags(List<TagRest> tags) {
+		this.tags = tags;
 	}
 	
 

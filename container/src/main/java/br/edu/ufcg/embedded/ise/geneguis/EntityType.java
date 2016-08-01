@@ -40,5 +40,21 @@ public class EntityType {
 	public void setTags(List<Tag> tags) {
 		this.tags = tags;
 	}
+	
+	EntityType tag(String name, String value) {
+		Tag tag = new Tag();
+		tag.setName(name);
+		tag.setValue(value);
+		tags.add(tag);
+		return this;
+	}
+	
+	public EntityType propertyType(String name, PropertyTypeType type) {
+		PropertyType propertyType = new PropertyType();
+		propertyType.setName(name);
+		propertyType.setType(type);
+		fieldTypes.add(propertyType);
+		return this;
+	}
 
 }

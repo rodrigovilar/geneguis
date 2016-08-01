@@ -21,17 +21,10 @@ import br.edu.ufcg.embedded.ise.geneguis.Widget;
 @RequestMapping(value = "/widgets")
 public class WidgetController {
 
-//	@Autowired
-//	private WidgetService service;
-//
-//	public void setWidgetService(WidgetService service) {
-//		this.service = service;
-//	}
-
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<Widget>> getAll() {
-		return new ResponseEntity<List<Widget>>(getContainer().getAll(), HttpStatus.OK);
+		return new ResponseEntity<List<Widget>>(getContainer().getAllWidgets(), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "{widget}", method = RequestMethod.GET)
