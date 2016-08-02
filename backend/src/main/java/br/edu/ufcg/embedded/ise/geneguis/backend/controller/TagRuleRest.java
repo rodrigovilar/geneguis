@@ -9,6 +9,16 @@ public class TagRuleRest {
 	private String entityLocator;
 	private String fieldLocator;
 
+	public TagRuleRest() {
+	}
+
+	public TagRuleRest(String name, String type, String value, String entityLocator, String fieldLocator) {
+		this.name = name;
+		this.type = type;
+		this.value = value;
+		this.entityLocator = entityLocator;
+		this.fieldLocator = fieldLocator;
+	}
 
 	public Long getId() {
 		return id;

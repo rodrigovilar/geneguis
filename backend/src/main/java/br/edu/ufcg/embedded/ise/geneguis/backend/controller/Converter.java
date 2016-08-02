@@ -19,6 +19,7 @@ import br.edu.ufcg.embedded.ise.geneguis.RelationshipType;
 import br.edu.ufcg.embedded.ise.geneguis.WidgetType;
 import br.edu.ufcg.embedded.ise.geneguis.Port;
 import br.edu.ufcg.embedded.ise.geneguis.Rule;
+import br.edu.ufcg.embedded.ise.geneguis.Tag;
 import br.edu.ufcg.embedded.ise.geneguis.TagRule;
 import br.edu.ufcg.embedded.ise.geneguis.TagType;
 import br.edu.ufcg.embedded.ise.geneguis.Widget;
@@ -46,7 +47,11 @@ public class Converter {
 					}
 
 				} else {
-					rest = toDomain((RelationshipType) fieldType);
+					rest = toRest((RelationshipType) fieldType);
+				}
+				
+				for (Tag tag : domain.getTags()) {
+					rest.getTags().add(toRest(tag));
 				}
 
 				entityTypeRest.getFieldTypes().add(rest);
@@ -56,7 +61,7 @@ public class Converter {
 		return entityTypeRest;
 	}
 
-	private static RelationshipTypeRest toDomain(RelationshipType relationType) {
+	private static RelationshipTypeRest toRest(RelationshipType relationType) {
 		RelationshipTypeRest rest = new RelationshipTypeRest();
 		rest.setName(relationType.getName());
 		rest.setSourceCardinality(relationType.getSourceCardinality());
@@ -89,7 +94,19 @@ public class Converter {
 	private static EntityTypeRest toRest(EntityType domain) {
 		EntityTypeRest entityTypeRest = new EntityTypeRest();
 		entityTypeRest.setName(domain.getName());
+		
+		for (Tag tag : domain.getTags()) {
+			entityTypeRest.getTags().add(toRest(tag));
+		}
+		
 		return entityTypeRest;
+	}
+
+	private static TagRest toRest(Tag tag) {
+		TagRest tagRest = new TagRest();
+		tagRest.setName(tag.getName());
+		tagRest.setValue(tag.getValue());
+		return tagRest;
 	}
 
 	public static Widget toDomain(WidgetRest rest) {

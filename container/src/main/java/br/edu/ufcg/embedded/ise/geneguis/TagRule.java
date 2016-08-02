@@ -58,4 +58,10 @@ public class TagRule {
 		this.fieldLocator = fieldLocator;
 	}
 
+	@Override
+	public String toString() {
+		return "TagRule [id=" + id + ", name=" + name + ", type=" + type + ", value=" + value + ", entityLocator="
+				+ entityLocator + ", fieldLocator=" + fieldLocator + "]";
+	}
+
 }

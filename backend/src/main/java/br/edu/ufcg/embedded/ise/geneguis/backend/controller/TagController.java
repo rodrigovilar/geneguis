@@ -18,7 +18,7 @@ import br.edu.ufcg.embedded.ise.geneguis.TagRule;
 @RequestMapping(value = "/tags")
 public class TagController {
 
-	@RequestMapping(value = "rules", method = RequestMethod.POST)
+	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<TagRuleRest> createTag(@RequestBody String input) {
 		TagRuleRest rest = (TagRuleRest) new Gson().fromJson(input, TagRuleRest.class);

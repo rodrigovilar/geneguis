@@ -21,4 +21,9 @@ public class Tag {
 		this.value = value;
 	}
 
+	@Override
+	public String toString() {
+		return "Tag [name=" + name + ", value=" + value + "]";
+	}
+
 }

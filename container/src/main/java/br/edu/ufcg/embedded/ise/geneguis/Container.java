@@ -28,40 +28,44 @@ public class Container {
 	public List<EntityType> getEntityTypes() {
 		List<TagRule> tagRules = renderingService.getAllTagRules();
 
+		List<EntityType> result = new ArrayList<EntityType>();
 		List<EntityType> entityTypes = model.getEntityTypes();
 		for (EntityType entityType : entityTypes) {
-			processTags(entityType, tagRules);
+			result.add(processTags(entityType, tagRules));
 		}
 		
-		return entityTypes;
+		return result;
 	}
 
 	public EntityType getEntityType(String name) {
 		for (EntityType entityType : getEntityTypes()) {
 			if (entityType.getName().equals(name)) {
-				processTags(entityType, renderingService.getAllTagRules());
-				return entityType;
+				return processTags(entityType, renderingService.getAllTagRules());
 			}
 		}
 
 		return null;
 	}
 
-	private void processTags(EntityType entityType, List<TagRule> tagRules) {
-		entityType.setTags(new ArrayList<Tag>());
+	private EntityType processTags(EntityType entityType, List<TagRule> tagRules) {	
+		EntityType copy = new EntityType(entityType.getName());
+		copy.getTags().addAll(entityType.getTags());
+		copy.getFieldTypes().addAll(entityType.getFieldTypes());
 		
 		for (FieldType fieldType : entityType.getFieldTypes()) {
-			processTags(entityType, fieldType, tagRules);
+			processTags(copy, fieldType, tagRules);
 		}
 		
 		for (TagRule tagRule : tagRules) {
 			if (TagType.EntityType.equals(tagRule.getType())) {
 
-				if (match(entityType.getName(), tagRule.getEntityLocator())) {
-					entityType.tag(tagRule.getName(), tagRule.getValue());
+				if (match(copy.getName(), tagRule.getEntityLocator())) {
+					copy.tag(tagRule.getName(), tagRule.getValue());
 				}
 			}
 		}
+		
+		return copy;
 	}
 
 	private void processTags(EntityType entityType, FieldType fieldType, List<TagRule> tagRules) {
