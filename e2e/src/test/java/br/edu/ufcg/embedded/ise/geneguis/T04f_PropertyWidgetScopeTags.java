@@ -7,6 +7,8 @@ import static br.edu.ufcg.embedded.ise.geneguis.Helper.deployEntityType;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.openApp;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.postEntity;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.rule;
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.ruleByTag;
+import static br.edu.ufcg.embedded.ise.geneguis.Helper.tagRule;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.widget;
 
 import org.openqa.selenium.By;
@@ -17,7 +19,7 @@ import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerDetailsReposit
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.Product;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.ProductRepository;
 
-public class T04d_PropertyWidgetScope extends WebBrowserTestCase {
+public class T04f_PropertyWidgetScopeTags extends WebBrowserTestCase {
 
 	@Override
 	void deployEntityTypes() throws Exception {
@@ -36,19 +38,23 @@ public class T04d_PropertyWidgetScope extends WebBrowserTestCase {
 		widget("SimpleValue2", Property);
 		widget("SimpleValue3", Property);
 		widget("SimpleValue4", Property);
+		widget("SimpleValue5", Property);
 	}
 
 	@Override
 	void addRules() {
+		tagRule("Mask", TagType.FieldType, "000-00-0000", "CustomerDetails", "ssn");
+
 		rule("root", "EntityTypeList", EntityTypeSet);
 		rule("entity_type_item", "EntityTypeItem", EntityType);
 		rule("entity_type_page", "EntityTitle2", EntityType);
 		rule("entity_list", "EntityOrderedList", EntityType);
 		rule("entity_item", "EntityItem2", Entity);
 		rule("property_value", "SimpleValue", Property);
-		rule("property_value", "*", "*", PropertyTypeType.real, "SimpleValue2", Property);
-		rule("property_value", "Product", "*", PropertyTypeType.real, "SimpleValue3", Property);
-		rule("property_value", "*", "name", PropertyTypeType.string, "SimpleValue4", Property);
+		ruleByTag("property_value", "Mask", "SimpleValue5", Property);
+
+		rule("property_value", "Product", "description", "SimpleValue3", Property);
+		rule("property_value", "*", "na*", "SimpleValue4", Property);
 	}
 
 	@Override
@@ -62,13 +68,14 @@ public class T04d_PropertyWidgetScope extends WebBrowserTestCase {
 		clickEntityType(CustomerDetails.class);
 		checkId(By.id("olist_CustomerDetails"));
 
-		checkTextById("li_" + c1.getId(), "ssn1; [name1] 1,");
-		checkTextById("li_" + c2.getId(), "ssn2; [name2] 2,");
+		checkTextById("li_" + c1.getId(), "Mask(ssn1) [name1] 1;");
+		checkTextById("li_" + c2.getId(), "Mask(ssn2) [name2] 2;");
 
 		openApp();
 		clickEntityType(Product.class);
 		checkId(By.id("olist_Product"));
-		checkTextById("li_" + p1.getId(), "111; [name 1] desc 1; 1/");
-		checkTextById("li_" + p2.getId(), "222; [name 2] desc 2; 2/");
+		checkTextById("li_" + p1.getId(), "111; [name 1] desc 1/1;");
+		checkTextById("li_" + p2.getId(), "222; [name 2] desc 2/2;");
 	}
+
 }

@@ -376,7 +376,8 @@
       _results = [];
       while (item) {
         widget = this.getWidget(port, {
-          entityTypeName: item.name
+          entityTypeName: item.name,
+          tags: item.tags
         });
         widget.template.render(item, function(err, html) {
           if (err) {
@@ -426,7 +427,8 @@
       var view, widget;
       console.log(this.name + '.newPage: ' + port);
       widget = this.getWidget(port, {
-        entityTypeName: entityType.name
+        entityTypeName: entityType.name,
+        tags: entityType.tags
       });
       view = GUI.newPage(widget, entityTypeName);
       entity.entityType = entityType;
@@ -440,14 +442,21 @@
     };
 
     EntityFilter.prototype.getRule = function(port, params) {
-      var defaultScope, matchName, rule, _i, _len;
+      var defaultScope, matchName, matchTag, rule, tag, _i, _len;
       defaultScope = null;
+      matchTag = null;
       matchName = null;
       for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
         rule = RulesCache[_i];
+        tag = this.getTag(rule.tag, params.tags);
         if (rule.portName === port) {
           if (rule.entityTypeLocator === "*") {
             defaultScope = rule;
+          } else if (tag) {
+            matchTag = rule;
+            if (tag.value) {
+              params[tag.name + "Value"] = tag.value;
+            }
           } else if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator)) {
             matchName = rule;
           }
@@ -455,6 +464,9 @@
       }
       if (matchName) {
         return matchName;
+      }
+      if (matchTag) {
+        return matchTag;
       }
       return defaultScope;
     };
@@ -464,7 +476,8 @@
         _this = this;
       console.log(this.name + '.forEachPort: ' + port);
       widget = this.getWidget(port, {
-        entityTypeName: context.name
+        entityTypeName: context.name,
+        tags: context.tags
       });
       return API.getEntities(context.name, function(entities) {
         var current, entity, result, size, _i, _len, _results;
@@ -514,13 +527,15 @@
     }
 
     PropertyTypeFilter.prototype.getRule = function(port, params) {
-      var defaultScope, fieldType, matchScope, matchType, rule, _i, _len;
+      var defaultScope, fieldType, matchScope, matchTag, matchType, rule, tag, _i, _len;
       fieldType = params.fieldType;
       defaultScope = null;
+      matchTag = null;
       matchScope = null;
       matchType = null;
       for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
         rule = RulesCache[_i];
+        tag = this.getTag(rule.tag, params.tags);
         if (rule.portName === port) {
           if ((rule.type === "PropertyType" || rule.type === "Property") && fieldType.kind === "Property") {
             if (rule.propertyTypeTypeLocator) {
@@ -530,6 +545,11 @@
             } else {
               if (rule.entityTypeLocator === "*" & rule.propertyTypeLocator === "*") {
                 defaultScope = rule;
+              } else if (tag) {
+                matchTag = rule;
+                if (tag.value) {
+                  params[tag.name + "Value"] = tag.value;
+                }
               } else if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator) && this.matchExpression(fieldType.name, rule.propertyTypeLocator)) {
                 matchScope = rule;
               }
@@ -542,6 +562,9 @@
       }
       if (matchScope) {
         return matchScope;
+      }
+      if (matchTag) {
+        return matchTag;
       }
       return defaultScope;
     };
@@ -559,7 +582,8 @@
         if (fieldType.kind === "Property") {
           widget = this.getWidget(port, {
             entityTypeName: entityType.name,
-            fieldType: fieldType
+            fieldType: fieldType,
+            tags: fieldType.tags
           });
           fieldType.entity = entityType;
           _results.push(widget.template.render(fieldType, function(err, html) {
@@ -786,13 +810,15 @@
     }
 
     PropertyFilter.prototype.getRule = function(port, params) {
-      var defaultScope, fieldType, matchScope, matchType, rule, _i, _len;
+      var defaultScope, fieldType, matchScope, matchTag, matchType, rule, tag, _i, _len;
       fieldType = params.fieldType;
       defaultScope = null;
+      matchTag = null;
       matchScope = null;
       matchType = null;
       for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
         rule = RulesCache[_i];
+        tag = this.getTag(rule.tag, params.tags);
         if (rule.portName === port) {
           if ((rule.type === "PropertyType" || rule.type === "Property") && fieldType.kind === "Property") {
             if (rule.propertyTypeTypeLocator) {
@@ -802,6 +828,11 @@
             } else {
               if (rule.entityTypeLocator === "*" & rule.propertyTypeLocator === "*") {
                 defaultScope = rule;
+              } else if (tag) {
+                matchTag = rule;
+                if (tag.value) {
+                  params[tag.name + "Value"] = tag.value;
+                }
               } else if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator) && this.matchExpression(fieldType.name, rule.propertyTypeLocator)) {
                 matchScope = rule;
               }
@@ -814,6 +845,9 @@
       }
       if (matchScope) {
         return matchScope;
+      }
+      if (matchTag) {
+        return matchTag;
       }
       return defaultScope;
     };
@@ -831,7 +865,8 @@
         if (fieldType.kind === "Property") {
           widget = this.getWidget(port, {
             entityTypeName: entity.entityType.name,
-            fieldType: fieldType
+            fieldType: fieldType,
+            tags: fieldType.tags
           });
           fieldType.entity = entity.entityType;
           propertyValue = entity[fieldType.name];

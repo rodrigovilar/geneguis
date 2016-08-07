@@ -61,15 +61,15 @@ public class T04c_PropertyWidgetScope extends WebBrowserTestCase {
 		openApp();
 		clickEntityType(CustomerDetails.class);
 		checkId(By.id("olist_CustomerDetails"));
-		
+
 		checkTextById("li_" + c1.getId(), "ssn1, [name1] 1;");
-		checkTextById("li_" + c2.getId(), "ssn2, [name2] 2;");		
-		
+		checkTextById("li_" + c2.getId(), "ssn2, [name2] 2;");
+
 		openApp();
 		clickEntityType(Product.class);
-		checkId(By.id("olist_Product")); 
+		checkId(By.id("olist_Product"));
 		checkTextById("li_" + p1.getId(), "111; [name 1] desc 1/1;");
-		checkTextById("li_" + p2.getId(), "222; [name 2] desc 2/2;");		
+		checkTextById("li_" + p2.getId(), "222; [name 2] desc 2/2;");
 	}
 
 }
