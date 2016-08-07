@@ -12,6 +12,8 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import br.edu.ufcg.embedded.ise.geneguis.WidgetType;
+
 @Entity
 public class Port {
 
@@ -23,7 +25,7 @@ public class Port {
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "port")
-	private List<Rule> rules;
+	private List<Rule> rules = new ArrayList<Rule>();
 	
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.LAZY)

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
+import br.edu.ufcg.embedded.ise.geneguis.WidgetType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.RuleRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetCodeRest;

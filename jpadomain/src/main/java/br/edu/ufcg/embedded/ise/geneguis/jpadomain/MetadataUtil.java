@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -18,6 +19,7 @@ import br.edu.ufcg.embedded.ise.geneguis.FieldType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
 import br.edu.ufcg.embedded.ise.geneguis.RelationshipType;
+import br.edu.ufcg.embedded.ise.geneguis.Tag;
 
 public class MetadataUtil {
 
@@ -46,6 +48,14 @@ public class MetadataUtil {
 
 		if (isProperty(field)) {
 			fieldType = propertyTypeFromField(field);
+			
+			if (field.isAnnotationPresent(Id.class)) {
+				Tag tag = new Tag();
+				tag.setName("Primary key");
+				tag.setValue(field.getName());
+				entityType.getTags().add(tag);
+			}
+			
 		} else {
 			fieldType = relationshipTypeRestFromField(field);
 		}
@@ -54,14 +64,7 @@ public class MetadataUtil {
 
 	public static PropertyType propertyTypeFromField(Field field) {
 
-		if (!field.getType().isEnum()) {
-			PropertyType propertyTypeRest = new PropertyType();
-			propertyTypeRest.setName(field.getName());
-			propertyTypeRest.setType(propertyTypeTypeFromString(field.getType()));
-			return propertyTypeRest;
-		}
-
-		else {
+		if (field.getType().isEnum()) {
 			EnumType enumPropertyTypeRest = new EnumType();
 			enumPropertyTypeRest.setName(field.getName());
 
@@ -77,6 +80,12 @@ public class MetadataUtil {
 				e.printStackTrace();
 			}
 			return enumPropertyTypeRest;
+			
+		} else {
+			PropertyType propertyTypeRest = new PropertyType();
+			propertyTypeRest.setName(field.getName());
+			propertyTypeRest.setType(propertyTypeTypeFromString(field.getType()));
+			return propertyTypeRest;
 		}
 	}
 

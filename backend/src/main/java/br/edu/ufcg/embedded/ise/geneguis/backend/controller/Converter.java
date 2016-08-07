@@ -16,10 +16,13 @@ import br.edu.ufcg.embedded.ise.geneguis.FieldType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyType;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
 import br.edu.ufcg.embedded.ise.geneguis.RelationshipType;
-import br.edu.ufcg.embedded.ise.geneguis.backend.Port;
-import br.edu.ufcg.embedded.ise.geneguis.backend.Rule;
-import br.edu.ufcg.embedded.ise.geneguis.backend.Widget;
-import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
+import br.edu.ufcg.embedded.ise.geneguis.WidgetType;
+import br.edu.ufcg.embedded.ise.geneguis.Port;
+import br.edu.ufcg.embedded.ise.geneguis.Rule;
+import br.edu.ufcg.embedded.ise.geneguis.Tag;
+import br.edu.ufcg.embedded.ise.geneguis.TagRule;
+import br.edu.ufcg.embedded.ise.geneguis.TagType;
+import br.edu.ufcg.embedded.ise.geneguis.Widget;
 
 public class Converter {
 
@@ -28,33 +31,42 @@ public class Converter {
 			return null;
 
 		EntityTypeRest entityTypeRest = toRest(domain);
-		
+
 		if (withDetails) {
 			for (FieldType fieldType : domain.getFieldTypes()) {
 				FieldTypeRest rest = null;
-				
+
 				if (fieldType.getKind().equals(FieldKind.Property)) {
-					
+
 					PropertyType propertyType = (PropertyType) fieldType;
-					
+
 					if (PropertyTypeType.enumeration.equals(propertyType.getType())) {
 						rest = toRest((EnumType) propertyType);
 					} else {
 						rest = toRest(propertyType);
 					}
-					
+
 				} else {
-					rest = toDomain((RelationshipType) fieldType);					
+					rest = toRest((RelationshipType) fieldType);
 				}
 				
+				for (Tag tag : fieldType.getTags()) {
+					rest.getTags().add(toRest(tag));
+				}
+
 				entityTypeRest.getFieldTypes().add(rest);
 			}
+			
+			for (Tag tag : domain.getTags()) {
+				entityTypeRest.getTags().add(toRest(tag));
+			}
+
 		}
 
 		return entityTypeRest;
 	}
 
-	private static RelationshipTypeRest toDomain(RelationshipType relationType) {
+	private static RelationshipTypeRest toRest(RelationshipType relationType) {
 		RelationshipTypeRest rest = new RelationshipTypeRest();
 		rest.setName(relationType.getName());
 		rest.setSourceCardinality(relationType.getSourceCardinality());
@@ -87,7 +99,19 @@ public class Converter {
 	private static EntityTypeRest toRest(EntityType domain) {
 		EntityTypeRest entityTypeRest = new EntityTypeRest();
 		entityTypeRest.setName(domain.getName());
+		
+		for (Tag tag : domain.getTags()) {
+			entityTypeRest.getTags().add(toRest(tag));
+		}
+		
 		return entityTypeRest;
+	}
+
+	private static TagRest toRest(Tag tag) {
+		TagRest tagRest = new TagRest();
+		tagRest.setName(tag.getName());
+		tagRest.setValue(tag.getValue());
+		return tagRest;
 	}
 
 	public static Widget toDomain(WidgetRest rest) {
@@ -101,12 +125,12 @@ public class Converter {
 		if (rest.getType() != null) {
 			widget.setType(WidgetType.valueOf(rest.getType()));
 		}
-		
+
 		for (PortRest portRest : rest.getRequiredPorts()) {
 			Port port = toDomain(portRest);
 			widget.getRequiredPorts().add(port);
 		}
-		
+
 		return widget;
 	}
 
@@ -118,13 +142,12 @@ public class Converter {
 		rest.setName(widget.getName());
 		rest.setVersion(widget.getVersion());
 		rest.setType(widget.getType().name());
-		
+
 		for (Port port : widget.getRequiredPorts()) {
 			PortRest portRest = toRest(port);
 			rest.getRequiredPorts().add(portRest);
 		}
 
-		
 		return rest;
 	}
 
@@ -161,6 +184,7 @@ public class Converter {
 		ruleRest.setPropertyTypeLocator(rule.getPropertyTypeLocator());
 		ruleRest.setPropertyTypeTypeLocator(rule.getPropertyTypeTypeLocator());
 		ruleRest.setConfiguration(rule.getConfiguration());
+		ruleRest.setTag(rule.getTag());
 		return ruleRest;
 	}
 
@@ -180,6 +204,7 @@ public class Converter {
 		port.setName(ruleRest.getPortName());
 		rule.setPort(port);
 		rule.setType(WidgetType.valueOf(ruleRest.getType()));
+		rule.setTag(ruleRest.getTag());
 		return rule;
 	}
 
@@ -248,6 +273,28 @@ public class Converter {
 		relationshipTypeRest.setTargetType(targetType.getName());
 
 		return relationshipTypeRest;
+	}
+
+	public static TagRule toDomain(TagRuleRest rest) {
+		TagRule domain = new TagRule();
+		domain.setName(rest.getName());
+		domain.setEntityLocator(rest.getEntityLocator());
+		domain.setFieldLocator(rest.getFieldLocator());
+		domain.setId(rest.getId());
+		domain.setType(TagType.valueOf(rest.getType()));
+		domain.setValue(rest.getValue());
+		return domain;
+	}
+
+	public static TagRuleRest toRest(TagRule domain) {
+		TagRuleRest rest = new TagRuleRest();
+		rest.setName(domain.getName());
+		rest.setEntityLocator(domain.getEntityLocator());
+		rest.setFieldLocator(domain.getFieldLocator());
+		rest.setId(domain.getId());
+		rest.setType(domain.getType().name());
+		rest.setValue(domain.getValue());
+		return rest;
 	}
 
 }

@@ -1,20 +1,21 @@
 package br.edu.ufcg.embedded.ise.geneguis;
 
+import java.io.Serializable;
 import java.util.List;
 
 public interface DomainModel {
 
-	Iterable<EntityType> getEntityTypes();
+	List<EntityType> getEntityTypes();
 
 	<T> List<Entity> getEntities(String resource);
 
 	<T> Entity saveEntity(String name, Entity instance) throws Exception;
 
-	<T> Entity getEntity(String name, Long entityId);
+	<T,K extends Serializable> Entity getEntity(String name, K entityId);
 
-	<T> Entity saveEntity(Long entityId, String name, Entity newEntity) throws Exception;
+	<T,K extends Serializable> Entity saveEntity(K entityId, String name, Entity newEntity) throws Exception;
 
-	boolean deleteEntity(String name, Long entityId);
+	<K extends Serializable> boolean deleteEntity(String name, K entityId);
 
 	void clear();
 }

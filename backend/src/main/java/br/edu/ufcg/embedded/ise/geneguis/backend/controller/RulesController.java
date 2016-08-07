@@ -1,9 +1,10 @@
 package br.edu.ufcg.embedded.ise.geneguis.backend.controller;
 
+import static br.edu.ufcg.embedded.ise.geneguis.backend.EntryPoint.getContainer;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,28 +16,20 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 
-import br.edu.ufcg.embedded.ise.geneguis.backend.Rule;
-import br.edu.ufcg.embedded.ise.geneguis.backend.service.RuleService;
+import br.edu.ufcg.embedded.ise.geneguis.Rule;
 
 @Controller
 @RequestMapping(value = "/rules")
 public class RulesController {
-
-	@Autowired
-	private RuleService service;
-
-	public void setRuleService(RuleService rulesContainer) {
-		this.service = rulesContainer;
-	}
 
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<RuleRest>> getAll(@RequestParam(value = "version", defaultValue = "0") Long version) {
 		List<Rule> rules = null;
 		if (version != 0) {
-			rules = service.getAllRulesByVersionGreaterThan(version);
+			rules = getContainer().getAllRulesByVersionGreaterThan(version);
 		} else {
-			rules = service.getAllRules();
+			rules = getContainer().getAllRules();
 		}
 
 		List<RuleRest> rulesRest = new ArrayList<RuleRest>();
@@ -51,7 +44,7 @@ public class RulesController {
 	@ResponseBody
 	public ResponseEntity<RuleRest> createRule(@RequestBody String input) {
 		RuleRest ruleRest = new Gson().fromJson(input, RuleRest.class);
-		Rule rule = service.saveRule(Converter.toDomain(ruleRest));
+		Rule rule = getContainer().saveRule(Converter.toDomain(ruleRest));
 		return new ResponseEntity<RuleRest>(Converter.toRest(rule), HttpStatus.CREATED);
 	}
 }

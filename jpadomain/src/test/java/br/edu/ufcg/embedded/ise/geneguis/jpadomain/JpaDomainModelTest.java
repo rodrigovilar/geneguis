@@ -1,5 +1,7 @@
 package br.edu.ufcg.embedded.ise.geneguis.jpadomain;
 
+import static br.edu.ufcg.embedded.ise.geneguis.test.Helper.*;
+
 import java.util.Iterator;
 
 import org.junit.Test;
@@ -7,17 +9,20 @@ import org.junit.Test;
 import br.edu.ufcg.embedded.ise.geneguis.Container;
 import br.edu.ufcg.embedded.ise.geneguis.ContainerException;
 import br.edu.ufcg.embedded.ise.geneguis.EntityType;
+import br.edu.ufcg.embedded.ise.geneguis.RenderingService;
 import br.edu.ufcg.embedded.ise.geneguis.jpadomain.examples.Item;
 import br.edu.ufcg.embedded.ise.geneguis.jpadomain.examples.Product;
 import br.edu.ufcg.embedded.ise.geneguis.jpadomain.examples.Supplier;
 import br.edu.ufcg.embedded.ise.geneguis.test.Helper;
+import br.edu.ufcg.embedded.ise.geneguis.test.PojoRenderingService;
 
 public class JpaDomainModelTest {
 
 	@Test
 	public void withoutEntitites() {
 		JpaDomainModel domainModel = new JpaDomainModel();
-		Container container = new Container(domainModel);
+		RenderingService renderingService = new PojoRenderingService();
+		Container container = new Container(domainModel, renderingService);
 		
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
 		Helper.assertNoMoreEntityTypes(entityTypes);
@@ -33,10 +38,11 @@ public class JpaDomainModelTest {
 	public void withOneEntityType() {
 		JpaDomainModel domainModel = new JpaDomainModel();
 		domainModel.deployEntityType(Item.class, new RepositoryAdapter<Item,Long>());
-		Container container = new Container(domainModel);
+		RenderingService renderingService = new PojoRenderingService();
+		Container container = new Container(domainModel, renderingService);
 
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
-		Helper.assertNextEntityType(entityTypes, "Item");
+		Helper.assertNextEntityType(entityTypes, entityType("Item"));
 		Helper.assertNoMoreEntityTypes(entityTypes);
 	}
 
@@ -45,12 +51,14 @@ public class JpaDomainModelTest {
 		JpaDomainModel domainModel = new JpaDomainModel();
 		domainModel.deployEntityType(Item.class, new RepositoryAdapter<Item,Long>());
 		domainModel.deployEntityType(Product.class, new RepositoryAdapter<Product,Long>());
-		Container container = new Container(domainModel);
+		RenderingService renderingService = new PojoRenderingService();
+		Container container = new Container(domainModel, renderingService);
 
 		Iterator<EntityType> entityTypes = container.getEntityTypes().iterator();
-		Helper.assertNextEntityType(entityTypes, "Item");
-		Helper.assertNextEntityType(entityTypes, "Product");
+		Helper.assertNextEntityType(entityTypes, entityType("Item"));
+		Helper.assertNextEntityType(entityTypes, entityType("Product"));
 		Helper.assertNoMoreEntityTypes(entityTypes);
 	}
 
 }
+

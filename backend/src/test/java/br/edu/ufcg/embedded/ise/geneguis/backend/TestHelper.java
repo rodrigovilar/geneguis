@@ -82,10 +82,20 @@ public class TestHelper {
 		return mockMvc.perform(MockMvcRequestBuilders.delete(url).accept(MediaType.APPLICATION_JSON));
 	}
 
-	public static ResultMatcher entityType(final int position, final String name) {
+	public static ResultMatcher entityType(final int position, final String name, final String... tags) {
 		return new ResultMatcher() {
 			public void match(MvcResult result) throws Exception {
 				jsonPath("$[" + position + "].name").value(name).match(result);
+				
+				for (int i = 0; i < tags.length; i++) {
+					String[] tagArray = tags[i].split(";");					
+					String tagName = tagArray[0];
+					jsonPath("$[" + position + "].tags[" + i + "].name").value(tagName).match(result);
+					if (tagArray.length > 1) {
+						String tagValue = tagArray[1];
+						jsonPath("$[" + position + "].tags[" + i + "].value").value(tagValue).match(result);						
+					}
+				}
 			}
 		};
 	}
@@ -98,14 +108,24 @@ public class TestHelper {
 		};
 	}
 
-	public static ResultMatcher propertyType(final int propertyTypePosition, final String name,
-			final PropertyTypeType type) {
+	public static ResultMatcher propertyType(final int position, final String name,
+			final PropertyTypeType type, final String... tags) {
 		return new ResultMatcher() {
 			public void match(MvcResult result) throws Exception {
-				jsonPath("$.fieldTypes[" + propertyTypePosition + "].name").value(name).match(result);
-				jsonPath("$.fieldTypes[" + propertyTypePosition + "].type").value(type.name()).match(result);
-				jsonPath("$.fieldTypes[" + propertyTypePosition + "].kind").value(FieldKind.Property.name())
-						.match(result);
+				jsonPath("$.fieldTypes[" + position + "].name").value(name).match(result);
+				jsonPath("$.fieldTypes[" + position + "].type").value(type.name()).match(result);
+				jsonPath("$.fieldTypes[" + position + "].kind").value(FieldKind.Property.name()).match(result);
+				
+				for (int i = 0; i < tags.length; i++) {
+					String[] tagArray = tags[i].split(";");					
+					String tagName = tagArray[0];
+					jsonPath("$.fieldTypes[" + position + "].tags[" + i + "].name").value(tagName).match(result);
+					if (tagArray.length > 1) {
+						String tagValue = tagArray[1];
+						jsonPath("$.fieldTypes[" + position + "].tags[" + i + "].value").value(tagValue).match(result);						
+					}
+				}
+
 			}
 		};
 	}

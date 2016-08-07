@@ -13,11 +13,12 @@ public class EntryPoint {
 	private static ApplicationContext application;
 	private static Container container;
 	private static JpaDomainModel domainModel;
-	
+	private static JpaRenderingService renderingService;
+
 	public static Container getContainer() {
 		return container;
 	}
-	
+
 	public static JpaDomainModel getDomainModel() {
 		return domainModel;
 	}
@@ -25,7 +26,7 @@ public class EntryPoint {
 	public static void setApplication(ApplicationContext application) {
 		EntryPoint.application = application;
 	}
-	
+
 	public static void setContainer(Container container) {
 		EntryPoint.container = container;
 	}
@@ -33,7 +34,15 @@ public class EntryPoint {
 	public static void setDomainModel(JpaDomainModel domainModel) {
 		EntryPoint.domainModel = domainModel;
 	}
-	
+
+	public static void setRenderingService(JpaRenderingService renderingService) {
+		EntryPoint.renderingService = renderingService;
+	}
+
+	public static JpaRenderingService getRenderingService() {
+		return renderingService;
+	}
+
 	public static <T> T getBean(Class<T> type) {
 		return application.getBean(type);
 	}
@@ -42,16 +51,20 @@ public class EntryPoint {
 		run(null, new JpaDomainModel(), args);
 	}
 
-	public static void run(Class<?> app, JpaDomainModel domainModel, String[] args) {
-		container = new Container(domainModel);
-		EntryPoint.domainModel = domainModel;
-		
+	public static void run(Class<?> app, JpaDomainModel domainModel,
+			String[] args) {
+
 		if (app == null) {
 			application = SpringApplication.run(EntryPoint.class);
 
 		} else {
-			Object[] apps = new Object[] { EntryPoint.class, app };			
+			Object[] apps = new Object[] { EntryPoint.class, app };
 			application = SpringApplication.run(apps, args);
-		}		
+		}
+		
+		JpaRenderingService renderingService = application.getBean(JpaRenderingService.class);
+		container = new Container(domainModel, renderingService);
+		EntryPoint.domainModel = domainModel;
+		EntryPoint.renderingService = renderingService;
 	}
 }

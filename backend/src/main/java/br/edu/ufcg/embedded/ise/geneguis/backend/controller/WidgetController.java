@@ -1,8 +1,9 @@
 package br.edu.ufcg.embedded.ise.geneguis.backend.controller;
 
+import static br.edu.ufcg.embedded.ise.geneguis.backend.EntryPoint.getContainer;
+
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -14,30 +15,22 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 
-import br.edu.ufcg.embedded.ise.geneguis.backend.Widget;
-import br.edu.ufcg.embedded.ise.geneguis.backend.service.WidgetService;
+import br.edu.ufcg.embedded.ise.geneguis.Widget;
 
 @Controller
 @RequestMapping(value = "/widgets")
 public class WidgetController {
 
-	@Autowired
-	private WidgetService service;
-
-	public void setWidgetService(WidgetService service) {
-		this.service = service;
-	}
-
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<Widget>> getAll() {
-		return new ResponseEntity<List<Widget>>(service.getAll(), HttpStatus.OK);
+		return new ResponseEntity<List<Widget>>(getContainer().getAllWidgets(), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "{widget}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<Widget> getWidget(@PathVariable String widgetName) {
-		Widget widget = service.getWidget(widgetName);
+		Widget widget = getContainer().getWidget(widgetName);
 
 		if (widget == null) {
 			return new ResponseEntity<Widget>(HttpStatus.NOT_FOUND);
@@ -50,7 +43,8 @@ public class WidgetController {
 	@ResponseBody
 	public ResponseEntity<WidgetRest> createWidget(@RequestBody String input) {
 		WidgetRest widget = new Gson().fromJson(input, WidgetRest.class);
-		widget = Converter.toRest(service.saveWidget(Converter.toDomain(widget)));
+		Widget savedWidget = getContainer().saveWidget(Converter.toDomain(widget));
+		widget = Converter.toRest(savedWidget);
 		return new ResponseEntity<WidgetRest>(widget, HttpStatus.CREATED);
 	}
 
@@ -61,14 +55,14 @@ public class WidgetController {
 		codeRest.setName(widgetName);
 		codeRest.setCode(code);
 
-		Widget widget = service.getWidget(widgetName);
+		Widget widget = getContainer().getWidget(widgetName);
 
 		if (widget == null) {
 			return new ResponseEntity<WidgetCodeRest>(HttpStatus.NOT_FOUND);
 		}
 		
 		widget.setCode(code);
-		service.saveWidget(widget);
+		getContainer().saveWidget(widget);
 
 		return new ResponseEntity<WidgetCodeRest>(codeRest, HttpStatus.CREATED);
 	}

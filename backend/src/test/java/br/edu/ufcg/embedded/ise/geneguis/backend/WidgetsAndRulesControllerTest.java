@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 import java.util.Map;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,14 +26,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import br.edu.ufcg.embedded.ise.geneguis.Container;
+import br.edu.ufcg.embedded.ise.geneguis.DomainModel;
 import br.edu.ufcg.embedded.ise.geneguis.PropertyTypeType;
+import br.edu.ufcg.embedded.ise.geneguis.WidgetType;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.RuleRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.RulesController;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetCodeRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetController;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetRest;
-import br.edu.ufcg.embedded.ise.geneguis.backend.service.RuleService;
-import br.edu.ufcg.embedded.ise.geneguis.backend.service.WidgetService;
+import br.edu.ufcg.embedded.ise.geneguis.jpadomain.JpaDomainModel;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = EntryPoint.class)
@@ -42,28 +43,21 @@ public class WidgetsAndRulesControllerTest {
 
 	MockMvc mockMvc;
 
-	@Autowired
-	RuleService rulesService;
-	@Autowired
-	WidgetService widgetService;
-
 	@InjectMocks
 	RulesController rulesController;
 	@InjectMocks
 	WidgetController widgetController;
+	@Autowired
+	JpaRenderingService renderingService;
+
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		this.mockMvc = standaloneSetup(rulesController, widgetController).build();
-		rulesController.setRuleService(rulesService);
-		widgetController.setWidgetService(widgetService);
-	}
-
-	@After
-	public void tearDown() {
-		rulesService.clear();
-		widgetService.clear();
+		DomainModel model = new JpaDomainModel();
+		EntryPoint.setRenderingService(renderingService);
+		EntryPoint.setContainer(new Container(model, EntryPoint.getRenderingService()));
 	}
 
 	@DirtiesContext

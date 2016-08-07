@@ -64,6 +64,9 @@ public class DeployEntityTypeRestTest {
 
 	@Autowired
 	ApplicationContext applicationContext;
+	
+	@Autowired
+	JpaRenderingService renderingService;
 
 	@Before
 	public void setUp() {
@@ -71,7 +74,8 @@ public class DeployEntityTypeRestTest {
 		this.mockMvc = standaloneSetup(metadataController, operationalController).build();
 
 		EntryPoint.setDomainModel(new JpaDomainModel());
-		EntryPoint.setContainer(new Container(EntryPoint.getDomainModel()));
+		EntryPoint.setRenderingService(renderingService);
+		EntryPoint.setContainer(new Container(EntryPoint.getDomainModel(), EntryPoint.getRenderingService()));
 	}
 
 

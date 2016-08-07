@@ -6,7 +6,7 @@ import static br.edu.ufcg.embedded.ise.geneguis.Helper.openApp;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.rule;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.widget;
 import static br.edu.ufcg.embedded.ise.geneguis.Helper.clickEntityType;
-import br.edu.ufcg.embedded.ise.geneguis.backend.WidgetType;
+
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.Customer;
 import br.edu.ufcg.embedded.ise.geneguis.backend.examples.CustomerRepository;

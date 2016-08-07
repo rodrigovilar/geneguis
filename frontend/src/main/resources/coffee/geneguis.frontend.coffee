@@ -196,15 +196,24 @@ class Filter.AbstractFilter
   renderFor: (widget, context, callback) ->
   
   matchExpression: (text, expression) -> 
-    new RegExp("^" + expression.split("*").join(".*") + "$").test(text);
-
+    if expression
+      return new RegExp("^" + expression.split("*").join(".*") + "$").test(text);
+    return false
+    
+  getTag: (tag, tags) -> 
+    if tags
+      for t in tags
+        if t.name == tag
+          return t
+    return null
+    
 class Filter.EntityTypeFilter extends Filter.AbstractFilter
   constructor: () ->
     super("EntityType")
 
   newPage: (port, entityType) ->
     console.log @name + '.newPage: ' + port
-    widget = @getWidget port, {entityTypeName: entityType.name}
+    widget = @getWidget port, {entityTypeName: entityType.name, tags: entityType.tags}
     view = GUI.newPage widget, entityType.name 
     view.rootWidget.context = entityType
     view.rootWidget.template.render entityType, (err, html) ->
@@ -214,15 +223,23 @@ class Filter.EntityTypeFilter extends Filter.AbstractFilter
 
   getRule: (port, params) ->
     defaultScope = null
+    matchTag = null
     matchName = null
     for rule in RulesCache
+      tag = @getTag(rule.tag, params.tags)    
       if rule.portName == port
         if rule.entityTypeLocator == "*"
           defaultScope = rule
+        else if tag
+          matchTag = rule
+          if tag.value
+            params[tag.name + "Value"] = tag.value
         else if @matchExpression(params.entityTypeName, rule.entityTypeLocator)
           matchName = rule
     if matchName
       return matchName
+    if matchTag
+      return matchTag
     return defaultScope
 
   forEachPort: (port, context, callback) ->
@@ -232,7 +249,7 @@ class Filter.EntityTypeFilter extends Filter.AbstractFilter
     current = 0
     item = context[size]
     while item
-      widget = @getWidget port, {entityTypeName: item.name}
+      widget = @getWidget port, {entityTypeName: item.name, tags: item.tags}
       widget.template.render item, (err, html) ->
         if err
           throw err
@@ -258,7 +275,7 @@ class Filter.EntityFilter extends Filter.AbstractFilter
 
   newPage: (port, entityType, entity) ->
     console.log @name + '.newPage: ' + port
-    widget = @getWidget port, {entityTypeName: entityType.name}
+    widget = @getWidget port, {entityTypeName: entityType.name, tags: entityType.tags}
     view = GUI.newPage widget, entityTypeName 
     entity.entityType = entityType
     view.rootWidget.context = entity
@@ -269,20 +286,28 @@ class Filter.EntityFilter extends Filter.AbstractFilter
 
   getRule: (port, params) ->
     defaultScope = null
+    matchTag = null
     matchName = null
     for rule in RulesCache
+      tag = @getTag(rule.tag, params.tags)    
       if rule.portName == port
         if rule.entityTypeLocator == "*"
           defaultScope = rule
+        else if tag
+          matchTag = rule
+          if tag.value
+            params[tag.name + "Value"] = tag.value
         else if @matchExpression(params.entityTypeName, rule.entityTypeLocator)
           matchName = rule
     if matchName
       return matchName
+    if matchTag
+      return matchTag
     return defaultScope
 
   forEachPort: (port, context, callback) ->
     console.log @name + '.forEachPort: ' + port
-    widget = @getWidget port, {entityTypeName: context.name}
+    widget = @getWidget port, {entityTypeName: context.name, tags: context.tags}
     API.getEntities context.name, (entities) =>
       result = ""
       size = entities.length
@@ -310,9 +335,11 @@ class Filter.PropertyTypeFilter extends Filter.AbstractFilter
   getRule: (port, params) ->
     fieldType = params.fieldType
     defaultScope = null
+    matchTag = null
     matchScope = null
     matchType = null
     for rule in RulesCache
+      tag = @getTag(rule.tag, params.tags)    
       if rule.portName == port
         if (rule.type == "PropertyType" || rule.type == "Property") && fieldType.kind == "Property" 
           if rule.propertyTypeTypeLocator 
@@ -321,12 +348,18 @@ class Filter.PropertyTypeFilter extends Filter.AbstractFilter
           else 
             if rule.entityTypeLocator == "*" & rule.propertyTypeLocator == "*"
               defaultScope = rule
+            else if tag
+              matchTag = rule
+              if tag.value
+                params[tag.name + "Value"] = tag.value
             else if @matchExpression(params.entityTypeName, rule.entityTypeLocator) && @matchExpression(fieldType.name, rule.propertyTypeLocator)
               matchScope = rule
     if matchType
       return matchType
     if matchScope
       return matchScope
+    if matchTag
+      return matchTag
     return defaultScope
 
   forEachPort: (port, entityType, callback) ->
@@ -336,7 +369,7 @@ class Filter.PropertyTypeFilter extends Filter.AbstractFilter
     size = entityType.fieldTypes.length
     for fieldType in entityType.fieldTypes
       if fieldType.kind == "Property"
-        widget = @getWidget port, {entityTypeName: entityType.name, fieldType: fieldType}
+        widget = @getWidget port, {entityTypeName: entityType.name, fieldType: fieldType, tags: fieldType.tags}
         fieldType.entity = entityType
         widget.template.render fieldType, (err, html) ->
           if err
@@ -456,9 +489,11 @@ class Filter.PropertyFilter extends Filter.AbstractFilter
   getRule: (port, params) ->
     fieldType = params.fieldType
     defaultScope = null
+    matchTag = null
     matchScope = null
     matchType = null
     for rule in RulesCache
+      tag = @getTag(rule.tag, params.tags)    
       if rule.portName == port
         if (rule.type == "PropertyType" || rule.type == "Property") && fieldType.kind == "Property" 
           if rule.propertyTypeTypeLocator 
@@ -467,12 +502,18 @@ class Filter.PropertyFilter extends Filter.AbstractFilter
           else 
             if rule.entityTypeLocator == "*" & rule.propertyTypeLocator == "*"
               defaultScope = rule
+            else if tag
+              matchTag = rule
+              if tag.value
+                params[tag.name + "Value"] = tag.value
             else if @matchExpression(params.entityTypeName, rule.entityTypeLocator) && @matchExpression(fieldType.name, rule.propertyTypeLocator)
               matchScope = rule
     if matchType
       return matchType
     if matchScope
       return matchScope
+    if matchTag
+      return matchTag
     return defaultScope
 
 
@@ -483,7 +524,7 @@ class Filter.PropertyFilter extends Filter.AbstractFilter
     size = entity.entityType.fieldTypes.length
     for fieldType in entity.entityType.fieldTypes
       if fieldType.kind == "Property"
-        widget = @getWidget port, {entityTypeName: entity.entityType.name, fieldType: fieldType}
+        widget = @getWidget port, {entityTypeName: entity.entityType.name, fieldType: fieldType, tags: fieldType.tags}
         fieldType.entity = entity.entityType
         propertyValue = entity[fieldType.name]
         property = {value: propertyValue, type: fieldType}
