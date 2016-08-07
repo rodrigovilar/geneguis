@@ -1,5 +1,6 @@
 package br.edu.ufcg.embedded.ise.geneguis.backend;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -12,7 +13,10 @@ public class TagRule {
 	@GeneratedValue
 	@Id
 	private Long id;
+	
+	@Column(unique=true, nullable=false) 
 	private String name;
+	
 	private TagType type;
 	private String value;
 	private String entityLocator;

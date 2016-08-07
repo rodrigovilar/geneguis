@@ -16,22 +16,23 @@ public class Rule {
 	@GeneratedValue
 	@Id
 	private Long id;
-	
+
 	private Long version;
-	
+
 	@NotNull
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Port port;
-	
+
 	@NotNull
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Widget widget;
-	
+
 	private String entityTypeLocator;
 	private String propertyTypeLocator;
 	private PropertyTypeType propertyTypeTypeLocator;
 	private String configuration;
 	private WidgetType type;
+	private String tag;
 
 	public Long getId() {
 		return id;
@@ -104,5 +105,13 @@ public class Rule {
 	public void setType(WidgetType type) {
 		this.type = type;
 	}
-	
+
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+
 }

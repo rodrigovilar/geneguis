@@ -12,6 +12,7 @@ public class RuleRest {
 	private String type;
 	private String entityTypeLocator;
 	private String propertyTypeLocator;
+	private String tag;
 	private PropertyTypeType propertyTypeTypeLocator;
 	private String configuration;
 
@@ -114,5 +115,13 @@ public class RuleRest {
 
 	public void setConfiguration(String configuration) {
 		this.configuration = configuration;
+	}
+
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
 	}
 }

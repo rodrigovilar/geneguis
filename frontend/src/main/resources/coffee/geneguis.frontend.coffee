@@ -196,15 +196,24 @@ class Filter.AbstractFilter
   renderFor: (widget, context, callback) ->
   
   matchExpression: (text, expression) -> 
-    new RegExp("^" + expression.split("*").join(".*") + "$").test(text);
-
+    if expression
+      return new RegExp("^" + expression.split("*").join(".*") + "$").test(text);
+    return false
+    
+  getTag: (tag, tags) -> 
+    if tags
+      for t in tags
+        if t.name == tag
+          return t
+    return null
+    
 class Filter.EntityTypeFilter extends Filter.AbstractFilter
   constructor: () ->
     super("EntityType")
 
   newPage: (port, entityType) ->
     console.log @name + '.newPage: ' + port
-    widget = @getWidget port, {entityTypeName: entityType.name}
+    widget = @getWidget port, {entityTypeName: entityType.name, tags: entityType.tags}
     view = GUI.newPage widget, entityType.name 
     view.rootWidget.context = entityType
     view.rootWidget.template.render entityType, (err, html) ->
@@ -214,15 +223,23 @@ class Filter.EntityTypeFilter extends Filter.AbstractFilter
 
   getRule: (port, params) ->
     defaultScope = null
+    matchTag = null
     matchName = null
     for rule in RulesCache
+      tag = @getTag(rule.tag, params.tags)    
       if rule.portName == port
         if rule.entityTypeLocator == "*"
           defaultScope = rule
+        else if tag
+          matchTag = rule
+          if tag.value
+            params[tag.name + "Value"] = tag.value
         else if @matchExpression(params.entityTypeName, rule.entityTypeLocator)
           matchName = rule
     if matchName
       return matchName
+    if matchTag
+      return matchTag
     return defaultScope
 
   forEachPort: (port, context, callback) ->

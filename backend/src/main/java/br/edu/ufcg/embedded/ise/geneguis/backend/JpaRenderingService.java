@@ -129,6 +129,7 @@ public class JpaRenderingService implements RenderingService {
 		rule.setType(jparule.getType());
 		rule.setVersion(jparule.getVersion());
 		rule.setWidget(fromJPA(jparule.getWidget()));
+		rule.setTag(jparule.getTag());
 		return rule;
 	}
 
@@ -158,6 +159,7 @@ public class JpaRenderingService implements RenderingService {
 		jparule.setType(rule.getType());
 		jparule.setVersion(rule.getVersion());
 		jparule.setWidget(toJPA(rule.getWidget()));
+		jparule.setTag(rule.getTag());
 		return jparule;
 	}
 

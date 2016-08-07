@@ -288,7 +288,23 @@
     AbstractFilter.prototype.renderFor = function(widget, context, callback) {};
 
     AbstractFilter.prototype.matchExpression = function(text, expression) {
-      return new RegExp("^" + expression.split("*").join(".*") + "$").test(text);
+      if (expression) {
+        return new RegExp("^" + expression.split("*").join(".*") + "$").test(text);
+      }
+      return false;
+    };
+
+    AbstractFilter.prototype.getTag = function(tag, tags) {
+      var t, _i, _len;
+      if (tags) {
+        for (_i = 0, _len = tags.length; _i < _len; _i++) {
+          t = tags[_i];
+          if (t.name === tag) {
+            return t;
+          }
+        }
+      }
+      return null;
     };
 
     return AbstractFilter;
@@ -307,7 +323,8 @@
       var view, widget;
       console.log(this.name + '.newPage: ' + port);
       widget = this.getWidget(port, {
-        entityTypeName: entityType.name
+        entityTypeName: entityType.name,
+        tags: entityType.tags
       });
       view = GUI.newPage(widget, entityType.name);
       view.rootWidget.context = entityType;
@@ -320,14 +337,21 @@
     };
 
     EntityTypeFilter.prototype.getRule = function(port, params) {
-      var defaultScope, matchName, rule, _i, _len;
+      var defaultScope, matchName, matchTag, rule, tag, _i, _len;
       defaultScope = null;
+      matchTag = null;
       matchName = null;
       for (_i = 0, _len = RulesCache.length; _i < _len; _i++) {
         rule = RulesCache[_i];
+        tag = this.getTag(rule.tag, params.tags);
         if (rule.portName === port) {
           if (rule.entityTypeLocator === "*") {
             defaultScope = rule;
+          } else if (tag) {
+            matchTag = rule;
+            if (tag.value) {
+              params[tag.name + "Value"] = tag.value;
+            }
           } else if (this.matchExpression(params.entityTypeName, rule.entityTypeLocator)) {
             matchName = rule;
           }
@@ -335,6 +359,9 @@
       }
       if (matchName) {
         return matchName;
+      }
+      if (matchTag) {
+        return matchTag;
       }
       return defaultScope;
     };

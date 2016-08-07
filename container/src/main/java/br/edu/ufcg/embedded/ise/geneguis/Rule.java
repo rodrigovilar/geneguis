@@ -6,18 +6,19 @@ import br.edu.ufcg.embedded.ise.geneguis.WidgetType;
 public class Rule {
 
 	private Long id;
-	
+
 	private Long version;
-	
+
 	private Port port;
-	
+
 	private Widget widget;
-	
+
 	private String entityTypeLocator;
 	private String propertyTypeLocator;
 	private PropertyTypeType propertyTypeTypeLocator;
 	private String configuration;
 	private WidgetType type;
+	private String tag;
 
 	public Long getId() {
 		return id;
@@ -90,5 +91,13 @@ public class Rule {
 	public void setType(WidgetType type) {
 		this.type = type;
 	}
-	
+
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+
 }

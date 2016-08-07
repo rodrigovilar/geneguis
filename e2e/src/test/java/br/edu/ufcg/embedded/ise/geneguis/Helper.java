@@ -26,6 +26,7 @@ import br.edu.ufcg.embedded.ise.geneguis.backend.controller.EntityTypeDeployRest
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.JsonMetadata;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.PortRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.RuleRest;
+import br.edu.ufcg.embedded.ise.geneguis.backend.controller.TagRuleRest;
 import br.edu.ufcg.embedded.ise.geneguis.backend.controller.WidgetRest;
 import br.edu.ufcg.embedded.ise.geneguis.consolereader.BrowserConsoleReader;
 import br.edu.ufcg.embedded.ise.geneguis.consolereader.BrowserReaders;
@@ -137,9 +138,20 @@ public class Helper {
 		postJSON(SERVER_URL + "rules", rule);
 	}
 
+	static void ruleByTag(String port, String tag, String widget, WidgetType type) {
+		RuleRest rule = new RuleRest(widget, null, "*", null, port, type.name());
+		rule.setTag(tag);
+		postJSON(SERVER_URL + "rules", rule);
+	}
+
 	static void rule(String port, String widget, WidgetType type) {
 		RuleRest rule = new RuleRest(widget, "*", "*", null, port, type.name());
 		postJSON(SERVER_URL + "rules", rule);
+	}
+	
+	static void tagRule(String tagName, TagType tagType, String tagValue, String entityLocator, String fieldLocator) {
+		TagRuleRest tagRule = new TagRuleRest(tagName, tagType.name(), tagValue, entityLocator, fieldLocator);
+		postJSON(SERVER_URL + "tags", tagRule);
 	}
 
 	static <T> void deployEntityType(Class<T> entityType, Class<?> repository) throws Exception {

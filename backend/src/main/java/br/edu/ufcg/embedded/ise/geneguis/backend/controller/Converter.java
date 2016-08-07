@@ -50,12 +50,17 @@ public class Converter {
 					rest = toRest((RelationshipType) fieldType);
 				}
 				
-				for (Tag tag : domain.getTags()) {
+				for (Tag tag : fieldType.getTags()) {
 					rest.getTags().add(toRest(tag));
 				}
 
 				entityTypeRest.getFieldTypes().add(rest);
 			}
+			
+			for (Tag tag : domain.getTags()) {
+				entityTypeRest.getTags().add(toRest(tag));
+			}
+
 		}
 
 		return entityTypeRest;
@@ -179,6 +184,7 @@ public class Converter {
 		ruleRest.setPropertyTypeLocator(rule.getPropertyTypeLocator());
 		ruleRest.setPropertyTypeTypeLocator(rule.getPropertyTypeTypeLocator());
 		ruleRest.setConfiguration(rule.getConfiguration());
+		ruleRest.setTag(rule.getTag());
 		return ruleRest;
 	}
 
@@ -198,6 +204,7 @@ public class Converter {
 		port.setName(ruleRest.getPortName());
 		rule.setPort(port);
 		rule.setType(WidgetType.valueOf(ruleRest.getType()));
+		rule.setTag(ruleRest.getTag());
 		return rule;
 	}
 
