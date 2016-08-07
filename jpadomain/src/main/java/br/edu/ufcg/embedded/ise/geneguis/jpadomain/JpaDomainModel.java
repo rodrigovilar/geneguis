@@ -1,5 +1,6 @@
 package br.edu.ufcg.embedded.ise.geneguis.jpadomain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -175,24 +176,24 @@ public class JpaDomainModel implements DomainModel {
 		return getEntity(rt.getTargetType().getName(), id);
 	}
 
-	public <T> Entity getEntity(String entityType, Long entityId) {
+	public <T,K extends Serializable> Entity getEntity(String entityType, K entityId) {
 		int entityPosition = getEntityPosition(entityType);
-		JpaRepository<T, Long> repository = (JpaRepository<T, Long>) repositories.get(entityPosition);
+		JpaRepository<T, K> repository = (JpaRepository<T, K>) repositories.get(entityPosition);
 		
 		T t = repository.findOne(entityId);
 		return DomainMetadata.fromDomain(t, entityTypes.get(entityPosition));
 	}
 
-	public <T> Entity saveEntity(Long entityId, String entityType, Entity entity) throws Exception {
+	public <T,K extends Serializable> Entity saveEntity(K entityId, String entityType, Entity entity) throws Exception {
 		int entityPosition = getEntityPosition(entityType);
-		JpaRepository<T, ?> repository = (JpaRepository<T, ?>) repositories.get(entityPosition);
+		JpaRepository<T, K> repository = (JpaRepository<T, K>) repositories.get(entityPosition);
 		T domain = toDomain(entity);
 		return DomainMetadata.fromDomain(repository.saveAndFlush(domain), entity.getType());
 	}
 
-	public boolean deleteEntity(String entityType, Long entityId) {
+	public <K extends Serializable> boolean deleteEntity(String entityType, K entityId) {
 		int entityPosition = getEntityPosition(entityType);
-		JpaRepository<?, Long> repository = (JpaRepository<?, Long>) repositories.get(entityPosition);
+		JpaRepository<?, K> repository = (JpaRepository<?, K>) repositories.get(entityPosition);
 
 		if (!repository.exists(entityId)) {
 			return false;

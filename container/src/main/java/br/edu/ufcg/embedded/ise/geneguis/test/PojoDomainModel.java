@@ -1,5 +1,6 @@
 package br.edu.ufcg.embedded.ise.geneguis.test;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,21 +28,19 @@ public class PojoDomainModel implements DomainModel {
 		return null;
 	}
 
-	public Entity getEntity(String name, Long entityId) {
-		return null;
-	}
-
-	public Entity saveEntity(Long entityId, String name, Entity newEntity) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public boolean deleteEntity(String name, Long entityId) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	public void clear() {
 		
+	}
+
+	public <T, K extends Serializable> Entity getEntity(String name, K entityId) {
+		return null;
+	}
+
+	public <T, K extends Serializable> Entity saveEntity(K entityId, String name, Entity newEntity) throws Exception {
+		return null;
+	}
+
+	public <K extends Serializable> boolean deleteEntity(String name, K entityId) {
+		return false;
 	}
 }
