@@ -54,7 +54,7 @@ public class MetadataUtil {
 				tag.setName("Primary key");
 				tag.setValue(field.getName());
 				entityType.getTags().add(tag);
-			}
+			} 
 			
 		} else {
 			fieldType = relationshipTypeRestFromField(field);
@@ -65,21 +65,26 @@ public class MetadataUtil {
 	public static PropertyType propertyTypeFromField(Field field) {
 
 		if (field.getType().isEnum()) {
-			EnumType enumPropertyTypeRest = new EnumType();
-			enumPropertyTypeRest.setName(field.getName());
+			EnumType enumPropertyType = new EnumType();
+			enumPropertyType.setName(field.getName());
 
 			Class<?> c;
 			try {
 				c = Class.forName(field.getType().getName());
-				enumPropertyTypeRest.setSource(field.getType().getName());
+				enumPropertyType.setSource(field.getType().getName());
 
 				for (Object enumConstant : c.getEnumConstants()) {
-					enumPropertyTypeRest.getEnumValues().add(enumConstant.toString());
+					enumPropertyType.getEnumValues().add(enumConstant.toString());
 				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-			return enumPropertyTypeRest;
+			
+			Tag tag = new Tag();
+			tag.setName("Enum");
+			enumPropertyType.getTags().add(tag);				
+						
+			return enumPropertyType;
 			
 		} else {
 			PropertyType propertyTypeRest = new PropertyType();

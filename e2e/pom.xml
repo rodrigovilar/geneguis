@@ -30,13 +30,13 @@
 			<version>0.1</version>
 		</dependency>
 
-		<dependency>
+		<!-- dependency>
 			<groupId>net.jsourcerer.webdriver</groupId>
 			<artifactId>JSErrorCollector</artifactId>
 			<version>0.6</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- To install this dependency run: 
+		<To install this dependency run: 
 		  git clone https://github.com/mguillem/JSErrorCollector.git
 		  cd JSErrorCollector/ 
 		  mvn install -->
