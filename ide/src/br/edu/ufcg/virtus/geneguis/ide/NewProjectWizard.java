@@ -8,7 +8,10 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
 public class NewProjectWizard extends Wizard implements INewWizard {
 
-	private static final String WIZARD_NAME = "New Geneguis Project";
+	private static final String PAGE_NAME = "From Scratch Project Wizard"; //$NON-NLS-1$
+
+
+	private static final String WIZARD_NAME = "New Geneguis Project"; //$NON-NLS-1$
 	
 	
 	private WizardNewProjectCreationPage _pageOne;
@@ -32,9 +35,9 @@ public class NewProjectWizard extends Wizard implements INewWizard {
 	public void addPages() {
 		super.addPages();
 
-		_pageOne = new WizardNewProjectCreationPage("From Scratch Project Wizard");
-		_pageOne.setTitle("From Scratch Project");
-		_pageOne.setDescription("Create something from scratch.");
+		_pageOne = new WizardNewProjectCreationPage(PAGE_NAME);
+		_pageOne.setTitle(Messages.getString("NewProjectWizard.GeneguisNewProjectWizard_Geneguis_Project")); //$NON-NLS-1$
+		_pageOne.setDescription(Messages.getString("NewProjectWizard.GeneguisNewProjectWizard_Create_From_Scratch")); //$NON-NLS-1$
 
 		addPage(_pageOne);
 	}

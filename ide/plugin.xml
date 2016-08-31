@@ -6,6 +6,7 @@
       <wizard
             category="geneguis.IDE.category.wizards"
             class="br.edu.ufcg.virtus.geneguis.ide.NewProjectWizard"
+            icon="icons/browser.png"
             id="geneguis.IDE.new.project"
             name="Geneguis Project">
       </wizard>
@@ -18,7 +19,7 @@
          point="org.eclipse.ui.views">
       <view
             class="org.eclipse.ui.navigator.CommonNavigator"
-            icon="icons/logo16.png"
+            icon="icons/browser.png"
             id="geneguis.IDE.navigator"
             name="Geneguis Navigator">
       </view>
@@ -55,7 +56,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="br.edu.ufcg.virtus.geneguis.ide.Perspective"
-            icon="icons/logo16.png"
+            icon="icons/browser.png"
             id="geneguis.IDE.perspective"
             name="Geneguis Perspective">
       </perspective>
