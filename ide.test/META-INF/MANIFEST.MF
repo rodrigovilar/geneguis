@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: IDE_Test
+Bundle-SymbolicName: IDE_Test
+Bundle-Version: 0.1
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.junit;bundle-version="4.12.0",
+ org.eclipse.core.resources,
+ org.eclipse.equinox.registry
+Bundle-ClassPath: lib/dom4j-1.6.1.jar,
+ lib/jaxen-1.1-beta-6.jar,
+ .
+Import-Package: br.edu.ufcg.virtus.geneguis.ide.natures,
+ br.edu.ufcg.virtus.geneguis.ide.projects

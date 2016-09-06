@@ -6,6 +6,7 @@
       <wizard
             category="geneguis.IDE.category.wizards"
             class="br.edu.ufcg.virtus.geneguis.ide.NewProjectWizard"
+            finalPerspective="geneguis.IDE.perspective"
             icon="icons/browser.png"
             id="geneguis.IDE.new.project"
             name="Geneguis Project">
@@ -73,6 +74,15 @@
                relative="org.eclipse.ui.editorss">
          </view>
       </perspectiveExtension>
+   </extension>
+   <extension
+         id="geneguis.projectNature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="br.edu.ufcg.virtus.geneguis.ide.natures.ProjectNature">
+         </run>
+      </runtime>
    </extension>
 
 </plugin>
