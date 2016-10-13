@@ -18,8 +18,8 @@ import br.edu.ufcg.embedded.ise.geneguis.e2e.issue.Issue;
 import br.edu.ufcg.embedded.ise.geneguis.e2e.issue.IssueRepository;
 import br.edu.ufcg.embedded.ise.geneguis.e2e.issue.Project;
 import br.edu.ufcg.embedded.ise.geneguis.e2e.issue.ProjectRepository;
-import br.edu.ufcg.embedded.ise.geneguis.e2e.issue.User;
-import br.edu.ufcg.embedded.ise.geneguis.e2e.issue.UserRepository;
+import br.edu.ufcg.embedded.ise.geneguis.e2e.issue.ProjectUser;
+import br.edu.ufcg.embedded.ise.geneguis.e2e.issue.ProjectUserRepository;
 import br.edu.ufcg.embedded.ise.geneguis.e2e.issue.Version;
 import br.edu.ufcg.embedded.ise.geneguis.e2e.issue.VersionRepository;
 
@@ -29,7 +29,7 @@ public class T11_JiraIssue extends WebBrowserTestCase {
 	void deployEntityTypes() throws Exception {
 		deployEntityType(Project.class, ProjectRepository.class);
 		deployEntityType(Component.class, ComponentRepository.class);
-		deployEntityType(User.class, UserRepository.class);
+		deployEntityType(ProjectUser.class, ProjectUserRepository.class);
 		deployEntityType(Version.class, VersionRepository.class);
 		deployEntityType(Issue.class, IssueRepository.class);
 	}

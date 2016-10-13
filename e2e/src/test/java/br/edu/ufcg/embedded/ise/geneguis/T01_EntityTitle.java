@@ -18,7 +18,7 @@ public class T01_EntityTitle extends WebBrowserTestCase {
 	}
 	
 	void addWidgets() {
-		widget("EntityTypeList", WidgetType.EntityTypeSet,
+		widget("EntityTypeList", EntityTypeSet,
 				new PortRest("entity_type_item", EntityType.name()));
 		widget("EntityTypeItem", EntityType, new PortRest("entity_type_page", EntityType.name()));
 		widget("EntityTitle", EntityType);
